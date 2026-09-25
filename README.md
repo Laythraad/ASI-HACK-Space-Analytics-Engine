@@ -192,6 +192,10 @@ docs/
   MORS_REPORT.pdf        generated platform report (see §7)
   PROJECT_GUIDE.pdf      generated file-by-file project guide (see §7)
   COMMITTEE_GUIDE.pdf    printable Arabic edition of the committee guide
+presentation/
+  MORS_ASI-HACK-2026_Deck.pptx / .pdf  10-slide pitch deck (16:9)
+  MORS_Pitch_2min.mp4    2-minute pitch video (01:59, English voiceover)
+  frames/                1920x1080 UI captures used by both builders
 prompts/                 prompt templates used by the agents
 data/                    reference CSVs (light pollution, spectra, Kp, metrics)
 DEPLOYMENT.md            deployment & operations guide
@@ -210,6 +214,8 @@ python tools\audit_data.py      # confirm the data layer first -> AUDIT: PASS
 python tools\build_report.py    # writes docs\MORS_REPORT.pdf
 python tools\build_guide.py     # writes docs\PROJECT_GUIDE.pdf
 python tools\build_committee.py # writes 00_COMMITTEE_GUIDE.md + docs\COMMITTEE_GUIDE.pdf
+python tools\build_deck.py      # writes presentation\MORS_ASI-HACK-2026_Deck.pptx (+ .pdf/.png via PowerPoint)
+python tools\build_video.py     # writes presentation\MORS_Pitch_2min.mp4 (System.Speech TTS + ffmpeg)
 ```
 
 The report pulls live figures from `/api/report` and `/api/mors/*`, so it always

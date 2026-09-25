@@ -338,3 +338,6 @@ working tree so it always matches the files on disk.
 | Package manifest (size + SHA-256 per file) | `00_MANIFEST.txt` via `tools/build_zip.py` |
 | Run instructions | `README.md` + this file + `START.bat` |
 | API contract incl. MORS | `docs/API_CONTRACT.md` §15–20 |
+| Pitch deck, 10 slides (PPTX + PDF) | `presentation/MORS_ASI-HACK-2026_Deck.pptx` / `.pdf` via `tools/build_deck.py` |
+| Pitch video, 01:59 English voiceover | `presentation/MORS_Pitch_2min.mp4` via `tools/build_video.py` (System.Speech + ffmpeg) |
+| Launcher cards for deck + video | root `index.html` (site front door) |
