@@ -75,7 +75,7 @@
       lines.push("3- آخر تشغيل معتمد: " + (home.verdict || "CERTIFIED") + " بنتيجة " + numOf(home.score, 96) +
         "/100 من " + numOf(home.rows, 1711) + " صفراً و" + numOf(home.sources, 8) + " مصادر بيانات.");
       lines.push("الخلاصة: اكتب (المشكلات) أو (المصادر) أو (الفريق) أو (النتيجة) أو (التشغيل) للتفاصيل.");
-    } else if (has(["مشكل", "حلول", "حل ", "problem", "solution", "fix", "بطاقة"])) {
+    } else if (has(["مشاكل", "مشكل", "حلول", "حل", "fix", "problem", "solution", "bug", "أخطاء", "خطأ", "بطاقة", "issues"])) {
       lines.push(numOf(byP.High, probs.length ? 3 : 0) + " عالية الأولوية، و" +
         numOf(byP.Medium, 2) + " متوسطة — من " + numOf(S.problems.count, probs.length) + " بطاقة موثّقة");
       probs.slice(0, 3).forEach(function (p, i) {
@@ -163,10 +163,10 @@
       science: numOf(m.cme_count, 125) + " CME · Kp max " + numOf(m.kp_max, 4.33) + " · " + numOf(m.neo_count, 32) + " NEO",
       quantum: "entropy " + numOf(m.quantum_entropy_ebit, 1.0) + " ebit · classical NumPy simulation"
     };
-    var qKey = /quality|جودة|دقة/.test(q) ? "quality"
-      : /problem|مشكل|حل/.test(q) ? "problems"
-        : /science|فيزياء|شمس|cme|flare|kp/.test(q) ? "science"
-          : /quantum|كمي/.test(q) ? "quantum" : "report";
+      var qKey = /quality|جودة|دقة/.test(q) ? "quality"
+        : /problem|مشكل|مشاكل|حلول|حل/.test(q) ? "problems"
+          : /science|فيزياء|شمس|cme|flare|kp|طقس/.test(q) ? "science"
+            : /quantum|كمي/.test(q) ? "quantum" : "report";
     var parts = q.split(/\s+/).filter(Boolean).slice(0, 12).join(" ");
 
     return {

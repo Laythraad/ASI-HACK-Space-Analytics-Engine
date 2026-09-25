@@ -1,9 +1,9 @@
 ASI-HACK Space Analytics Engine - package manifest
 MORS Scientific Command Center
 
-generated : 2026-09-25 19:28 UTC
+generated : 2026-09-25 19:32 UTC
 files     : 43
-raw bytes : 1889282
+raw bytes : 1889371
 
 Verify with:  Get-FileHash -Algorithm SHA256 <file>
 Columns: SHA-256 | bytes | path | role
@@ -37,7 +37,7 @@ cb9d3406c32adb6558f9f0ca41e2dbe7b4fff3e4b1393dc541b5920465a8d4cc       3021  pro
 af770ae87693c06c2faddd37e1ef976b4b688e3e5fd6fb12c7a0d7456fcdfdb2       3659  prompts/deep_audit_prompt.txt               DEEP.AUDIT five-pass audit prompt
 91c9baf1bf266d765866c4deafbe0f863d7ca9f3bfc9967fae18766939e67665      48021  static/index.html                           Legacy ASI-HACK dashboard (single file, no build step)
 e231b278775aff36680f16e9024b3e3ae2ee568a3a5e9079066ab777df731ec1     176580  static/mors.html                            MORS Scientific Command Center SPA
-de2ab206004fefd9b75b88ee9ae89cf8a707fd3d108d342242264c147f775041      14441  static/offline_assistant.js                 
+fb4fd5a10edc217aca26150ee3a9254e14b0f82ae34114a204eaf28bc263c9a7      14530  static/offline_assistant.js                 
 2eee1d9395967145d5cc45039d47ce5cacd77a3f176c3cd0a9dfca82ca5094f8      49650  tools/audit_data.py                         Read-only data & analysis audit (225+ checks)
 55cfabc3ff6909a7733877926c55e95cbc1bd29050ca01669b3282e3a7ae7d4b      86226  tools/build_report.py                       Generates docs/MORS_REPORT.pdf
 f58dac6d42d06f6a8671a9ba3d1985bc01c09166e887b25a7b62e52db60cf11e      48478  tools/build_guide.py                        Generates this document (docs/PROJECT_GUIDE.pdf)
