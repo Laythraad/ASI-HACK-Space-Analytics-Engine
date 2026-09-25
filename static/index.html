@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Cairo:wght@400;600;700&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="offline_assistant.js"></script>
 <style>
 :root{
   --bg:#050515; --bg2:#0a0e1d; --panel:rgba(13,18,42,.74);
@@ -501,7 +502,7 @@ function markSnapshot(){
   if(window.__SNAP__) return; window.__SNAP__ = true;
   const d=document.createElement('div');
   d.id='snapBanner';
-  d.textContent='Static demo — no backend here, showing the JSON snapshot captured at build time (Run Pipeline / chat disabled).';
+  d.textContent='وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).';
   d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center';
   const add=()=>{ if(!document.getElementById('snapBanner') && document.body) document.body.appendChild(d); };
   document.addEventListener('DOMContentLoaded',add);
@@ -843,7 +844,23 @@ async function runPipeline(){
         }
       }catch(e){ clearInterval(pollTimer); btn.disabled=false; }
     },1000);
-  }catch(e){ btn.disabled=false; toast('تعذّر بدء المخطط: '+e.message,'err'); }
+  }catch(e){
+    if(window.OfflineAssistant){
+      markSnapshot();
+      toast('وضع العرض الثابت — إعادة تشغيل النتائج المعتمدة من اللقطة','ok');
+      await window.OfflineAssistant.pipeline((pct,label,note)=>{
+        $('#progFill').style.width=pct+'%';
+        $('#progLabel').textContent=`${label} · ${note} · ${pct}%`;
+      });
+      btn.disabled=false;
+      $('#progFill').style.width='100%';
+      $('#progLabel').textContent='✅ completed — certified report ready (snapshot)';
+      toast('اكتمل المخطط والتقرير معتمد ✅','ok');
+      await loadReport(); await loadCharts();
+      return;
+    }
+    btn.disabled=false; toast('تعذّر بدء المخطط: '+e.message,'err');
+  }
 }
 
 /* ---------------- Ai.Mors chat ---------------- */
@@ -901,6 +918,22 @@ async function sendChat(message){
       c.textContent='verified: '+r.trace.join(', '); log.appendChild(c);
     }
   }catch(e){
+    if(window.OfflineAssistant){
+      try{
+        markSnapshot();
+        const off = await window.OfflineAssistant.reply(message);
+        log.appendChild(renderReply(off.reply));
+        if(off.trace && off.trace.length){
+          const c=document.createElement('span'); c.className='cite';
+          c.textContent='verified: '+off.trace.join(', '); log.appendChild(c);
+        }
+      }catch(e2){
+        const err = document.createElement('div'); err.className='msg bot';
+        err.innerHTML = '<span class="greeting">أهلاً وسهلاً بكم في الفضاء</span>تعذّر الوصول إلى لقطة البيانات.';
+        log.appendChild(err);
+      }
+      return;
+    }
     const err = document.createElement('div'); err.className='msg bot';
     err.innerHTML = '<span class="greeting">أهلاً وسهلاً بكم في الفضاء</span>'+
       (e.status===503 ? 'شغّل المخطط أولاً لتتوفر قاعدة المعتمدة.' : 'خطأ: '+e.message);

@@ -6,6 +6,7 @@
 <meta name="description" content="MORS - Scientific Command Center &amp; Research Platform. Data - Space - Quantum">
 <title>MORS · Scientific Command Center</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="offline_assistant.js"></script>
 <style>
 :root{
   --bg:#030712; --bg2:#0F172A; --panel:#0A101F; --panel2:#111A2C;
@@ -561,7 +562,7 @@ function markSnapshot() {
   window.__MORS_SNAPSHOT__ = true;
   var d = document.createElement("div");
   d.id = "snapBanner";
-  d.textContent = "Static demo — no backend here, showing the JSON snapshot captured at build time (chat, insight and Run Pipeline are disabled).";
+  d.textContent = "وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).";
   d.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;" +
     "background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);" +
     "padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center";
@@ -1099,36 +1100,60 @@ VIEWS.ai = function () {
     $("#view").innerHTML = html;
   });
 };
+function renderInsight(box, j) {
+  var html = "";
+  var tiers = j.tiers || j.blocks || j.sections;
+  if (Array.isArray(tiers)) {
+    html = tiers.map(function (t) {
+      var lab = t.tier || t.type || "AI Interpretation";
+      var txt = t.text || t.value || t.content || "";
+      return '<div class="tier t' + tierOf(lab) + '"><div class="tl2">' + esc(lab) + "</div><p>" + esc(txt) + "</p></div>";
+    }).join("");
+  } else {
+    html = '<div class="tier t3"><div class="tl2">AI Interpretation</div><p>' +
+      esc(j.reply || j.answer || j.text || JSON.stringify(j)) + "</p></div>";
+  }
+  if (Array.isArray(j.citations) && j.citations.length)
+    html += '<div class="trace">[ <b>CITATIONS</b> · ' + esc(j.citations.join(" | ")) + " ]</div>";
+  if (j.engine) html += '<div class="cap"><b>Engine</b>' + esc(j.engine) + "</div>";
+  if (box) box.innerHTML = html;
+}
 function runInsight() {
   var box = $("#insOut");
   var q = ($("#insQ") && $("#insQ").value || "").trim();
   if (!q) { toast("Type a question first"); return; }
   if (box) box.innerHTML = '<div class="hint"><span class="spin"></span> analysing certified report…</div>';
+  var ds = ($("#insDs") || {}).value || "auto";
   fetch("/api/mors/insight", { method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: q, dataset: ($("#insDs") || {}).value || "auto" }) })
+    body: JSON.stringify({ question: q, dataset: ds }) })
     .then(function (r) { return r.json(); })
     .then(function (j) {
       if (j.error) throw new Error(j.error);
-      var html = "";
-      var tiers = j.tiers || j.blocks || j.sections;
-      if (Array.isArray(tiers)) {
-        html = tiers.map(function (t) {
-          var lab = t.tier || t.type || "AI Interpretation";
-          var txt = t.text || t.value || t.content || "";
-          return '<div class="tier t' + tierOf(lab) + '"><div class="tl2">' + esc(lab) + "</div><p>" + esc(txt) + "</p></div>";
-        }).join("");
-      } else {
-        html = '<div class="tier t3"><div class="tl2">AI Interpretation</div><p>' +
-          esc(j.reply || j.answer || j.text || JSON.stringify(j)) + "</p></div>";
-      }
-      if (Array.isArray(j.citations) && j.citations.length)
-        html += '<div class="trace">[ <b>CITATIONS</b> · ' + esc(j.citations.join(" | ")) + " ]</div>";
-      if (j.engine) html += '<div class="cap"><b>Engine</b>' + esc(j.engine) + "</div>";
-      if (box) box.innerHTML = html;
+      renderInsight(box, j);
     })
     .catch(function (e) {
+      if (window.OfflineAssistant) {
+        markSnapshot();
+        window.OfflineAssistant.insight(q, ds)
+          .then(function (j) { renderInsight(box, j); })
+          .catch(function (e2) {
+            if (box) box.innerHTML = '<div class="tier t5"><div class="tl2">Unavailable</div><p>' + esc(e2.message) + "</p></div>";
+          });
+        return;
+      }
       if (box) box.innerHTML = '<div class="tier t5"><div class="tl2">Unavailable</div><p>' + esc(e.message) + "</p></div>";
     });
+}
+function renderMorsChat(box, j) {
+  var body = String(j.reply || "").split("\n");
+  var head = body.shift() || "";
+  var html = '<div class="tier t3"><div class="tl2">' + esc(head) + "</div>" +
+    '<p class="ar">' + esc(body.join("\n")).replace(/\n/g, "<br>") + "</p></div>";
+  html += '<div class="trace">[ <b>Ai.Mors</b> | engine: ' + esc(j.engine || "—") +
+    " | greeting_ok: " + esc(String(!!j.greeting_ok)) +
+    " | trace: " + esc((j.trace || []).join(", ") || "none") +
+    (j.timestamp ? " | " + esc(j.timestamp) : "") + " ]</div>";
+  if (box) box.innerHTML = html;
 }
 function runMorsChat() {
   var box = $("#chatOut");
@@ -1140,17 +1165,19 @@ function runMorsChat() {
     .then(function (r) { return r.json(); })
     .then(function (j) {
       if (j.error) throw new Error(j.error);
-      var body = String(j.reply || "").split("\n");
-      var head = body.shift() || "";
-      var html = '<div class="tier t3"><div class="tl2">' + esc(head) + "</div>" +
-        '<p class="ar">' + esc(body.join("\n")).replace(/\n/g, "<br>") + "</p></div>";
-      html += '<div class="trace">[ <b>Ai.Mors</b> | engine: ' + esc(j.engine || "—") +
-        " | greeting_ok: " + esc(String(!!j.greeting_ok)) +
-        " | trace: " + esc((j.trace || []).join(", ") || "none") +
-        (j.timestamp ? " | " + esc(j.timestamp) : "") + " ]</div>";
-      if (box) box.innerHTML = html;
+      renderMorsChat(box, j);
     })
     .catch(function (e) {
+      if (window.OfflineAssistant) {
+        markSnapshot();
+        window.OfflineAssistant.reply(q)
+          .then(function (j) { renderMorsChat(box, j); })
+          .catch(function (e2) {
+            if (box) box.innerHTML = '<div class="tier t5"><div class="tl2">Unavailable</div><p class="ar">' +
+              esc(e2.message) + "</p></div>";
+          });
+        return;
+      }
       if (box) box.innerHTML = '<div class="tier t5"><div class="tl2">Unavailable</div><p class="ar">' +
         esc(e.message) + "</p></div>";
     });
@@ -2830,7 +2857,18 @@ function bindEvents() {
           body: "{}" }).then(function (r) { return r.json(); }).then(function () {
           toast("Pipeline started — results will refresh when it completes");
           setTimeout(function () { Object.keys(D).forEach(function (k) { delete D[k]; }); go(CURRENT); }, 12000);
-        }).catch(function () { toast("Could not start the pipeline"); });
+        }).catch(function () {
+          if (!window.OfflineAssistant) { toast("Could not start the pipeline"); return; }
+          markSnapshot();
+          toast("Static demo — يعيد عرض النتائج المعتمدة من اللقطة");
+          window.OfflineAssistant.pipeline(function (pct, label, note) {
+            toast(label + " · " + pct + "% — " + note);
+          }).then(function () {
+            toast("اكتمل العرض — الحكم CERTIFIED من اللقطة المعتمدة");
+            Object.keys(D).forEach(function (k) { delete D[k]; });
+            go(CURRENT);
+          });
+        });
       }
       if (act.dataset.act === "insight") runInsight();
       if (act.dataset.act === "chat") runMorsChat();

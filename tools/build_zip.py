@@ -48,6 +48,7 @@ INCLUDE = [
     "prompts/deep_audit_prompt.txt",
     "static/index.html",
     "static/mors.html",
+    "static/offline_assistant.js",
     "tools/audit_data.py",
     "tools/build_report.py",
     "tools/build_guide.py",

@@ -1,9 +1,9 @@
 ASI-HACK Space Analytics Engine - package manifest
 MORS Scientific Command Center
 
-generated : 2026-09-25 19:17 UTC
-files     : 42
-raw bytes : 1871805
+generated : 2026-09-25 19:28 UTC
+files     : 43
+raw bytes : 1889282
 
 Verify with:  Get-FileHash -Algorithm SHA256 <file>
 Columns: SHA-256 | bytes | path | role
@@ -35,13 +35,14 @@ ecbb949abe78d91780b8909547e54938c13fc88e4c85aeb4af63e2e29946a7a8       6691  pro
 02a8e9077b0fcd24b01aebce4bd54c44aaa7c7f8b534997b7d8a7c842dcd124c       2152  prompts/cyber_mors_prompt.txt               CYBER.MORS threat intelligence & sensor audit prompt
 cb9d3406c32adb6558f9f0ca41e2dbe7b4fff3e4b1393dc541b5920465a8d4cc       3021  prompts/report_generator_prompt.txt         ANALYTICS.REPORT file analysis prompt
 af770ae87693c06c2faddd37e1ef976b4b688e3e5fd6fb12c7a0d7456fcdfdb2       3659  prompts/deep_audit_prompt.txt               DEEP.AUDIT five-pass audit prompt
-df1e1e63e488ee198c5610d7a44ef9dc1dc8da3d0f672a024ad27aef4874341e      46506  static/index.html                           Legacy ASI-HACK dashboard (single file, no build step)
-c9021b48bb32174f997ce212b674b59b9323b47b1be342bd3893dac8de51c597     175094  static/mors.html                            MORS Scientific Command Center SPA
+91c9baf1bf266d765866c4deafbe0f863d7ca9f3bfc9967fae18766939e67665      48021  static/index.html                           Legacy ASI-HACK dashboard (single file, no build step)
+e231b278775aff36680f16e9024b3e3ae2ee568a3a5e9079066ab777df731ec1     176580  static/mors.html                            MORS Scientific Command Center SPA
+de2ab206004fefd9b75b88ee9ae89cf8a707fd3d108d342242264c147f775041      14441  static/offline_assistant.js                 
 2eee1d9395967145d5cc45039d47ce5cacd77a3f176c3cd0a9dfca82ca5094f8      49650  tools/audit_data.py                         Read-only data & analysis audit (225+ checks)
 55cfabc3ff6909a7733877926c55e95cbc1bd29050ca01669b3282e3a7ae7d4b      86226  tools/build_report.py                       Generates docs/MORS_REPORT.pdf
 f58dac6d42d06f6a8671a9ba3d1985bc01c09166e887b25a7b62e52db60cf11e      48478  tools/build_guide.py                        Generates this document (docs/PROJECT_GUIDE.pdf)
 bc4f1ffd480eff55aea18c3ae2dffc35e3390e86fd6277fb151e2a9cda4ca896      41562  tools/build_committee.py                    Generates 00_COMMITTEE_GUIDE.md and docs/COMMITTEE_GUIDE.pdf
-a9527aaf912df2600d827fa0335e4af6f69a6b6ee79896462b2489cc08bc6d9c       4194  tools/build_zip.py                          Portable packager — writes the submitted archive
+cabe64f2fa07803af18214395309cfae516c265a9d31bc8bdd26cef07650253c       4229  tools/build_zip.py                          Portable packager — writes the submitted archive
 8b9cc77ed846d21d20fd27be91f811d71f3d8ee60b3658dd780c5ecaa63bfe32       4050  tools/build_static_api.py                   
 a29f4102e7127837b4c869bcd1dd9c516396ca87be124639fb23f9f0a6563321      21863  docs/API_CONTRACT.md                        Machine-readable-ish API contract
 79c683c9d6b33394dcb5058428669623c21aa75a98883fc3ccdec91f8e63a32a     562850  docs/MORS_REPORT.pdf                        Generated platform report (43 pages)
