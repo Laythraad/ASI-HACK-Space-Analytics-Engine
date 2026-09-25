@@ -5,6 +5,12 @@ A four-agent scientific pipeline (ingest → council → citations → Ai.Mors) 
 10-section command-center UI that turns NASA / NOAA / CelesTrak / Exoplanet-Archive
 feeds into **provenance-labelled** findings, problem cards, solution paths and charts.
 
+**Live demo (static hosting):** <https://laythraad.github.io/ASI-HACK-Space-Analytics-Engine/>
+— a launcher page with both UIs and the three generated PDFs. Static hosting runs no backend,
+so the frontends fall back to the JSON snapshot in `static/api/` (regenerate with
+`python tools/build_static_api.py`) and show a *"Static demo"* banner; chat, insight and
+`POST /api/pipeline/run` require the local server.
+
 ---
 
 ## 1. Requirements

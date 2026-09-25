@@ -1,9 +1,9 @@
 ASI-HACK Space Analytics Engine - package manifest
 MORS Scientific Command Center
 
-generated : 2026-09-25 19:14 UTC
+generated : 2026-09-25 19:16 UTC
 files     : 42
-raw bytes : 1870797
+raw bytes : 1871743
 
 Verify with:  Get-FileHash -Algorithm SHA256 <file>
 Columns: SHA-256 | bytes | path | role
@@ -12,9 +12,9 @@ b18106a9fff493b115042b99dce30981b1d3590206787d235149577e289a7a12      27253  00_
 893f0daa6cfd77e6a29abbecdddf74742efdfecc7df3c3360cf3625724c2bee4      31772  main.py                                     Flask orchestrator, HTTP API and CLI entry point
 d67a9b78906a94ca7356b5f3c6d215de3e98de1ab1c7630542f3c38a22b35a21       4557  START.bat                                   Windows launcher with environment checks
 e2354410d97f4c5a720213d66472ab4382cc50238e1a8ec76a86255da44d70ef       4616  index.html                                  
-12db0e957e052348b34e4546ee62f365520132f73dd8e4cb274a2978438b8d2a       9692  README.md                                   Front door: how to run, what it does, what it does not do
+a3dbf3cbf603b9a22307bf16ac17b69336b92992591f2902d68b4278558aae62      10112  README.md                                   Front door: how to run, what it does, what it does not do
 30fa2b2348725c6f2ab9ed4641c9e1dedcaaffbab450df4633b07eefd51a7fcb      23722  المشكلات_التي_تم_حلها.md                    Problems solved — data & analysis defect log (Arabic)
-88775c1535dd7cbc02da4f421d8b6f4b78345228a88ecde711a64a801fda71e1      15916  DEPLOYMENT.md                               Operations and deliverables manual
+1e0a2b7158af11df8255dd46707a5ad57d25447d883a20a1f1cbf20ef8b69e7f      16442  DEPLOYMENT.md                               Operations and deliverables manual
 25901df55afc01427862031c8d0a6c8efa86d37816ac253d20a9719c4b5c2306        469  requirements.txt                            Python dependency list
 2ea0c49e6f3567c419ec22a6568c24e59e120df2969ae86f829a965b431bd5c3       1530  .env                                        Secrets — never committed
 9552279f30cbf3d8cb2b0fe851c056b2c6889aaafe1233e85332b39e951b1a9e        171  .gitignore                                  Keeps secrets and runtime artifacts out of the repository
