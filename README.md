@@ -8,8 +8,10 @@ feeds into **provenance-labelled** findings, problem cards, solution paths and c
 **Live demo (static hosting):** <https://laythraad.github.io/ASI-HACK-Space-Analytics-Engine/>
 — a launcher page with both UIs and the three generated PDFs. Static hosting runs no backend,
 so the frontends fall back to the JSON snapshot in `static/api/` (regenerate with
-`python tools/build_static_api.py`) and show a *"Static demo"* banner; chat, insight and
-`POST /api/pipeline/run` require the local server.
+`python tools/build_static_api.py`) and show a *"وضع العرض الثابت"* banner. The chat, the
+insight box and **Run Pipeline** keep working offline through `static/offline_assistant.js`,
+which answers from that same certified snapshot and labels itself `static:snapshot`; run the
+server locally for live Gemini / NASA answers and a real pipeline run.
 
 ---
 

@@ -205,8 +205,11 @@ Defects found this way — with before/after numbers — are documented in
   — GitHub Pages from `main` (`index.html` launcher, `.nojekyll` present). Pages cannot run
   Flask, so `GET` endpoints are snapshotted into `static/api/**.json` by
   `python tools/build_static_api.py`; both frontends fall back to that snapshot when
-  `/api/health` is unreachable and show a "Static demo" banner. Refresh the snapshot after
-  every pipeline run (`python main.py` in one terminal, then the script) and push.
+  `/api/health` is unreachable and show the "وضع العرض الثابت" banner. The chat, insight and
+  **Run Pipeline** controls keep working offline via `static/offline_assistant.js`
+  (`engine: static:snapshot`), while live Gemini/NASA answers and a real pipeline run need
+  the local server. Refresh the snapshot after every pipeline run (`python main.py` in one
+  terminal, then the script) and push.
 - **LAN demo:** `python main.py --host 0.0.0.0` + allow the port in Windows Firewall.
 - **Cloud (Render/Railware/Fly.io):** build command `pip install -r requirements.txt`,
   start command `gunicorn -w 2 -b 0.0.0.0:$PORT main:app` (add `gunicorn` to requirements;
