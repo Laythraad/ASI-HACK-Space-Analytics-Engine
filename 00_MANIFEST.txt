@@ -1,0 +1,52 @@
+ASI-HACK Space Analytics Engine - package manifest
+MORS Scientific Command Center
+
+generated : 2026-09-25 06:31 UTC
+files     : 40
+raw bytes : 1858494
+
+Verify with:  Get-FileHash -Algorithm SHA256 <file>
+Columns: SHA-256 | bytes | path | role
+----------------------------------------------------------------------------------------------------
+b18106a9fff493b115042b99dce30981b1d3590206787d235149577e289a7a12      27253  00_COMMITTEE_GUIDE.md                       Submission guide for the judging committee (Markdown)
+bfe7722658b7684447bb96fdc401f6e67caf216d5ed0889b600b79f85c6db814      30992  main.py                                     Flask orchestrator, HTTP API and CLI entry point
+d67a9b78906a94ca7356b5f3c6d215de3e98de1ab1c7630542f3c38a22b35a21       4557  START.bat                                   Windows launcher with environment checks
+12db0e957e052348b34e4546ee62f365520132f73dd8e4cb274a2978438b8d2a       9692  README.md                                   Front door: how to run, what it does, what it does not do
+30fa2b2348725c6f2ab9ed4641c9e1dedcaaffbab450df4633b07eefd51a7fcb      23722  المشكلات_التي_تم_حلها.md                    Problems solved — data & analysis defect log (Arabic)
+88775c1535dd7cbc02da4f421d8b6f4b78345228a88ecde711a64a801fda71e1      15916  DEPLOYMENT.md                               Operations and deliverables manual
+25901df55afc01427862031c8d0a6c8efa86d37816ac253d20a9719c4b5c2306        469  requirements.txt                            Python dependency list
+2ea0c49e6f3567c419ec22a6568c24e59e120df2969ae86f829a965b431bd5c3       1530  .env                                        Secrets — never committed
+41d0edb3d4ebebb0fdde9722285252e2f2e6310884b437a9b97153297c3050aa        164  .gitignore                                  Keeps secrets and runtime artifacts out of the repository
+a7a7a5faa0c071c102bf2764365cfde84c307b1307262a4dd66825241d84c766      84076  last_report.json                            Persisted copy of the most recent pipeline report
+737d0631a349ba97a20104189c03b37e0dcf62c290d85771deefe1889b269290        341  agents/__init__.py                          Package façade for the four agents
+6bf88b817f19520eb84ecdcff25160a7d8243806797bb529b241e9248ae1ca61      38668  agents/agent1_ingestion.py                  Agent 1 — Ingest & Clean
+805140e5bce8a0ff08e2895532ec8862fe3bf2e4ecec1822021caeef7f0c79ec      15685  agents/agent2_council.py                    Agent 2 — Council of Five
+f656add055618ea173b6a14b3f136614e1006fdac1946f2c98572c6f1e7848b1      16168  agents/agent3_citations.py                  Agent 3 — Citations & traceability
+0de91312516df48730c5f6ba4be59de3d26f5a3baa158e8172ec49a05a8f412d      12956  agents/agent4_aimors.py                     Agent 4 — Ai.Mors conversational agent
+fac18bd83af1405d33b36516d5c74bac6b5181feadd073b51037d7a771a5039d      33212  agents/datasets.py                          Dataset builders for the science widgets
+29b3fddc6c3c75a96ffeae96c32b13d454403ad3c1dde144411b4fa7c94c8b68     108135  agents/mors_data.py                         MORS data layer — the 17 science modules
+599cb42e9c874314eba69f1caf098a1c191242b916db4f451803085ae48a07ad      29479  agents/sources_data.py                      Scientific source registry and hackathon condition map
+1634c574014767cd87d47cb72fc67115bc4aacb2bdaf0e4a99e605ba0985c4a5       4867  prompts/aimors_prompt.txt                   System prompt for Agent 4 (Ai.Mors)
+9f70c6fc9043b26a317a74861b4034917a5747c30307ea851c0e17ed8d7c6eb9       5068  prompts/council_prompt.txt                  System prompt for Agent 2 (Council of Five)
+ecbb949abe78d91780b8909547e54938c13fc88e4c85aeb4af63e2e29946a7a8       6691  prompts/aimors_analyst_prompt.txt           AI.MORS scientific space-data analyst prompt
+1d9872ad8d3e6610eef6fd4cfdcec0088340638a3f33bbf380a5ef027b4ad575       6250  prompts/uiux_command_center_prompt.txt      Frontend UI/UX & satellite command center specification
+20e9c443c7abdcbc1ee674d2237a197652cffdbbd2420a969f23909fb3cd6c42       5750  prompts/uiux_visualization_prompt.txt       Astronomical & satellite visualization lead prompt
+02a8e9077b0fcd24b01aebce4bd54c44aaa7c7f8b534997b7d8a7c842dcd124c       2152  prompts/cyber_mors_prompt.txt               CYBER.MORS threat intelligence & sensor audit prompt
+cb9d3406c32adb6558f9f0ca41e2dbe7b4fff3e4b1393dc541b5920465a8d4cc       3021  prompts/report_generator_prompt.txt         ANALYTICS.REPORT file analysis prompt
+af770ae87693c06c2faddd37e1ef976b4b688e3e5fd6fb12c7a0d7456fcdfdb2       3659  prompts/deep_audit_prompt.txt               DEEP.AUDIT five-pass audit prompt
+313f10e9d1ab5f08c300f0511a89b4036658f3fd978f77e0d94ec07e60ca59bd      45252  static/index.html                           Legacy ASI-HACK dashboard (single file, no build step)
+7fb96521d2a76122931fb709f65464b57b3d0dc409e9a9ee1d436409882239dd     173717  static/mors.html                            MORS Scientific Command Center SPA
+3e93e8cd1d9232b21781a3089258fcac1d6086b26fe55935006f670d4cb80c16      49420  tools/audit_data.py                         Read-only data & analysis audit (225+ checks)
+55cfabc3ff6909a7733877926c55e95cbc1bd29050ca01669b3282e3a7ae7d4b      86226  tools/build_report.py                       Generates docs/MORS_REPORT.pdf
+f58dac6d42d06f6a8671a9ba3d1985bc01c09166e887b25a7b62e52db60cf11e      48478  tools/build_guide.py                        Generates this document (docs/PROJECT_GUIDE.pdf)
+bc4f1ffd480eff55aea18c3ae2dffc35e3390e86fd6277fb151e2a9cda4ca896      41562  tools/build_committee.py                    Generates 00_COMMITTEE_GUIDE.md and docs/COMMITTEE_GUIDE.pdf
+97146ebaf133e013e66a0c708ee770f2a810b4d49b947857a2245c067b0d0d78       4143  tools/build_zip.py                          Portable packager — writes the submitted archive
+a29f4102e7127837b4c869bcd1dd9c516396ca87be124639fb23f9f0a6563321      21863  docs/API_CONTRACT.md                        Machine-readable-ish API contract
+79c683c9d6b33394dcb5058428669623c21aa75a98883fc3ccdec91f8e63a32a     562850  docs/MORS_REPORT.pdf                        Generated platform report (43 pages)
+e0b9c64a86cf9d7ea4001bcaf67033f30cbdcfd18a9135020b65924af6a03c00     186546  docs/PROJECT_GUIDE.pdf                      This document
+64feafff8fe7c2ff2d6dd660b8fd52045155acf13dd38575194e47bd6c3cf060     146249  docs/COMMITTEE_GUIDE.pdf                    Submission guide for the judging committee (PDF)
+adcb158e32127e2950c3883fab134fd666c84f59d65296fe943de8ede2119ee6        652  data/reference_metrics.csv                  Reference metrics for the quality audit
+6bddc6acbea7f00d8953a5f24d2756511171d761b2af9abede9d34e74b884875        657  data/light_pollution_reference.csv          Reference night-light / sky-brightness table
+63bfce72b2555fb2d7530667498bfdd394481f01e9337b2761a0f93df182db48        406  data/spectral_reference.csv                 Laboratory emission-line list
+----------------------------------------------------------------------------------------------------
+This manifest itself: 00_MANIFEST.txt (its own digest is the one you compute after extracting).

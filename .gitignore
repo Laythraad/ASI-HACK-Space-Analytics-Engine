@@ -1,0 +1,11 @@
+# --- ASI-HACK Space Analytics Engine ---
+# NEVER commit credentials or runtime artifacts
+.env
+last_report.json
+__pycache__/
+*.pyc
+*.log
+.venv/
+venv/
+node_modules/
+*.zip

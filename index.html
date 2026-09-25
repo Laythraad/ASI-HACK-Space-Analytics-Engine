@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASI-HACK — Space Analytics Engine</title>
+<style>
+  :root{--bg:#030712;--panel:rgba(15,23,42,.75);--line:rgba(56,189,248,.15);
+        --accent:#38BDF8;--ok:#34D399;--warn:#FBBF24;--text:#F8FAFC;--dim:#94A3B8}
+  *{box-sizing:border-box}
+  body{margin:0;background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(56,189,248,.12),transparent 60%),
+      radial-gradient(900px 500px at 10% 110%,rgba(52,211,153,.08),transparent 60%),var(--bg);
+      color:var(--text);font:15px/1.7 "Segoe UI",Inter,system-ui,sans-serif;padding:32px 18px}
+  .wrap{max-width:940px;margin:0 auto}
+  .badge{display:inline-block;font-size:11.5px;letter-spacing:.4px;color:#052432;
+      background:var(--accent);padding:3px 10px;border-radius:999px;font-weight:700}
+  h1{font-size:30px;margin:16px 0 6px}
+  .sub{color:var(--dim);margin:0 0 22px}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  a.card{display:block;background:var(--panel);border:1px solid var(--line);
+      border-radius:14px;padding:16px 16px 14px;text-decoration:none;color:var(--text);
+      backdrop-filter:blur(12px);transition:.15s}
+  a.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  a.card h3{margin:0 0 6px;font-size:17px}
+  a.card p{margin:0;color:var(--dim);font-size:13px}
+  a.card .tag{display:inline-block;margin-top:10px;font-size:11px;color:var(--accent);
+      border:1px solid var(--line);padding:2px 8px;border-radius:999px}
+  .note{margin-top:22px;background:var(--panel);border:1px solid rgba(251,191,36,.35);
+      border-radius:12px;padding:12px 14px;font-size:13px;color:var(--warn)}
+  .note b{color:var(--text)}
+  footer{margin-top:22px;color:var(--dim);font-size:12px}
+  code{background:rgba(56,189,248,.1);padding:1px 6px;border-radius:5px;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">ASI HACK 2026 · AI FOR SPACE CHALLENGES</span>
+  <h1>ASI-HACK — Space Analytics Engine</h1>
+  <p class="sub">منصة MORS لتحليل بيانات الفضاء والأقمار الصناعية — أربعة وكلاء، 8 شروط تحدي موثّقة على 16 مصدراً، تقرير علمي مُخرَج آلياً.</p>
+
+  <div class="grid">
+    <a class="card" href="static/mors.html">
+      <h3>MORS Command Center</h3>
+      <p>مركز القيادة: الأقمار، الفلك، الكمية، المشكلات ← الحلول، الفريق، مكتبة المطالبات.</p>
+      <span class="tag">/static/mors.html</span>
+    </a>
+    <a class="card" href="static/index.html">
+      <h3>Analytics Dashboard</h3>
+      <p>لوحة القياسات الحية: الطقس الشمسي، NEO، تلوّث الضوء، Kp، الأطياف، القياس الضوئي.</p>
+      <span class="tag">/static/index.html</span>
+    </a>
+    <a class="card" href="docs/MORS_REPORT.pdf">
+      <h3>MORS Report (PDF)</h3>
+      <p>التقرير العلمي الكامل — 44 صفحة، بطاقات المشكلات، الحلول، التتبّع.</p>
+      <span class="tag">PDF</span>
+    </a>
+    <a class="card" href="docs/PROJECT_GUIDE.pdf">
+      <h3>Project Guide (PDF)</h3>
+      <p>دليل المشروع بالعربية: البنية، الملفات، أوامر التشغيل.</p>
+      <span class="tag">PDF</span>
+    </a>
+    <a class="card" href="docs/COMMITTEE_GUIDE.pdf">
+      <h3>Committee Guide (PDF)</h3>
+      <p>دليل اللجنة بالعربية: الشروط الثمانية، المصادر الستّة عشر، الاتفاقيات الخمسة.</p>
+      <span class="tag">PDF</span>
+    </a>
+    <a class="card" href="README.md">
+      <h3>README</h3>
+      <p>التشغيل المحلي: <code>pip install -r requirements.txt</code> ثم <code>python main.py</code>.</p>
+      <span class="tag">docs</span>
+    </a>
+  </div>
+
+  <div class="note">
+    <b>Static demo:</b> هذه الاستضافة الثابتة (GitHub Pages) تعمل بلا خادم — الواجهات تقرأ
+    لقطة JSON محفوظة في <code>static/api/</code> وتُظهر شارة «Static demo».
+    للحصول على المخطط الحيّ (Gemini + NASA + Run Pipeline) شغّل المشروع محلياً:
+    <code>python main.py</code> ثم افتح <code>http://127.0.0.1:5000/</code>.
+  </div>
+
+  <footer>Team: ليث رعد (Team Leader) · Data Analyst · Astronomy Researcher · Space Systems &amp; AI Engineer</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,2912 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="MORS - Scientific Command Center &amp; Research Platform. Data - Space - Quantum">
+<title>MORS · Scientific Command Center</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#030712; --bg2:#0F172A; --panel:#0A101F; --panel2:#111A2C;
+  --line:rgba(148,163,184,.16); --line2:rgba(148,163,184,.28);
+  --text:#E2E8F0; --muted:#93A3B8; --dim:#64748B;
+  --accent:#38BDF8; --accent2:#0EA5E9; --accentSoft:rgba(56,189,248,.14);
+  --ok:#34D399; --warn:#FBBF24; --bad:#F87171; --info:#818CF8;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+  --r:12px; --sb:264px; --fs:14px; --grid-op:.35;
+}
+html[data-theme="light"]{
+  --bg:#FFFFFF; --bg2:#E0F7FA; --panel:#F7FCFD; --panel2:#EEF6F9;
+  --line:rgba(15,23,42,.10); --line2:rgba(15,23,42,.18);
+  --text:#0F172A; --muted:#475569; --dim:#64748B;
+  --accent:#0E7490; --accent2:#0891B2; --accentSoft:rgba(14,116,144,.10);
+  --ok:#059669; --warn:#B45309; --bad:#DC2626; --info:#4F46E5;
+  --shadow:0 8px 24px rgba(15,23,42,.10);
+}
+html[data-theme="earth"]  {--bg:#04121B;--bg2:#0A2432;--panel:#071A26;--panel2:#0C2A3A;--accent:#38BDF8;--accent2:#22C55E;--accentSoft:rgba(56,189,248,.14)}
+html[data-theme="mars"]   {--bg:#150A08;--bg2:#23110D;--panel:#1A0D0A;--panel2:#27140F;--accent:#F97316;--accent2:#FB923C;--accentSoft:rgba(249,115,22,.14)}
+html[data-theme="jupiter"]{--bg:#16100A;--bg2:#251B10;--panel:#1C140C;--panel2:#2A1F13;--accent:#D9A441;--accent2:#EAB308;--accentSoft:rgba(217,164,65,.14)}
+html[data-theme="saturn"] {--bg:#16130B;--bg2:#262014;--panel:#1D180E;--panel2:#2B2416;--accent:#E7C97B;--accent2:#FACC15;--accentSoft:rgba(231,201,123,.14)}
+html[data-theme="neptune"]{--bg:#050C1C;--bg2:#0B1630;--panel:#080F23;--panel2:#0E1A38;--accent:#60A5FA;--accent2:#818CF8;--accentSoft:rgba(96,165,250,.14)}
+html[data-theme="moon"]   {--bg:#0E0E12;--bg2:#17171D;--panel:#131318;--panel2:#1C1C23;--accent:#CBD5E1;--accent2:#94A3B8;--accentSoft:rgba(203,213,225,.13)}
+html[data-accent="cyan"]{--accent:#38BDF8;--accent2:#0EA5E9;--accentSoft:rgba(56,189,248,.14)}
+html[data-accent="teal"]{--accent:#2DD4BF;--accent2:#14B8A6;--accentSoft:rgba(45,212,191,.14)}
+html[data-accent="blue"]{--accent:#60A5FA;--accent2:#3B82F6;--accentSoft:rgba(96,165,250,.14)}
+html[data-accent="violet"]{--accent:#A78BFA;--accent2:#8B5CF6;--accentSoft:rgba(167,139,250,.14)}
+html[data-accent="amber"]{--accent:#FBBF24;--accent2:#F59E0B;--accentSoft:rgba(251,191,36,.14)}
+html[data-accent="rose"]{--accent:#FB7185;--accent2:#F43F5E;--accentSoft:rgba(251,113,133,.14)}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);color:var(--text);font:400 var(--fs)/1.55 "Inter","Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(1100px 620px at 82% -12%,var(--accentSoft),transparent 62%),
+             radial-gradient(900px 560px at -8% 108%,var(--accentSoft),transparent 60%)}
+html[data-grid="on"] body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:var(--grid-op);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 88%);
+  mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 88%)}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+body.compact{--fs:13px;--sb:236px}
+body.compact .card{padding:12px}
+body.density-high .view{gap:8px}
+body.no-motion *,body.no-motion *::before,body.no-motion *::after{animation:none!important;transition:none!important}
+body.contrast{--line:rgba(148,163,184,.42);--line2:rgba(148,163,184,.7);--muted:#C3CEDD;--dim:#A9B6C7}
+html[data-theme="light"].contrast{--line:rgba(15,23,42,.30);--line2:rgba(15,23,42,.55);--muted:#1E293B}
+::selection{background:var(--accentSoft);color:var(--text)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px}
+::-webkit-scrollbar-track{background:transparent}
+a{color:var(--accent);text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+.app{position:relative;z-index:1;display:grid;grid-template-columns:var(--sb) 1fr;height:100vh}
+.sidebar{background:linear-gradient(180deg,var(--panel),var(--bg));border-right:1px solid var(--line);
+  display:flex;flex-direction:column;min-height:0}
+.brand{display:flex;gap:11px;align-items:center;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.mark{width:36px;height:36px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+  background:var(--accentSoft);border:1px solid var(--accent);color:var(--accent);font-weight:800;font-size:15px}
+.brand h1{margin:0;font-size:15.5px;letter-spacing:2.6px;font-weight:800}
+.brand small{display:block;color:var(--dim);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.nav{flex:1;overflow-y:auto;padding:12px 10px 6px}
+.nav-lab{font-size:9.5px;letter-spacing:1.7px;color:var(--dim);text-transform:uppercase;padding:12px 10px 7px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:3px;border-radius:9px;
+  color:var(--muted);font-size:13.2px;font-weight:500;border:1px solid transparent;transition:.14s}
+.nav a svg{width:17px;height:17px;flex:0 0 auto;stroke-width:1.7}
+.nav a:hover{background:var(--panel2);color:var(--text)}
+.nav a.on{background:var(--accentSoft);color:var(--accent);border-color:var(--accent);font-weight:600}
+.nav a .cnt{margin-left:auto;font-size:10.5px;background:var(--panel2);border:1px solid var(--line);
+  padding:1px 6px;border-radius:20px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nav a.on .cnt{border-color:var(--accent);color:var(--accent)}
+.side-foot{border-top:1px solid var(--line);padding:12px 16px;font-size:10.5px;color:var(--dim);line-height:1.7}
+.side-foot b{color:var(--muted);font-weight:600}
+
+.shell{display:flex;flex-direction:column;min-width:0;min-height:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line);
+  background:var(--panel);backdrop-filter:blur(9px);flex-wrap:wrap}
+.burger{display:none;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+  width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px}
+.crumb{font-size:12.5px;color:var(--muted);letter-spacing:.3px;min-width:0}
+.crumb b{color:var(--text);font-weight:650}
+.crumb .sep{opacity:.45;margin:0 7px}
+.searchwrap{position:relative;flex:1;min-width:190px;max-width:440px}
+.searchwrap>svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--dim)}
+#q{width:100%;padding:8px 12px 8px 33px;border-radius:9px;background:var(--panel2);
+  border:1px solid var(--line);color:var(--text);font-size:13px;font-family:inherit}
+#q::placeholder{color:var(--dim)}
+#q:focus{border-color:var(--accent);outline:none}
+.pills{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4.5px 9px;border-radius:20px;
+  background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill .dot{width:6px;height:6px;border-radius:50%;background:var(--dim)}
+.pill.ok .dot{background:var(--ok);box-shadow:0 0 0 3px rgba(52,211,153,.22)}
+.pill.warn .dot{background:var(--warn);box-shadow:0 0 0 3px rgba(251,191,36,.22)}
+.pill.bad .dot{background:var(--bad);box-shadow:0 0 0 3px rgba(248,113,113,.22)}
+.pill.acc{border-color:var(--accent);color:var(--accent);background:var(--accentSoft)}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);
+  color:var(--text);font:inherit;font-size:12.5px;padding:7.5px 12px;border-radius:9px;cursor:pointer;transition:.14s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#04121B;font-weight:650}
+.btn.pri:hover{filter:brightness(1.08);color:#04121B}
+.btn svg{width:15px;height:15px}
+
+.health{display:flex;border-bottom:1px solid var(--line);background:var(--panel);overflow-x:auto}
+.health .h{flex:1;min-width:132px;padding:9px 15px;border-right:1px solid var(--line)}
+.health .h:last-child{border-right:0}
+.health .k{font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim)}
+.health .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px;margin-top:1px}
+.health .v small{font-size:10.5px;font-weight:500;color:var(--muted)}
+.bar{height:3px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.bar.ok i{background:var(--ok)} .bar.warn i{background:var(--warn)} .bar.bad i{background:var(--bad)}
+
+main{flex:1;overflow-y:auto;padding:20px 22px 60px;scroll-behavior:smooth}
+.view{display:flex;flex-direction:column;gap:16px;max-width:1560px;margin:0 auto}
+.phead{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.phead h2{margin:0;font-size:21px;letter-spacing:-.4px;font-weight:750}
+.phead p{margin:5px 0 0;color:var(--muted);font-size:13px;max-width:78ch}
+.phead .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;position:relative;min-width:0}
+.card.soft{background:var(--panel2)}
+.card.acc{border-color:rgba(56,189,248,.42)}
+html[data-theme="light"] .card.acc{border-color:rgba(14,116,144,.42)}
+.card>h3{margin:0 0 3px;font-size:13.5px;font-weight:700}
+.card>h3+.sub{font-size:11.5px;color:var(--dim);margin-bottom:12px}
+.chd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.chd h3{margin:0;font-size:13.5px;font-weight:700}
+.chd .sub{font-size:11px;color:var(--dim);margin-top:2px}
+.chd .rt{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px}
+.metric .k{font-size:9.8px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
+.metric .v{font-size:25px;font-weight:750;letter-spacing:-1px;margin-top:3px;font-variant-numeric:tabular-nums}
+.metric .v small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
+.metric .d{font-size:11px;color:var(--muted);margin-top:4px}
+.metric.acc .v{color:var(--accent)}
+.kpis{display:flex;gap:6px;flex-wrap:wrap}
+.kpi{font-size:10.5px;padding:3px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:650;letter-spacing:.5px;
+  padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);text-transform:uppercase}
+.tag.acc{border-color:var(--accent);color:var(--accent);background:var(--accentSoft)}
+.tag.high{border-color:rgba(248,113,113,.6);color:var(--bad);background:rgba(248,113,113,.12)}
+.tag.med{border-color:rgba(251,191,36,.6);color:var(--warn);background:rgba(251,191,36,.12)}
+.tag.low{border-color:rgba(52,211,153,.6);color:var(--ok);background:rgba(52,211,153,.12)}
+.tag.info{border-color:rgba(129,140,248,.6);color:var(--info);background:rgba(129,140,248,.12)}
+.trace{font:500 10.5px/1.5 ui-monospace,"Cascadia Mono",Consolas,monospace;color:var(--dim);
+  background:var(--panel2);border:1px dashed var(--line2);border-radius:7px;padding:7px 10px;
+  word-break:break-word;margin-top:12px}
+.trace b{color:var(--accent);font-weight:700}
+html[data-sci="off"] .trace{display:none}
+.hint{font-size:11.5px;color:var(--dim)}
+/* Arabic blocks (source registry + Ai.Mors identity) — RTL, right-aligned */
+.ar{direction:rtl;text-align:right;font-family:"Segoe UI","Tahoma","Arial",system-ui,sans-serif;
+    line-height:1.85;unicode-bidi:isolate}
+.ar.ttl{font-size:15px;font-weight:750;color:var(--text);letter-spacing:0}
+.ar.sm{font-size:12.2px;color:var(--dim)}
+.ar b{color:var(--accent)}
+.ar-list{list-style:none;padding:0;margin:0}
+.ar-list li{padding:7px 0;border-bottom:1px dashed var(--line);display:flex;gap:10px;align-items:flex-start}
+.ar-list li:last-child{border-bottom:0}
+.ar-list li .n{flex:0 0 auto;font-family:ui-monospace,Consolas,monospace;color:var(--accent);font-weight:800}
+.ar-list li .t{flex:1}
+.note{font-size:11.5px;color:var(--muted);background:var(--panel2);border-left:2px solid var(--accent);
+  padding:8px 11px;border-radius:0 7px 7px 0;margin-top:10px}
+.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12px}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{position:sticky;top:0;background:var(--panel2);text-align:left;padding:9px 12px;font-size:10px;
+  letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--accentSoft)}
+tbody tr.clk{cursor:pointer}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:ui-monospace,Consolas,monospace}
+.tsub{display:block;color:var(--dim);font-size:10.8px;margin-top:2px}
+.filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.chip{font-size:11.5px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--muted);cursor:pointer;transition:.14s;font-family:inherit}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:var(--accentSoft);border-color:var(--accent);color:var(--accent);font-weight:650}
+select,input[type=text],input[type=search]{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+  border-radius:8px;padding:7px 10px;font:inherit;font-size:12.5px}
+select:focus,input:focus{border-color:var(--accent);outline:none}
+
+.flow{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+.flow .st{flex:1;min-width:118px;position:relative;padding:13px 12px 13px 20px;background:var(--panel);
+  border:1px solid var(--line);border-left:3px solid var(--line2);margin-right:9px;border-radius:0 9px 9px 0}
+.flow .st:last-child{margin-right:0}
+.flow .st b{display:block;font-size:11.6px;letter-spacing:.6px}
+.flow .st span{display:block;font-size:10.3px;color:var(--dim);margin-top:3px;line-height:1.45}
+.flow .st i{position:absolute;left:-6px;top:50%;transform:translateY(-50%) rotate(45deg);
+  width:9px;height:9px;background:var(--panel);border-top:1px solid var(--line);border-right:1px solid var(--line)}
+.flow .st:first-child i{display:none}
+.flow .st.hot{border-left-color:var(--bad);background:rgba(248,113,113,.07)}
+.flow .st.done{border-left-color:var(--ok)}
+.flow .st.now{border-left-color:var(--accent);background:var(--accentSoft)}
+.flow .st.now b{color:var(--accent)}
+
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.pcard>.ph{display:flex;gap:12px;align-items:flex-start;padding:15px 16px;border-bottom:1px solid var(--line);
+  background:linear-gradient(90deg,var(--accentSoft),transparent 55%);cursor:pointer}
+.pcard>.ph .id{font:700 11.5px ui-monospace,Consolas,monospace;color:var(--accent);padding-top:2px}
+.pcard>.ph h4{margin:0;font-size:14.5px;font-weight:700;letter-spacing:-.15px}
+.pcard>.ph .why{font-size:11.8px;color:var(--muted);margin-top:4px;line-height:1.5}
+.pcard>.ph .meta{margin-left:auto;display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.pbody{padding:16px;display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.pcard.open .pbody{display:grid}
+.fld{border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2);min-width:0}
+.fld.wide{grid-column:1/-1}
+.fld .fl{font-size:9.6px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+.fld p{margin:0;font-size:12.8px;line-height:1.62}
+.fld ul,.fld ol{margin:0;padding-left:17px;font-size:12.8px;line-height:1.7}
+.fld ol li::marker{color:var(--accent);font-weight:700}
+.meter{height:7px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:7px}
+.meter i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.meter.w i{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+.meter.g i{background:linear-gradient(90deg,#10B981,#34D399)}
+.pfoot{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  border-top:1px dashed var(--line);padding-top:12px}
+.disclaim{font-size:11px;color:var(--dim);line-height:1.6;background:var(--panel2);
+  border:1px dashed var(--line2);border-radius:8px;padding:9px 11px;grid-column:1/-1}
+
+.tl{position:relative;padding-left:26px}
+.tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--accent),var(--line))}
+.tl .ev{position:relative;margin-bottom:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.tl .ev::before{content:"";position:absolute;left:-23px;top:17px;width:11px;height:11px;border-radius:50%;
+  background:var(--bg);border:2.5px solid var(--accent)}
+.tl .ev.acc{border-color:rgba(56,189,248,.45)}
+.tl .ev h5{margin:0 0 6px;font-size:13.4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tl .ev .row{display:flex;gap:8px;font-size:12.4px;line-height:1.6;color:var(--muted);margin-top:5px}
+.tl .ev .row b{flex:0 0 116px;color:var(--dim);font-size:10.4px;letter-spacing:1.1px;text-transform:uppercase;padding-top:2px}
+.tl .ev .row span{color:var(--text)}
+
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 34px;font-size:12.8px;line-height:1.6;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:21px;height:21px;border-radius:6px;
+  background:var(--accentSoft);border:1px solid var(--accent);color:var(--accent);font-size:10.5px;font-weight:700;
+  display:grid;place-items:center}
+.steps li em{font-style:normal;color:var(--dim);font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;margin-left:6px}
+
+.tier{border:1px solid var(--line);border-left-width:3px;border-radius:0 9px 9px 0;padding:11px 13px;background:var(--panel2);margin-bottom:9px}
+.tier .tl2{font-size:9.8px;letter-spacing:1.5px;text-transform:uppercase;font-weight:750;margin-bottom:5px}
+.tier p{margin:0;font-size:12.9px;line-height:1.65}
+.tier.t1{border-left-color:var(--ok)} .tier.t1 .tl2{color:var(--ok)}
+.tier.t2{border-left-color:var(--info)} .tier.t2 .tl2{color:var(--info)}
+.tier.t3{border-left-color:var(--accent)} .tier.t3 .tl2{color:var(--accent)}
+.tier.t4{border-left-color:var(--warn)} .tier.t4 .tl2{color:var(--warn)}
+.tier.t5{border-left-color:var(--bad)} .tier.t5 .tl2{color:var(--bad)}
+
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:13px}
+/* source registry cards carry 4 Arabic paragraphs each — wider columns than .mods */
+.srcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px}
+.srcgrid>.card{align-self:start}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:15px;cursor:pointer;
+  transition:.16s;position:relative;overflow:hidden}
+.mod::after{content:"";position:absolute;inset:auto 0 0 0;height:2px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;transition:.2s}
+.mod:hover{border-color:var(--accent);transform:translateY(-2px)}
+.mod:hover::after{transform:scaleX(1)}
+.mod .ic{width:34px;height:34px;border-radius:9px;background:var(--accentSoft);border:1px solid var(--accent);
+  color:var(--accent);display:grid;place-items:center;margin-bottom:11px}
+.mod .ic svg{width:17px;height:17px}
+.mod h4{margin:0;font-size:13.6px;font-weight:700}
+.mod p{margin:5px 0 9px;font-size:11.7px;color:var(--muted);line-height:1.55}
+.mod .fx{display:flex;gap:5px;flex-wrap:wrap}
+.mod .fx span{font-size:9.7px;padding:2.5px 6px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);color:var(--dim)}
+
+.cbox{position:relative;width:100%}
+.cbox.h220{height:220px} .cbox.h260{height:260px} .cbox.h300{height:300px} .cbox.h340{height:340px}
+.cap{display:flex;gap:14px;flex-wrap:wrap;font-size:10.6px;color:var(--dim);margin-top:9px;
+  border-top:1px dashed var(--line);padding-top:8px}
+.cap b{color:var(--muted);font-weight:650;letter-spacing:.6px;text-transform:uppercase;font-size:9.6px}
+canvas{max-width:100%}
+
+.scrim{position:fixed;inset:0;background:rgba(2,6,16,.72);backdrop-filter:blur(3px);z-index:60;opacity:0;
+  pointer-events:none;transition:.2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:360px;max-width:92vw;background:var(--panel);
+  border-left:1px solid var(--line);z-index:70;transform:translateX(102%);transition:.24s;
+  display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer.on{transform:none}
+.drawer header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.drawer header h3{margin:0;font-size:15px}
+.drawer .body{flex:1;overflow-y:auto;padding:16px 18px 30px}
+.drawer section{margin-bottom:20px}
+.drawer section>h5{margin:0 0 9px;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim)}
+.opt{display:flex;flex-wrap:wrap;gap:6px}
+.opt button{flex:1 1 auto;min-width:64px;padding:7px 9px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--muted);font:inherit;font-size:12px;cursor:pointer;transition:.14s}
+.opt button:hover{border-color:var(--accent);color:var(--accent)}
+.opt button.on{background:var(--accentSoft);border-color:var(--accent);color:var(--accent);font-weight:650}
+.sw{display:flex;gap:7px;flex-wrap:wrap}
+.sw i{width:27px;height:27px;border-radius:50%;border:2px solid transparent;cursor:pointer;display:block}
+.sw i.on{border-color:var(--text);box-shadow:0 0 0 2px var(--panel)}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px dashed var(--line);font-size:12.7px}
+.toggle:last-child{border-bottom:0}
+.sw2{position:relative;width:38px;height:21px;border-radius:20px;background:var(--line2);cursor:pointer;flex:0 0 auto;transition:.18s}
+.sw2::after{content:"";position:absolute;top:2.5px;left:2.5px;width:16px;height:16px;border-radius:50%;
+  background:var(--panel);transition:.18s}
+.sw2.on{background:var(--accent)}
+.sw2.on::after{transform:translateX(17px);background:#04121B}
+.modal{position:fixed;z-index:70;top:50%;left:50%;transform:translate(-50%,-46%) scale(.98);opacity:0;
+  pointer-events:none;width:min(940px,94vw);max-height:88vh;background:var(--panel);border:1px solid var(--line2);
+  border-radius:14px;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:.2s}
+.modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal header{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.modal header h3{margin:0;font-size:16px}
+.modal header .sub{font-size:11.5px;color:var(--dim);margin-top:4px}
+.modal .mbody{padding:18px;overflow-y:auto}
+.x{background:var(--panel2);border:1px solid var(--line);color:var(--muted);width:30px;height:30px;
+  border-radius:8px;cursor:pointer;font-size:15px;line-height:1;flex:0 0 auto}
+.x:hover{border-color:var(--bad);color:var(--bad)}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+.kv .c{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.kv .c .k{font-size:9.4px;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim)}
+.kv .c .v{font-size:15px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;word-break:break-word}
+.kv .c .v.sm{font-size:12.4px;font-weight:600}
+
+.sres{position:absolute;top:calc(100% + 7px);left:0;right:0;background:var(--panel);border:1px solid var(--line2);
+  border-radius:11px;box-shadow:var(--shadow);z-index:80;max-height:min(60vh,460px);overflow-y:auto;display:none}
+.sres.on{display:block}
+.sres .grp{font-size:9.6px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);padding:10px 13px 5px}
+.sres .it{display:flex;gap:10px;align-items:center;padding:9px 13px;cursor:pointer;border-top:1px solid var(--line)}
+.sres .it:hover{background:var(--accentSoft)}
+.sres .it b{font-size:12.7px;font-weight:650}
+.sres .it small{display:block;color:var(--dim);font-size:10.8px;margin-top:1px}
+.sres .it .ty{margin-left:auto}
+.sres .empty{padding:16px;color:var(--dim);font-size:12.4px;text-align:center}
+
+#toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;z-index:90;
+  background:var(--panel);border:1px solid var(--accent);color:var(--text);padding:10px 17px;border-radius:10px;
+  font-size:12.7px;box-shadow:var(--shadow);transition:.22s;pointer-events:none;max-width:88vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+.empty-state{text-align:center;padding:44px 20px;color:var(--dim)}
+.empty-state b{display:block;color:var(--muted);font-size:14px;margin-bottom:5px}
+.skel{background:linear-gradient(90deg,var(--panel2),var(--line),var(--panel2));background-size:200% 100%;
+  animation:sk 1.1s infinite;border-radius:7px;height:14px}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line2);border-top-color:var(--accent);
+  border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.imgthumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px;border:1px solid var(--line);background:var(--panel2)}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+img.broken{display:none}
+
+@media (max-width:1240px){ .g6{grid-template-columns:repeat(3,minmax(0,1fr))} .g4{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:1000px){ .g3{grid-template-columns:repeat(2,minmax(0,1fr))} .pbody{grid-template-columns:1fr} }
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;inset:0 auto 0 0;width:264px;z-index:75;transform:translateX(-102%);transition:.24s}
+  .sidebar.on{transform:none;box-shadow:var(--shadow)}
+  .burger{display:grid;place-items:center}
+  main{padding:16px 14px 54px}
+  .g2,.g3,.g4,.g6{grid-template-columns:1fr}
+  .searchwrap{order:9;flex:1 1 100%;max-width:none}
+  .phead{align-items:flex-start}
+}
+@media (max-width:560px){ .health .h{min-width:118px} .metric .v{font-size:21px} .phead h2{font-size:18px} }
+@media (prefers-reduced-motion:reduce){ *{animation-duration:.01ms!important;transition-duration:.01ms!important} }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="mark">M</div>
+      <div><h1>MORS</h1><small>Data · Space · Quantum</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <b>MORS Scientific Command Center</b><br>
+      build 1.0.0 · <span id="sfEngine">—</span><br>
+      <span id="sfSync">no sync yet</span>
+    </div>
+  </aside>
+
+  <div class="shell">
+    <div class="topbar">
+      <button class="burger" id="burger" aria-label="Open navigation">☰</button>
+      <div class="crumb" id="crumb"><b>MORS Home</b></div>
+      <div class="searchwrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search datasets · stars · planets · satellites · problems · projects …"
+               aria-label="Central MORS search">
+        <div class="sres" id="sres"></div>
+      </div>
+      <div class="pills">
+        <span class="pill" id="pillEngine"><span class="dot"></span>engine</span>
+        <span class="pill" id="pillQuality">quality —</span>
+        <span class="pill acc" id="pillOpen">0 open</span>
+      </div>
+      <button class="btn" id="btnTheme" title="Cycle theme">◐ <span id="themeName">Dark</span></button>
+      <button class="btn pri" id="btnCustom" title="Customize MORS">⚙ Customize MORS</button>
+    </div>
+
+    <div class="health" id="health"></div>
+    <main id="main"><div class="view" id="view"></div></main>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer" aria-label="Customize MORS">
+  <header><h3>Customize MORS</h3><button class="x" data-close>✕</button></header>
+  <div class="body">
+    <section><h5>Theme</h5>
+      <div class="opt" data-set="theme">
+        <button data-v="light">Light</button><button data-v="dark">Dark</button><button data-v="planet">Planet</button>
+      </div>
+    </section>
+    <section id="planetSec"><h5>Planet mode</h5>
+      <div class="opt" data-set="planet">
+        <button data-v="earth">Earth</button><button data-v="mars">Mars</button>
+        <button data-v="jupiter">Jupiter</button><button data-v="saturn">Saturn</button>
+        <button data-v="neptune">Neptune</button><button data-v="moon">Moon</button>
+      </div>
+    </section>
+    <section><h5>Accent colour</h5>
+      <div class="sw" data-set="accent">
+        <i data-v="cyan" style="background:#38BDF8" title="Cyan"></i>
+        <i data-v="teal" style="background:#2DD4BF" title="Teal"></i>
+        <i data-v="blue" style="background:#60A5FA" title="Blue"></i>
+        <i data-v="violet" style="background:#A78BFA" title="Violet"></i>
+        <i data-v="amber" style="background:#FBBF24" title="Amber"></i>
+        <i data-v="rose" style="background:#FB7185" title="Rose"></i>
+      </div>
+      <div class="hint" style="margin-top:7px">Accent layers on top of any background; planet themes keep their atmosphere.</div>
+    </section>
+    <section><h5>Background style</h5>
+      <div class="opt" data-set="grid"><button data-v="on">Grid overlay</button><button data-v="off">Plain</button></div>
+      <div class="opt" data-set="particles" style="margin-top:7px">
+        <button data-v="off">Particles off</button><button data-v="low">Low</button>
+        <button data-v="med">Medium</button><button data-v="high">High</button>
+      </div>
+    </section>
+    <section><h5>Layout</h5>
+      <div class="toggle"><span>Compact mode</span><div class="sw2" data-t="compact"></div></div>
+      <div class="toggle"><span>High-density data tables</span><div class="sw2" data-t="density"></div></div>
+      <div class="toggle"><span>Scientific mode (units, traceability, formulas)</span><div class="sw2" data-t="sci"></div></div>
+      <div class="toggle"><span>Animations</span><div class="sw2" data-t="motion"></div></div>
+    </section>
+    <section><h5>Accessibility</h5>
+      <div class="toggle"><span>High contrast</span><div class="sw2" data-t="contrast"></div></div>
+      <div class="toggle"><span>Larger text</span><div class="sw2" data-t="bigtext"></div></div>
+      <div class="toggle"><span>Respect reduced motion</span><div class="sw2" data-t="rmotion"></div></div>
+    </section>
+    <section><h5>Reset</h5>
+      <button class="btn" id="btnReset" style="width:100%;justify-content:center">Restore MORS defaults</button>
+    </section>
+  </div>
+</aside>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <header>
+    <div><h3 id="mTitle">—</h3><div class="sub" id="mSub"></div></div>
+    <button class="x" data-close>✕</button>
+  </header>
+  <div class="mbody" id="mBody"></div>
+</div>
+
+<div id="toast"></div>
+<script>
+"use strict";
+/* ================================================================ utils */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function n2(v, d) {
+  d = (d == null) ? 2 : d;
+  return (typeof v === "number" && isFinite(v)) ? v.toLocaleString(undefined, { maximumFractionDigits: d }) : "—";
+}
+function pct(v) { return (typeof v === "number" && isFinite(v)) ? n2(v, 1) + "%" : "—"; }
+function num(v) { return (typeof v === "number" && isFinite(v)) ? v.toLocaleString() : "—"; }
+function toast(msg) {
+  var t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove("on"); }, 2600);
+}
+function jsDate(s) {
+  var d = new Date(s);
+  return isNaN(d) ? String(s || "—") : d.toISOString().replace("T", " ").slice(0, 19) + "Z";
+}
+
+/* ================================================================ icons */
+var ICON = {
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
+  ai: '<rect x="4" y="6" width="16" height="13" rx="2.5"/><path d="M9 3v3M15 3v3M9 12h.01M15 12h.01M9.5 16.5h5"/>',
+  data: '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+  astro: '<circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="10.5" ry="4.6" transform="rotate(-24 12 12)"/>',
+  sat: '<path d="M6.5 13.5 4 16l4 4 2.5-2.5"/><path d="m13.5 6.5 4-2.5 2.5 4-2.5 2.5"/><rect x="9.4" y="9.4" width="5.2" height="5.2" rx="1" transform="rotate(45 12 12)"/>',
+  quantum: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/>',
+  problems: '<path d="M12 3 2.7 19.5h18.6z"/><path d="M12 9.5v4.2M12 17h.01"/>',
+  solutions: '<path d="M4 20 9 8l4 6 3-4 4 10z"/><path d="M4 20h16"/>',
+  projects: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3 12h18"/>',
+  team: '<circle cx="9" cy="8.5" r="3.2"/><path d="M3 20c0-3.2 2.7-5.2 6-5.2s6 2 6 5.2"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.9M17.5 14.6c2 .8 3.5 2.5 3.5 5.4"/>',
+  sources: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H19v3H6.5A2.5 2.5 0 0 1 4 20.5z"/><path d="M8 7h7M8 10.5h5"/>',
+  bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  img: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 17 5-4.5 4.5 4 3-2.5L20 17"/>',
+  lc: '<path d="M3 16c3 0 3-9 6-9s3 9 6 9 3-6 6-6"/>',
+  spec: '<path d="M4 20V9M8 20V4M12 20v-8M16 20V7M20 20v-5"/>',
+  orbit: '<circle cx="12" cy="12" r="3.4"/><ellipse cx="12" cy="12" rx="10.5" ry="5" transform="rotate(-30 12 12)"/>',
+  grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.4"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.4"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.4"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.4"/>'
+};
+function svg(k, cls) {
+  return '<svg class="' + (cls || "") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-linecap="round" stroke-linejoin="round">' + (ICON[k] || ICON.grid) + "</svg>";
+}
+
+/* ================================================================ nav */
+var NAV = [
+  { id: "home",      label: "MORS Home",           icon: "home",     group: "Platform" },
+  { id: "ai",        label: "AI.MORS",             icon: "ai",       group: "Platform" },
+  { id: "data",      label: "DATA.MORS",           icon: "data",     group: "Platform" },
+  { id: "astronomy", label: "ASTRONOMY.MORS",      icon: "astro",    group: "Science Modules" },
+  { id: "satellite", label: "SATELLITE.MORS",      icon: "sat",      group: "Science Modules" },
+  { id: "quantum",   label: "QUANTUM.MORS",        icon: "quantum",  group: "Science Modules" },
+  { id: "problems",  label: "Problems → Solutions", icon: "problems", group: "Discovery Cycle" },
+  { id: "solutions", label: "Solutions Center",     icon: "solutions", group: "Discovery Cycle" },
+  { id: "projects",  label: "PROJECTS.MORS",       icon: "projects", group: "Research" },
+  { id: "sources",   label: "SOURCES.MORS",        icon: "sources",  group: "Research" },
+  { id: "team",      label: "TEAM.MORS",           icon: "team",     group: "Research" }
+];
+
+/* ================================================================ state */
+var D = {}, CH = {}, IDX = [];
+var S = { theme: "dark", planet: "earth", accent: null, grid: "off", particles: "low",
+  compact: false, density: false, sci: true, motion: true, contrast: false,
+  bigtext: false, rmotion: true };
+var LS = "mors.settings.v1";
+
+function markSnapshot() {
+  if (window.__MORS_SNAPSHOT__) return;
+  window.__MORS_SNAPSHOT__ = true;
+  var d = document.createElement("div");
+  d.id = "snapBanner";
+  d.textContent = "Static demo — no backend here, showing the JSON snapshot captured at build time (chat, insight and Run Pipeline are disabled).";
+  d.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;" +
+    "background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);" +
+    "padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center";
+  if (document.body) document.body.appendChild(d);
+  else document.addEventListener("DOMContentLoaded", function () { document.body.appendChild(d); });
+}
+function snapshot(url) {
+  var rel = String(url).replace(/^\/+/, "");
+  return fetch(rel + ".json", { cache: "no-cache" }).then(function (r) {
+    if (!r.ok) throw new Error("snapshot missing -> " + rel + ".json");
+    return r.json();
+  }).then(function (j) {
+    markSnapshot();
+    return j;
+  });
+}
+function api(name) {
+  if (D[name]) return Promise.resolve(D[name]);
+  return fetch("/api/mors/" + name, { headers: { Accept: "application/json" } })
+    .then(function (r) {
+      if (!r.ok) throw new Error(name + " → HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (j) {
+      if (j && j.error) throw new Error(j.error);
+      D[name] = j; return j;
+    })
+    .catch(function () {
+      return snapshot("/api/mors/" + name).then(function (j) {
+        D[name] = j; return j;
+      });
+    });
+}
+function tryApi(name) { return api(name).catch(function (e) { console.warn(e.message); return null; }); }
+function getJSON(url) {
+  return fetch(url).then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (j) {
+      if (j) return j;
+      if (String(url).indexOf("/api/") !== 0) return null;
+      return snapshot(url).catch(function () { return null; });
+    });
+}
+
+/* ================================================================ settings */
+function applySettings() {
+  var html = document.documentElement;
+  html.dataset.theme = (S.theme === "planet") ? S.planet : S.theme;
+  if (S.accent) html.dataset.accent = S.accent; else html.removeAttribute("data-accent");
+  html.dataset.grid = S.grid;
+  html.dataset.sci = S.sci ? "on" : "off";
+  document.body.classList.toggle("compact", !!S.compact);
+  document.body.classList.toggle("density-high", !!S.density);
+  document.body.classList.toggle("no-motion", !S.motion);
+  document.body.classList.toggle("contrast", !!S.contrast);
+  html.style.setProperty("--fs", S.bigtext ? "15.5px" : (S.compact ? "13px" : "14px"));
+  $$("#drawer [data-set='theme'] button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === S.theme); });
+  $$("#drawer [data-set='planet'] button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === S.planet); });
+  $("#planetSec").style.opacity = (S.theme === "planet") ? "1" : ".45";
+  $$("#drawer [data-set='accent'] i").forEach(function (b) { b.classList.toggle("on", b.dataset.v === S.accent); });
+  $$("#drawer [data-set='grid'] button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === S.grid); });
+  $$("#drawer [data-set='particles'] button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === S.particles); });
+  $$("#drawer .sw2").forEach(function (t) { t.classList.toggle("on", !!S[t.dataset.t]); });
+  var names = { light: "Light", dark: "Dark", planet: S.planet.charAt(0).toUpperCase() + S.planet.slice(1) };
+  $("#themeName").textContent = names[S.theme] || "Dark";
+  try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {}
+  seedFX();
+}
+function loadSettings() {
+  try { Object.assign(S, JSON.parse(localStorage.getItem(LS) || "{}")); } catch (e) {}
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    S.rmotion = true; S.particles = "off"; S.motion = false;
+  }
+}
+function cycleTheme() {
+  var order = ["dark", "light", "planet"];
+  S.theme = order[(order.indexOf(S.theme) + 1) % order.length];
+  if (S.theme === "planet") S.accent = null;
+  applySettings();
+  toast("Theme → " + $("#themeName").textContent);
+}
+
+/* ================================================================ particles */
+var FX = { pts: [], raf: 0, w: 0, h: 0 };
+function seedFX() {
+  var cv = $("#fx");
+  var n = (!S.motion || S.particles === "off") ? 0 :
+    { low: 26, med: 54, high: 96 }[S.particles] || 0;
+  FX.w = cv.width = window.innerWidth;
+  FX.h = cv.height = window.innerHeight;
+  FX.pts = [];
+  for (var i = 0; i < n; i++) {
+    FX.pts.push({ x: Math.random() * FX.w, y: Math.random() * FX.h,
+      r: Math.random() * 1.25 + 0.35, s: Math.random() * 0.16 + 0.03, a: Math.random() * 0.4 + 0.12 });
+  }
+  cancelAnimationFrame(FX.raf);
+  if (!FX.pts.length) { cv.getContext("2d").clearRect(0, 0, cv.width, cv.height); return; }
+  var ctx = cv.getContext("2d");
+  var accent = cssVar("--accent") || "#38BDF8";
+  (function loop() {
+    ctx.clearRect(0, 0, FX.w, FX.h);
+    ctx.fillStyle = accent;
+    FX.pts.forEach(function (p) {
+      p.y -= p.s;
+      if (p.y < -4) { p.y = FX.h + 4; p.x = Math.random() * FX.w; }
+      ctx.globalAlpha = p.a;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.284); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    FX.raf = requestAnimationFrame(loop);
+  })();
+}
+
+/* ================================================================ charts */
+function cssVar(v) {
+  return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+}
+function mkChart(id, cfg) {
+  var el = document.getElementById(id);
+  if (!el || !window.Chart) return null;
+  if (CH[id]) { try { CH[id].destroy(); } catch (e) {} }
+  var mut = cssVar("--muted"), line = cssVar("--line"), text = cssVar("--text"), p2 = cssVar("--panel2");
+  Chart.defaults.color = mut;
+  Chart.defaults.borderColor = line;
+  Chart.defaults.font.family = '"Inter","Segoe UI",system-ui,sans-serif';
+  Chart.defaults.font.size = 10.5;
+  var circular = cfg.type === "doughnut" || cfg.type === "pie" || cfg.type === "radar";
+  cfg.options = Object.assign({
+    responsive: true, maintainAspectRatio: false,
+    animation: S.motion ? { duration: 420 } : false,
+    plugins: {
+      legend: { labels: { boxWidth: 11, boxHeight: 11, usePointStyle: true, pointStyle: "rectRounded", padding: 14, color: mut } },
+      tooltip: { backgroundColor: p2, borderColor: line, borderWidth: 1, titleColor: text,
+        bodyColor: mut, padding: 10, cornerRadius: 8, displayColors: true }
+    }
+  }, cfg.options || {});
+  if (!circular && !cfg.options.scales) {
+    cfg.options.scales = {
+      x: { grid: { color: line }, ticks: { color: mut, maxRotation: 0, autoSkipPadding: 16 } },
+      y: { grid: { color: line }, ticks: { color: mut } }
+    };
+  }
+  if (circular) delete cfg.options.scales;
+  CH[id] = new Chart(el, cfg);
+  return CH[id];
+}
+function destroyCharts() {
+  Object.keys(CH).forEach(function (k) { try { CH[k].destroy(); } catch (e) {} delete CH[k]; });
+}
+function PALETTE() {
+  return [cssVar("--accent"), "#818CF8", "#34D399", "#FBBF24", "#F87171", "#F472B6", "#22D3EE", "#A3E635"];
+}
+
+/* ================================================================ badges */
+function traceHTML(t, note) {
+  if (!t) return "";
+  var parts = [t.source, "v" + (t.dataset_version || "1.0.0"), t.processing_pipeline,
+    t.method, "updated " + jsDate(t.last_updated), t.operator_id].filter(Boolean);
+  return '<div class="trace">[ <b>TRACE</b> · ' + esc(parts.join(" | ")) +
+    (t.endpoint ? " | " + esc(t.endpoint) : "") +
+    (note ? " | " + esc(note) : "") + " ]</div>";
+}
+function badgeHTML(b) { return b ? '<div class="trace">' + esc(b) + "</div>" : ""; }
+function srcPill(trace) {
+  var via = (trace && trace.via) || "—";
+  var cls = via === "api" ? "ok" : (via === "ai_synthesis" ? "warn" : "");
+  var lbl = { api: "live API", ai_synthesis: "AI synthesis", local_model: "local model", pipeline: "pipeline" }[via] || via;
+  return '<span class="pill ' + cls + '"><span class="dot"></span>' + esc(lbl) + "</span>";
+}
+function priTag(p) {
+  var c = p === "High" ? "high" : (p === "Medium" ? "med" : "low");
+  return '<span class="tag ' + c + '">' + esc(p || "—") + "</span>";
+}
+
+/* ================================================================ router */
+var CURRENT = "home";
+function renderNav() {
+  var html = "", g = "";
+  NAV.forEach(function (n) {
+    if (n.group !== g) { g = n.group; html += '<div class="nav-lab">' + esc(g) + "</div>"; }
+    var c = navCount(n.id);
+    html += '<a href="#/' + n.id + '" data-nav="' + n.id + '"' + (CURRENT === n.id ? ' class="on"' : "") + ">" +
+      svg(n.icon) + "<span>" + esc(n.label) + "</span>" +
+      (c ? '<span class="cnt">' + c + "</span>" : "") + "</a>";
+  });
+  $("#nav").innerHTML = html;
+}
+function navCount(id) {
+  if (id === "problems" && D.problems) return D.problems.count;
+  if (id === "solutions" && D.solutions) return D.solutions.count;
+  if (id === "projects" && D.projects) return D.projects.count;
+  if (id === "team" && D.team) return D.team.count;
+  if (id === "astronomy" && D.objects) return D.objects.count;
+  return "";
+}
+function crumbFor(id, sub) {
+  var n = NAV.filter(function (x) { return x.id === id; })[0] || NAV[0];
+  $("#crumb").innerHTML = "<b>" + esc(n.label) + "</b>" +
+    (sub ? '<span class="sep">/</span>' + esc(sub) : "");
+}
+var VIEWS = {};
+function go(id, sub) {
+  if (!NAV.some(function (n) { return n.id === id; })) id = "home";
+  CURRENT = id;
+  destroyCharts();
+  renderNav();
+  crumbFor(id, sub);
+  $("#view").innerHTML = '<div class="card"><div class="skel" style="width:44%"></div>' +
+    '<div class="skel" style="width:76%;margin-top:10px"></div>' +
+    '<div class="skel" style="height:180px;margin-top:16px"></div></div>';
+  $("#main").scrollTop = 0;
+  $("#sidebar").classList.remove("on");
+  var fn = VIEWS[id] || VIEWS.home;
+  fn().catch(function (e) {
+    console.error(e);
+    $("#view").innerHTML = '<div class="card"><div class="empty-state"><b>This module could not be loaded</b>' +
+      esc(e.message) + '<div style="margin-top:14px"><button class="btn pri" id="retryBtn">Retry</button></div></div></div>';
+    var rb = $("#retryBtn"); if (rb) rb.addEventListener("click", function () { go(id); });
+  });
+}
+/* ================================================================ common */
+function pageHead(title, desc, acts) {
+  return '<div class="phead"><div><h2>' + title + "</h2><p>" + desc + "</p></div>" +
+    (acts ? '<div class="acts">' + acts + "</div>" : "") + "</div>";
+}
+function metric(k, v, d, cls) {
+  return '<div class="metric ' + (cls || "") + '"><div class="k">' + esc(k) + '</div><div class="v">' + v + "</div>" +
+    (d ? '<div class="d">' + esc(d) + "</div>" : "") + "</div>";
+}
+function chartCard(id, title, sub, src, h) {
+  return '<div class="card"><div class="chd"><div><h3>' + esc(title) + '</h3><div class="sub">' + esc(sub) +
+    '</div></div></div><div class="cbox ' + (h || "h220") + '"><canvas id="' + id + '"></canvas></div>' +
+    '<div class="cap"><b>Source</b>' + esc(src) + "</div></div>";
+}
+function lifecycleHTML(stages) {
+  var s = (stages || []).map(function (x) { return typeof x === "string" ? { label: x } : x; });
+  return s.map(function (st, i) {
+    var key = String(st.label || "").toUpperCase();
+    var cls = "";
+    if (/PROBLEM|EVIDENCE/.test(key)) cls = "hot";
+    else if (/ACTION|SUGGEST/.test(key)) cls = "done";
+    else if (i === 0) cls = "now";
+    return '<div class="st ' + cls + '"><i></i><b>' + esc(st.label || st) + "</b>" +
+      (st.desc ? "<span>" + esc(st.desc) + "</span>" : "") + "</div>";
+  }).join("");
+}
+function shortName(s) { s = String(s || ""); return s.length > 22 ? s.slice(0, 20) + "…" : s; }
+function openScrim(on) { $("#scrim").classList.toggle("on", !!on); }
+function openModal(title, sub, body) {
+  $("#mTitle").textContent = title;
+  $("#mSub").innerHTML = sub || "";
+  $("#mBody").innerHTML = body || "";
+  $("#modal").classList.add("on");
+  $("#drawer").classList.remove("on");
+  openScrim(true);
+}
+function closeAll() {
+  $("#modal").classList.remove("on");
+  $("#drawer").classList.remove("on");
+  $("#sidebar").classList.remove("on");
+  openScrim(false);
+}
+
+/* ================================================================ HOME */
+VIEWS.home = function () {
+  return Promise.all([api("home"), tryApi("problems"), tryApi("datahealth")]).then(function (r) {
+    var h = r[0], pr = r[1], dh = r[2], m = h.metrics || {};
+    var open = (pr && pr.count) || m.problems_open || 0;
+    var high = (pr && pr.by_priority && pr.by_priority.High) || m.problems_high || 0;
+    var med = (pr && pr.by_priority && pr.by_priority.Medium) || 0;
+
+    var html = pageHead(
+      "MORS Scientific Command Center",
+      (h.headline && h.headline.platform ? esc(h.headline.platform) + " — " : "") +
+      "An interactive research platform built around one cycle: <b style='color:var(--accent)'>DATA → ANALYSIS → " +
+      "DISCOVERY → PROBLEM → EVIDENCE → SOLUTION → SUGGESTION → ACTION</b>. Every figure carries a traceability " +
+      "badge naming its source, pipeline, method and operator.",
+      '<button class="btn" data-act="run">↻ Re-run pipeline</button>' +
+      '<a class="btn pri" href="#/problems">Open Problems → Solutions</a>');
+
+    html += '<div class="grid g4">' +
+      metric("Data rows ingested", num(m.rows), (m.formulas || 0) + " formulas · " + (m.references || 0) + " references", "acc") +
+      metric("Data quality score", dh ? n2(dh.data_quality_score, 1) : n2(m.data_quality_score, 1),
+        dh ? "completeness " + pct(dh.completeness_pct) : "awaiting pipeline", "") +
+      metric("Problems detected", String(open), high + " high · " + med + " medium", "") +
+      metric("Council verdict", (h.runs && h.runs[0] && h.runs[0].verdict) || "—",
+        h.runs && h.runs[0] ? h.runs[0].score + "/100 · " + h.runs[0].engine : "no run yet", "acc") +
+      "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>The MORS discovery cycle</h3>' +
+      '<div class="sub">Every screen maps to one stage of this loop — click a stage to jump there.</div></div>' +
+      '<div class="rt"><span class="tag acc">DATA → ACTION</span></div></div><div class="flow">' +
+      lifecycleHTML((pr && pr.lifecycle) || (h.headline && h.headline.lifecycle) || []) + "</div></div>";
+
+    html += '<div class="grid g3">';
+    (h.domains || []).forEach(function (d) {
+      html += '<div class="card"><div class="chd"><div><h3>' + esc(d.label) + '</h3><div class="sub">' +
+        esc(d.desc || "") + '</div></div><div class="rt"><span class="tag acc">' + esc(d.key || "") +
+        "</span></div></div></div>";
+    });
+    html += "</div>";
+
+    html += '<div class="grid g2">';
+    html += '<div class="card acc"><div class="chd"><div><h3>Top problems detected</h3>' +
+      '<div class="sub">Evidence-based findings from the certified run. Open a card for the full schema.</div></div>' +
+      '<div class="rt"><a class="btn" href="#/problems">All ' + open + "</a></div></div>" +
+      '<div class="tl">' + (h.problems || []).slice(0, 4).map(function (p) {
+        return '<div class="ev" style="cursor:pointer" data-goproblem="' + esc(p.id) + '">' +
+          '<h5><span class="mono" style="color:var(--accent)">' + esc(p.id) + "</span>" + esc(p.title) +
+          priTag(p.priority) + "</h5>" +
+          '<div class="row"><b>Evidence</b><span>' + esc((p.evidence || [])[0] || p.symptom || "") + "</span></div>" +
+          '<div class="row"><b>Confidence</b><span>' + n2(p.confidence_level, 0) +
+          "% — algorithmic, not proof</span></div></div>";
+      }).join("") + "</div></div>";
+
+    html += '<div class="card acc"><div class="chd"><div><h3>Solutions &amp; expected impact</h3>' +
+      '<div class="sub">Each resolution path derives from its problem: cause → action → measurable delta.</div></div>' +
+      '<div class="rt"><a class="btn" href="#/solutions">Solutions Center</a></div></div>' +
+      '<div class="tl">' + (h.solutions_summary || []).slice(0, 4).map(function (s) {
+        var imp = (s.expected_impact || [])[0];
+        return '<div class="ev" data-gosol="' + esc(s.id) + '" style="cursor:pointer">' +
+          '<h5><span class="mono" style="color:var(--accent)">' + esc(s.id) + "</span>" + esc(s.title) +
+          priTag(s.priority) + "</h5>" +
+          (imp ? '<div class="row"><b>Expected</b><span class="mono">' + esc(imp.metric) + ": " +
+            esc(imp.now) + " → " + esc(imp.target) + "</span></div>" : "") + "</div>";
+      }).join("") + "</div></div>";
+    html += "</div>";
+
+    html += '<div class="grid g3">' +
+      chartCard("qcChart", "Data-quality composition", "Completeness vs missing vs duplicate vs outlier cells",
+        "MORS Ingestion Pipeline · cell census") +
+      chartCard("priChart", "Problems by priority", "Rule-derived priority, not editorial judgement",
+        "Formula: 0.40·evidence + 0.35·impact + 0.25·confidence") +
+      chartCard("sparkChart", "Latest observations", "Kp index over the certified observation window",
+        "NOAA SWPC planetary K-index") +
+      "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Latest analysis runs</h3>' +
+      '<div class="sub">Certified pipeline executions with council verdicts.</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Run</th><th>Generated</th><th>Status</th><th>Verdict</th>' +
+      '<th class="num">Score</th><th class="num">Rows</th><th class="num">Sources</th><th>Engine</th></tr></thead><tbody>' +
+      (h.runs || []).map(function (r2) {
+        return '<tr><td class="mono">' + esc(r2.run_id) + "</td><td>" + jsDate(r2.generated_at) + "</td>" +
+          '<td><span class="tag ' + (r2.status === "completed" ? "low" : "med") + '">' + esc(r2.status) + "</span></td>" +
+          "<td>" + esc(r2.verdict || "—") + '</td><td class="num">' + n2(r2.score, 0) + "</td>" +
+          '<td class="num">' + num(r2.rows) + '</td><td class="num">' + num(r2.sources) + "</td>" +
+          "<td>" + esc(r2.engine || "—") + "</td></tr>";
+      }).join("") + "</tbody></table></div>" + badgeHTML(h.badge) + "</div>";
+
+    $("#view").innerHTML = html;
+
+    if (dh) {
+      var rest = Math.max(0, 100 - dh.missing_pct - dh.duplicate_pct - dh.outliers_pct);
+      mkChart("qcChart", { type: "doughnut",
+        data: { labels: ["Complete", "Missing", "Duplicate", "Outlier"],
+          datasets: [{ data: [rest, dh.missing_pct, dh.duplicate_pct, dh.outliers_pct],
+            backgroundColor: PALETTE(), borderWidth: 0, hoverOffset: 6 }] },
+        options: { cutout: "64%", plugins: { legend: { position: "bottom" } } } });
+    }
+    if (pr) {
+      var bp = pr.by_priority || {};
+      mkChart("priChart", { type: "bar",
+        data: { labels: ["High", "Medium", "Low"],
+          datasets: [{ label: "problems", data: [bp.High || 0, bp.Medium || 0, bp.Low || 0],
+            backgroundColor: ["#F87171", "#FBBF24", "#34D399"], borderRadius: 6, barThickness: 34 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+    }
+    return getJSON("/api/data/kp-index").then(function (kp) {
+      var labels = [], data = [];
+      var daily = (kp && kp.daily) || [];
+      daily.forEach(function (d) {
+        if (!d.no_data && typeof d.kp === "number") { labels.push(String(d.date).slice(5)); data.push(d.kp); }
+      });
+      if (!labels.length) { labels = ["—"]; data = [0]; }
+      mkChart("sparkChart", { type: "line",
+        data: { labels: labels, datasets: [{ label: "Kp index", data: data,
+          borderColor: cssVar("--accent"), backgroundColor: cssVar("--accentSoft"), fill: true,
+          tension: 0.34, pointRadius: 0, borderWidth: 2 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+    });
+  });
+};
+
+/* ================================================================ AI.MORS */
+function tierOf(type) {
+  var t = String(type || "").toLowerCase();
+  if (t.indexOf("observed") >= 0) return 1;
+  if (t.indexOf("calc") >= 0) return 2;
+  if (t.indexOf("hyp") >= 0) return 4;
+  if (t.indexOf("suggest") >= 0 || t.indexOf("action") >= 0) return 5;
+  return 3;
+}
+var TIER_DESC = [
+  "Values copied from a named dataset — reproducible by re-querying the same source.",
+  "Values recomputed here from observed data — reproducible from the stated formula.",
+  "A model reading of the numbers: interpretation, not measurement.",
+  "An untested explanation offered for future checking.",
+  "A proposed next step — an engineering action, not a scientific claim."
+];
+VIEWS.ai = function () {
+  return Promise.all([api("ai"),
+                      api("prompts").catch(function () { return {}; })]).then(function (rr) {
+    var a = rr[0] || {}, lib = rr[1] || {};
+    var e = a.engine || {};
+    var html = pageHead("AI.MORS — Data Intelligence",
+      "AI here is an <b>analysis assistant</b>, not a chatbot: it reads the certified dataset, flags problems, " +
+      "explains results and proposes verification steps — and it always labels what kind of statement it is making.",
+      '<button class="btn pri" data-act="insight">Generate AI insight</button>');
+
+    html += '<div class="card"><div class="chd"><div><h3>Who is Ai.Mors</h3>' +
+      '<div class="sub">Agent 4 — the conversational face of the pipeline. It never measures anything itself: ' +
+      "it reads the council-certified report, repeats the mandatory greeting, answers in numbered steps and " +
+      "labels every claim with the 5-tier protocol.</div></div>" +
+      '<div class="rt"><span class="tag acc">POST /api/chat</span>' +
+      '<span class="tag low">POST /api/mors/insight</span></div></div>' +
+      '<div class="grid g2"><div>' +
+      '<div class="ar ttl">أهلاً وسهلاً بكم في الفضاء</div>' +
+      '<ul class="ar-list">' +
+      [["1-", "أنا <b>Ai.Mors</b>، وكيل الفضاء المعتمد داخل منصة ASI-HACK."],
+       ["2-", "اضغط <b>Run Pipeline</b> أولاً لبناء قاعدة المعرفة من بيانات NASA الحية " +
+              '(<span class="mono">DONKI · NEOWS · JPL Horizons</span>).'],
+       ["3-", "بعد الاعتماد اسألني أي سؤال فلكي، وأجيب بخطوات مرقّمة مع المعادلات " +
+              'ومعرّفات التتبع <span class="mono">Traceability IDs</span> والمراجع العلمية.'],
+       ["\u2713", "الخلاصة: كل إجابة أقدّمها مُوثّقة من مجلس الخبراء الخمسة."]]
+        .map(function (x) {
+          return '<li><span class="n">' + x[0] + '</span><span class="t ar">' + x[1] + "</span></li>";
+        }).join("") + "</ul>" +
+      '<div class="disclaim">The greeting is a hard constraint in <span class="mono">agent4_aimors.py</span> — ' +
+      "if the model omits it, the agent prepends it before the answer is returned.</div></div>" +
+      '<div><div class="fld"><div class="fl">Ask Ai.Mors directly</div>' +
+      '<div class="filters"><input type="search" id="chatQ" style="flex:1;min-width:200px" dir="auto" ' +
+      'placeholder="اسأل سؤالاً فلكياً… e.g. what is the fastest CME speed?">' +
+      '<button class="btn pri" data-act="chat">Ask</button></div>' +
+      '<div id="chatOut"><div class="hint">Answers are grounded in the certified report; ' +
+      "replies come back prefixed with the Arabic greeting.</div></div></div>" +
+      '<div class="fld"><div class="fl">Response envelope</div><div class="pill-row">' +
+      ["reply", "greeting_ok", "trace[]", "engine", "timestamp"].map(function (k) {
+        return '<span class="kpi mono">' + esc(k) + "</span>";
+      }).join("") + "</div></div>" +
+      '<div class="fld"><div class="fl">Engine ladder</div><p class="hint">' +
+      '<span class="mono">gemini:3.1-pro</span> \u2192 <span class="mono">gemini:3.6-flash</span> \u2192 ' +
+      '<span class="mono">gemini-flash-latest</span> \u2192 <span class="mono">deterministic_fallback</span> ' +
+      "\u2014 each rung is tried in order and the one that answered is echoed in " +
+      '<span class="mono">engine</span>.</p></div></div></div></div>';
+
+    html += '<div class="grid g4">' +
+      metric("Council engine", esc(e.council || "—"), "Agent 2 verification path", "acc") +
+      metric("Last council score", n2(e.last_score, 0) + "/100", "deterministic audit", "") +
+      metric("Formula coverage", n2(e.formula_coverage, 0), "equations with references", "") +
+      metric("Data quality", n2(e.data_quality, 1), "as reported by ingestion", "") + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>AI output protocol — 5 tiers</h3>' +
+      '<div class="sub">Every AI statement on this platform is tagged. A tier is a claim about <i>how we know</i>, ' +
+      "not how true it is.</div></div></div><div class=\"grid g2\">" +
+      (a.protocol || []).map(function (p, i) {
+        var t = [1, 1, 3, 4, 5][i] || 3;
+        return '<div class="tier t' + t + '"><div class="tl2">' + esc(p) + "</div><p>" +
+          esc(TIER_DESC[i] || "") + "</p></div>";
+      }).join("") + "</div>" +
+      '<div class="disclaim">Zero-hallucination rule: AI never invents a measurement. If a value is not in a dataset ' +
+      "or derivable from a formula in the report, it is tier 4 (hypothesis) or tier 5 (suggestion) — and it says so." +
+      "</div></div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Prompt library — the six master prompts</h3>' +
+      '<div class="sub">The operating prompts shipped in <span class="mono">prompts/</span>: the AI.MORS scientific ' +
+      "analyst lifecycle, the two UI/UX command-center specs, CYBER.MORS, ANALYTICS.REPORT and DEEP.AUDIT. " +
+      'Expand an entry to read the full prompt.</div></div>' +
+      '<div class="rt"><span class="tag acc">GET /api/mors/prompts</span>' +
+      '<span class="tag low">' + n2(lib.count, 0) + " prompts</span></div></div>" +
+      (lib.prompts || []).map(function (p) {
+        return '<details class="fld" style="margin-bottom:8px"><summary style="cursor:pointer">' +
+          '<span class="mono" style="color:var(--accent)">' + esc(p.id) + "</span> " + esc(p.title) +
+          ' <span class="tag">' + esc(p.domain) + "</span>" +
+          '<span class="tsub">' + n2(p.lines, 0) + " lines · " + esc(p.file) + "</span></summary>" +
+          '<p class="hint">' + esc(p.summary) + "</p>" +
+          '<pre style="white-space:pre-wrap;font-size:11.5px;max-height:340px;overflow:auto;margin-top:8px">' +
+          esc(p.text) + "</pre></details>";
+      }).join("") +
+      '<div class="disclaim">Read-only registry: the library documents exactly what each agent and the UI spec were built against.</div></div>';
+
+    html += '<div class="grid g2">';
+    html += '<div class="card"><div class="chd"><div><h3>AI models</h3>' +
+      '<div class="sub">Model roster and their assigned scientific role</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Model</th><th>Role</th><th class="num">Temp</th><th>Status</th></tr></thead><tbody>' +
+      (a.models || []).map(function (m) {
+        var act = String(m.status).toLowerCase().indexOf("active") >= 0;
+        return '<tr><td class="mono">' + esc(m.id) + "</td><td>" + esc(m.role) +
+          '<span class="tsub">' + esc(m.context || "") + '</span></td><td class="num">' + n2(m.temperature, 2) + "</td>" +
+          '<td><span class="tag ' + (act ? "low" : "med") + '">' + esc(m.status) + "</span></td></tr>";
+      }).join("") + "</tbody></table></div></div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>AI tools &amp; data intelligence</h3>' +
+      '<div class="sub">Instruments the assistant is allowed to touch</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Tool</th><th>Type</th><th class="num">Records</th><th>Status</th></tr></thead><tbody>' +
+      (a.tools || []).map(function (t) {
+        var ok = String(t.status).toLowerCase().indexOf("ok") >= 0;
+        return "<tr><td>" + esc(t.name) + "</td><td>" + esc(t.type) + '</td><td class="num">' + num(t.records) + "</td>" +
+          '<td><span class="tag ' + (ok ? "low" : "med") + '">' + esc(t.status) + "</span></td></tr>";
+      }).join("") + "</tbody></table></div></div>";
+    html += "</div>";
+
+    html += '<div class="grid g3">';
+    html += '<div class="card acc"><div class="chd"><div><h3>AI insights</h3>' +
+      '<div class="sub">Tier-tagged readings of the current dataset</div></div></div>' +
+      (a.insights || []).map(function (i) {
+        return '<div class="tier t' + tierOf(i.type) + '"><div class="tl2">' + esc(i.type || "AI Interpretation") +
+          "</div><p>" + esc(i.text) + "</p></div>";
+      }).join("") + "</div>";
+    html += '<div class="card"><div class="chd"><div><h3>AI recommendations</h3>' +
+      '<div class="sub">Tier 5 — suggested actions</div></div></div><ol class="steps">' +
+      (a.recommendations || []).map(function (r) {
+        return "<li>" + esc(r.text) + "<em>" + esc(r.priority || "") + "</em></li>";
+      }).join("") + "</ol></div>";
+    html += '<div class="card"><div class="chd"><div><h3>AI research queue</h3>' +
+      '<div class="sub">Open questions the assistant is tracking</div></div></div>' +
+      (a.research || []).map(function (r) {
+        return '<div class="tier t4"><div class="tl2">' + esc(r.status || "open") + "</div><p>" + esc(r.topic) +
+          '</p><p style="color:var(--dim);font-size:11.5px;margin-top:5px">owner: ' + esc(r.owner) + "</p></div>";
+      }).join("") + "</div>";
+    html += "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Ask the analysis assistant</h3>' +
+      '<div class="sub">Answers are assembled from the certified report and tagged with the 5-tier protocol.</div></div></div>' +
+      '<div class="filters"><input type="search" id="insQ" style="flex:1;min-width:240px" ' +
+      'placeholder="e.g. what is the maximum Kp value in the dataset?">' +
+      '<select id="insDs"><option value="auto">dataset: auto</option>' +
+      ["report", "problems", "quality", "science", "quantum"].map(function (d) {
+        return '<option value="' + d + '">dataset: ' + d + "</option>";
+      }).join("") + '</select><button class="btn pri" data-act="insight">Run</button></div>' +
+      '<div id="insOut"><div class="hint">No query yet — the assistant only answers from the certified report.</div></div>' +
+      traceHTML({ source: "MORS AI Workspace", dataset_version: "1.0.0",
+        processing_pipeline: "5-tier tagged generation", method: "report-grounded synthesis",
+        last_updated: new Date().toISOString(), operator_id: "agent:ai.mors" }) + "</div>";
+
+    $("#view").innerHTML = html;
+  });
+};
+function runInsight() {
+  var box = $("#insOut");
+  var q = ($("#insQ") && $("#insQ").value || "").trim();
+  if (!q) { toast("Type a question first"); return; }
+  if (box) box.innerHTML = '<div class="hint"><span class="spin"></span> analysing certified report…</div>';
+  fetch("/api/mors/insight", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: q, dataset: ($("#insDs") || {}).value || "auto" }) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (j.error) throw new Error(j.error);
+      var html = "";
+      var tiers = j.tiers || j.blocks || j.sections;
+      if (Array.isArray(tiers)) {
+        html = tiers.map(function (t) {
+          var lab = t.tier || t.type || "AI Interpretation";
+          var txt = t.text || t.value || t.content || "";
+          return '<div class="tier t' + tierOf(lab) + '"><div class="tl2">' + esc(lab) + "</div><p>" + esc(txt) + "</p></div>";
+        }).join("");
+      } else {
+        html = '<div class="tier t3"><div class="tl2">AI Interpretation</div><p>' +
+          esc(j.reply || j.answer || j.text || JSON.stringify(j)) + "</p></div>";
+      }
+      if (Array.isArray(j.citations) && j.citations.length)
+        html += '<div class="trace">[ <b>CITATIONS</b> · ' + esc(j.citations.join(" | ")) + " ]</div>";
+      if (j.engine) html += '<div class="cap"><b>Engine</b>' + esc(j.engine) + "</div>";
+      if (box) box.innerHTML = html;
+    })
+    .catch(function (e) {
+      if (box) box.innerHTML = '<div class="tier t5"><div class="tl2">Unavailable</div><p>' + esc(e.message) + "</p></div>";
+    });
+}
+function runMorsChat() {
+  var box = $("#chatOut");
+  var q = ($("#chatQ") && $("#chatQ").value || "").trim();
+  if (!q) { toast("Type a question for Ai.Mors first"); return; }
+  if (box) box.innerHTML = '<div class="hint"><span class="spin"></span> Ai.Mors يفكر…</div>';
+  fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: q, history: [] }) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (j.error) throw new Error(j.error);
+      var body = String(j.reply || "").split("\n");
+      var head = body.shift() || "";
+      var html = '<div class="tier t3"><div class="tl2">' + esc(head) + "</div>" +
+        '<p class="ar">' + esc(body.join("\n")).replace(/\n/g, "<br>") + "</p></div>";
+      html += '<div class="trace">[ <b>Ai.Mors</b> | engine: ' + esc(j.engine || "—") +
+        " | greeting_ok: " + esc(String(!!j.greeting_ok)) +
+        " | trace: " + esc((j.trace || []).join(", ") || "none") +
+        (j.timestamp ? " | " + esc(j.timestamp) : "") + " ]</div>";
+      if (box) box.innerHTML = html;
+    })
+    .catch(function (e) {
+      if (box) box.innerHTML = '<div class="tier t5"><div class="tl2">Unavailable</div><p class="ar">' +
+        esc(e.message) + "</p></div>";
+    });
+}
+/* ================================================================ DATA.MORS */
+function healthTile(k, v, pv, cls) {
+  return '<div class="metric"><div class="k">' + esc(k) + '</div><div class="v">' + v + "</div>" +
+    '<div class="bar ' + cls + '"><i style="width:' + Math.max(2, Math.min(100, pv || 0)) + '%"></i></div></div>';
+}
+function pearson(a, b) {
+  var n = Math.min(a.length, b.length);
+  if (n < 3) return 0;
+  var sa = 0, sb = 0, i;
+  for (i = 0; i < n; i++) { sa += a[i]; sb += b[i]; }
+  var ma = sa / n, mb = sb / n, nr = 0, da = 0, db = 0;
+  for (i = 0; i < n; i++) { var x = a[i] - ma, y = b[i] - mb; nr += x * y; da += x * x; db += y * y; }
+  return (da && db) ? nr / Math.sqrt(da * db) : 0;
+}
+function hexMix(a, b, t) {
+  function p(s) { return [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16)]; }
+  var A = p(a), B = p(b);
+  return "rgb(" + A.map(function (v, i) { return Math.round(v + (B[i] - v) * t); }).join(",") + ")";
+}
+function drawCorr(id, ps) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var cols = ["rows", "missing_pct", "completeness_pct", "duplicate_rows", "invalid_cells", "accuracy_score"];
+  var labels = ["rows", "missing", "complete", "duplicates", "invalid", "accuracy"];
+  var series = cols.map(function (c) { return ps.map(function (s) { return Number(s[c]) || 0; }); });
+  var M = series.map(function (a) { return series.map(function (b) { return pearson(a, b); }); });
+  var dpr = window.devicePixelRatio || 1;
+  var w = el.clientWidth || 460, h = 260;
+  el.width = w * dpr; el.height = h * dpr;
+  var ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  var padL = 74, padT = 34;
+  var cell = Math.min((w - padL - 12) / labels.length, (h - padT - 16) / labels.length);
+  var acc = cssVar("--accent");
+  ctx.font = "9.5px Inter, sans-serif";
+  labels.forEach(function (l, i) {
+    ctx.fillStyle = cssVar("--dim");
+    ctx.textAlign = "right";
+    ctx.fillText(l, padL - 6, padT + i * cell + cell / 2 + 3);
+    ctx.save();
+    ctx.translate(padL + i * cell + cell / 2, padT - 8);
+    ctx.rotate(-0.5);
+    ctx.textAlign = "left";
+    ctx.fillText(l, 0, 0);
+    ctx.restore();
+  });
+  for (var r = 0; r < M.length; r++)
+    for (var c = 0; c < M[r].length; c++) {
+      var v = M[r][c], x = padL + c * cell, y = padT + r * cell;
+      ctx.fillStyle = v >= 0 ? hexMix(acc, "#0EA5E9", 1) : hexMix("#F87171", "#FBBF24", 1);
+      ctx.globalAlpha = 0.14 + 0.72 * Math.abs(v);
+      ctx.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = cssVar("--line");
+      ctx.strokeRect(x + 1, y + 1, cell - 2, cell - 2);
+      ctx.fillStyle = Math.abs(v) > 0.55 ? "#fff" : cssVar("--muted");
+      ctx.textAlign = "center";
+      ctx.fillText(v.toFixed(2), x + cell / 2, y + cell / 2 + 3);
+    }
+  ctx.fillStyle = cssVar("--dim");
+  ctx.textAlign = "right";
+  ctx.fillText("Pearson r", w - 6, h - 6);
+}
+function drawPeriodogram(id, flux) {
+  if (!flux || flux.length < 8) return;
+  var mean = flux.reduce(function (s, v) { return s + v; }, 0) / flux.length;
+  var wn = flux.map(function (_, i) { return 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (flux.length - 1)); });
+  var N = 90, fMin = 0.02, fMax = 3, labels = [], pw = [];
+  for (var k = 0; k < N; k++) {
+    var f = fMin * Math.pow(fMax / fMin, k / (N - 1)), re = 0, im = 0;
+    for (var i = 0; i < flux.length; i++) {
+      var ang = 2 * Math.PI * f * (i / 1);
+      var v = (flux[i] - mean) * wn[i];
+      re += v * Math.cos(ang);
+      im -= v * Math.sin(ang);
+    }
+    labels.push(f.toFixed(3));
+    pw.push(Math.sqrt(re * re + im * im) / flux.length);
+  }
+  mkChart(id, { type: "line",
+    data: { labels: labels, datasets: [{ label: "power", data: pw,
+      borderColor: cssVar("--accent"), backgroundColor: cssVar("--accentSoft"),
+      fill: true, pointRadius: 0, borderWidth: 1.8, tension: 0.25 }] },
+    options: { plugins: { legend: { display: false } },
+      scales: { x: { title: { display: true, text: "frequency (cycles per point)" }, ticks: { maxTicksLimit: 8 } },
+        y: { title: { display: true, text: "power (arb.)" } } } } });
+}
+function drawStats(flux) {
+  var b = $("#statBody");
+  if (!b || !flux.length) return;
+  var n = flux.length;
+  var mean = flux.reduce(function (s, v) { return s + v; }, 0) / n;
+  var sd = Math.sqrt(flux.reduce(function (s, v) { return s + (v - mean) * (v - mean); }, 0) / (n - 1 || 1));
+  var sorted = flux.slice().sort(function (a, b2) { return a - b2; });
+  var med = n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+  var sk = sd ? flux.reduce(function (s, v) { return s + Math.pow((v - mean) / sd, 3); }, 0) / n : 0;
+  var ku = sd ? flux.reduce(function (s, v) { return s + Math.pow((v - mean) / sd, 4); }, 0) / n - 3 : 0;
+  var rows = [
+    ["n", n, "points"], ["mean", mean, "relative flux"], ["median", med, "relative flux"],
+    ["std (σ)", sd, "relative flux"], ["min", sorted[0], "relative flux"],
+    ["max", sorted[n - 1], "relative flux"], ["range", sorted[n - 1] - sorted[0], "relative flux"],
+    ["skewness", sk, "—"], ["excess kurtosis", ku, "—"], ["S/N = mean/σ", sd ? mean / sd : 0, "—"]
+  ];
+  b.innerHTML = rows.map(function (r) {
+    return "<tr><td>" + esc(r[0]) + '</td><td class="num">' + n2(r[1], 5) + "</td><td>" + esc(r[2]) + "</td></tr>";
+  }).join("");
+}
+function drawCleanLog() {
+  var el = $("#cleanLog");
+  if (!el) return;
+  var steps = (D.datahealth && D.datahealth.cleaning) || null;
+  var fallback = [
+    ["Schema normalisation", "column names → snake_case; dtypes parsed by Astropy where applicable"],
+    ["Missing-value handling", "calendar padding with no_data flags; no silent mean-filling"],
+    ["Duplicate removal", "key = (source, timestamp); first occurrence retained"],
+    ["Invalid-range filtering", "physically impossible values quarantined, not deleted"],
+    ["Outlier detection", "IsolationForest + z-score (>4σ) flagging"],
+    ["Scaling", "StandardScaler for the ML branch; raw units preserved for reporting"],
+    ["Quality census", "per-source completeness, accuracy, duplicate and invalid-cell metrics"],
+    ["Traceability stamp", "dataset id, version, method, operator and timestamp attached"]
+  ];
+  var list = (Array.isArray(steps) && steps.length) ? steps : fallback;
+  el.innerHTML = '<ol class="steps">' + list.map(function (s) {
+    var op = typeof s === "string" ? s : (s.op || s.label || s.step);
+    var det = typeof s === "string" ? "" : (s.detail || s.description || "");
+    return "<li><b>" + esc(op) + "</b>" + (det ? '<div class="hint">' + esc(det) + "</div>" : "") + "</li>";
+  }).join("") + "</ol>";
+}
+VIEWS.data = function () {
+  return Promise.all([api("datahealth"), tryApi("problems"), tryApi("lightcurves"),
+    getJSON("/api/data/space-weather")]).then(function (r) {
+    var dh = r[0], pr = r[1], lc = r[2], sw = r[3];
+    var ps = dh.per_source || [];
+    var q = dh.data_quality_score || 0;
+
+    var html = pageHead("DATA.MORS — Data Science &amp; Data Quality",
+      "Cleaning, preprocessing, EDA, statistics and validation for every source that feeds the platform. " +
+      "Quality figures are measured cell-by-cell over the whole ingested frame — never sampled or asserted.",
+      '<button class="btn" data-act="run">↻ Re-run pipeline</button>');
+
+    html += '<div class="grid g6">' +
+      healthTile("Data quality", n2(q, 1), q, q >= 85 ? "ok" : q >= 60 ? "warn" : "bad") +
+      healthTile("Missing values", pct(dh.missing_pct), 100 - dh.missing_pct,
+        dh.missing_pct < 5 ? "ok" : dh.missing_pct < 20 ? "warn" : "bad") +
+      healthTile("Duplicates", pct(dh.duplicate_pct), 100 - dh.duplicate_pct, dh.duplicate_pct < 2 ? "ok" : "warn") +
+      healthTile("Completeness", pct(dh.completeness_pct), dh.completeness_pct,
+        dh.completeness_pct > 95 ? "ok" : "warn") +
+      healthTile("Accuracy", pct(dh.accuracy_score), dh.accuracy_score, dh.accuracy_score > 90 ? "ok" : "warn") +
+      healthTile("Outliers", num(dh.outlier_count), 100 - (dh.outliers_pct || 0), "ok") + "</div>";
+
+    html += '<div class="card soft"><div class="cap" style="border:0;margin:0;padding:0">' +
+      "<b>Last sync</b>" + esc(dh.last_sync || "—") + "<b>Pipeline</b>" + esc(dh.pipeline || "—") +
+      "<b>Cells</b>" + num(dh.cells) + "<b>Rows</b>" + num(dh.rows) +
+      "<b>Duplicate rows</b>" + num(dh.duplicate_rows) + "<b>Sources</b>" + num(dh.sources) + "</div>" +
+      traceHTML({ source: "MORS Ingestion Pipeline", dataset_version: "1.0.0",
+        processing_pipeline: "cell census → missing/duplicate/invalid/outlier detection",
+        method: "row-column completeness and IsolationForest outlier flags",
+        last_updated: dh.last_sync || new Date().toISOString(), operator_id: "agent:ingestion" }) + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Data sources &amp; validation</h3>' +
+      '<div class="sub">Per-source quality after cleaning. Click a row for the validation record.</div></div>' +
+      '<div class="rt"><span class="tag">' + ps.length + " sources</span></div></div>" +
+      '<div class="tblwrap"><table><thead><tr><th>Source</th><th class="num">Rows</th><th class="num">Cols</th>' +
+      '<th class="num">Missing %</th><th class="num">Completeness</th><th class="num">Dup rows</th>' +
+      '<th class="num">Invalid</th><th class="num">Accuracy</th><th>Status</th></tr></thead><tbody>' +
+      (ps.length ? ps.map(function (s, i) {
+        var st = String(s.status || "ok");
+        return '<tr class="clk" data-src="' + i + '"><td>' + esc(s.source || "—") +
+          '<span class="tsub">' + num(s.cells) + ' cells</span></td>' +
+          '<td class="num">' + num(s.rows) + '</td><td class="num">' + num(s.columns) + "</td>" +
+          '<td class="num">' + n2(s.missing_pct, 3) + '</td><td class="num">' + n2(s.completeness_pct, 2) + "%</td>" +
+          '<td class="num">' + num(s.duplicate_rows) + '</td><td class="num">' + num(s.invalid_cells) + "</td>" +
+          '<td class="num">' + n2(s.accuracy_score, 2) + "</td>" +
+          '<td><span class="tag ' + (st === "ok" ? "low" : st === "warning" ? "med" : "high") + '">' + esc(st) +
+          "</span></td></tr>";
+      }).join("")
+      : '<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:26px">No quality metrics yet — run the pipeline to populate per-source validation.</td></tr>') +
+      "</tbody></table></div></div>";
+
+    html += '<div class="grid g2">';
+    html += '<div class="card"><div class="chd"><div><h3>Missing values by source</h3>' +
+      '<div class="sub">EDA · univariate completeness per ingested frame</div></div></div>' +
+      '<div class="cbox h260"><canvas id="dMissing"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>% of cells <b>Filter</b>all sources <b>Source</b>MORS Ingestion Pipeline</div></div>';
+    html += '<div class="card"><div class="chd"><div><h3>Time series — CME speed</h3>' +
+      '<div class="sub">Space-weather velocity series from the certified window</div></div></div>' +
+      '<div class="cbox h260"><canvas id="dTime"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>km/s <b>Source</b>NASA DONKI CME <b>Points</b>' +
+      ((sw && sw.series && sw.series.length) || 0) + "</div></div>";
+    html += '<div class="card"><div class="chd"><div><h3>Correlation matrix</h3>' +
+      '<div class="sub">Pearson r across per-source quality metrics</div></div></div>' +
+      '<canvas id="dCorr" style="width:100%;height:262px"></canvas>' +
+      '<div class="cap"><b>Method</b>Pearson correlation <b>n</b>' + ps.length +
+      " sources <b>Note</b>descriptive only — no causal claim</div></div>";
+    html += '<div class="card"><div class="chd"><div><h3>Anomaly &amp; outlier detection</h3>' +
+      '<div class="sub">Completeness against accuracy; flagged sources are highlighted</div></div></div>' +
+      '<div class="cbox h260"><canvas id="dAnom"></canvas></div>' +
+      '<div class="cap"><b>Method</b>IsolationForest (contamination 0.1) <b>Source</b>MORS Ingestion Pipeline</div></div>';
+    html += "</div>";
+
+    var first = lc && lc.rows && lc.rows[0];
+    html += '<div class="grid g2">';
+    html += '<div class="card"><div class="chd"><div><h3>Signal processing — periodogram</h3>' +
+      '<div class="sub">Discrete Fourier transform of ' + esc(first ? first.curve_id : "the light curve") +
+      " (mean-subtracted, Hann window)</div></div></div>" +
+      '<div class="cbox h260"><canvas id="dSig"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>power (arb.) vs frequency <b>Method</b>DFT' +
+      (first ? " · P = " + n2(first.period_d, 4) + " d" : "") +
+      " <b>Source</b>MORS Light-Curve Engine</div></div>";
+    html += '<div class="card"><div class="chd"><div><h3>Descriptive statistics</h3>' +
+      '<div class="sub">Computed in your browser from ' + esc(first ? first.curve_id : "—") +
+      " relative flux — no value is pre-baked</div></div></div>" +
+      '<div class="tblwrap"><table><thead><tr><th>Statistic</th><th class="num">Value</th><th>Unit</th></tr></thead>' +
+      '<tbody id="statBody"></tbody></table></div></div>';
+    html += "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Data cleaning &amp; preprocessing log</h3>' +
+      '<div class="sub">Ordered transformation steps applied by Agent 1</div></div></div><div id="cleanLog"></div>' +
+      (dh.cleaning && dh.cleaning.length ? "" : "") + "</div>";
+
+    $("#view").innerHTML = html;
+
+    if (ps.length) {
+      mkChart("dMissing", { type: "bar",
+        data: { labels: ps.map(function (s) { return shortName(s.source); }),
+          datasets: [{ label: "missing %", data: ps.map(function (s) { return s.missing_pct || 0; }),
+            backgroundColor: cssVar("--accent"), borderRadius: 5 }] },
+        options: { indexAxis: "y", plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, title: { display: true, text: "missing %" } } } } });
+      drawCorr("dCorr", ps);
+      mkChart("dAnom", { type: "scatter",
+        data: { datasets: [
+          { label: "healthy", data: ps.filter(function (s) { return (s.status || "ok") === "ok"; })
+              .map(function (s) { return { x: s.completeness_pct, y: s.accuracy_score }; }),
+            backgroundColor: "#34D399", pointRadius: 6 },
+          { label: "flagged", data: ps.filter(function (s) { return (s.status || "ok") !== "ok"; })
+              .map(function (s) { return { x: s.completeness_pct, y: s.accuracy_score }; }),
+            backgroundColor: "#F87171", pointRadius: 8, pointStyle: "triangle" }] },
+        options: { scales: { x: { title: { display: true, text: "completeness %" }, beginAtZero: true },
+          y: { title: { display: true, text: "accuracy score" }, beginAtZero: true, max: 105 } } } });
+    }
+    if (sw && sw.series && sw.series.length) {
+      mkChart("dTime", { type: "line",
+        data: { labels: sw.series.map(function (p2) { return String(p2.t || "").slice(0, 10); }),
+          datasets: [{ label: "CME speed (km/s)", data: sw.series.map(function (p2) { return p2.value; }),
+            borderColor: "#FBBF24", backgroundColor: "rgba(251,191,36,.14)", fill: true,
+            tension: 0.3, pointRadius: 2.5, borderWidth: 2 }] },
+        options: { plugins: { legend: { display: false } },
+          scales: { y: { title: { display: true, text: "km/s" } } } } });
+    }
+    if (first) { drawPeriodogram("dSig", first.relative_flux || []); drawStats(first.relative_flux || []); }
+    drawCleanLog();
+  });
+};
+/* ================================================================ ASTRONOMY */
+var ASTRO_TILES = [
+  { k: "objects",     ic: "grid",  t: "Astronomical Objects", d: "Curated catalogue: stars, planets, galaxies, nebulae with ICRS coordinates.", f: ["ICRS", "Hipparcos/Gaia"] },
+  { k: "exoplanets",  ic: "orbit", t: "Exoplanets",           d: "NASA Exoplanet Archive — radius, mass, period, distance, discovery method.", f: ["TAP query", "live API"] },
+  { k: "lightcurves", ic: "lc",    t: "Light Curves",         d: "Time → flux → magnitude, transit events, variability and noise.", f: ["4σ flags", "phase-folded"] },
+  { k: "photometry",  ic: "lc",    t: "Photometry",           d: "Brightness, magnitude, cadence, variability, observation window.", f: ["V band", "S/N"] },
+  { k: "spectroscopy",ic: "spec",  t: "Spectroscopy",         d: "Wavelength, flux, spectral lines, redshift, temperature indicators.", f: ["NIST lines", "log ε"] },
+  { k: "fits",        ic: "img",   t: "FITS Data",            d: "Header cards: WCS, exposure, instrument, pipeline status.", f: ["FITS standard", "WCS"] },
+  { k: "images",      ic: "img",   t: "Astronomical Images",  d: "Telescope, object, exposure, wavelength, observation date.", f: ["NASA APOD", "Level 1"] },
+  { k: "coordinates", ic: "astro", t: "Sky Coordinates",      d: "ICRS / GCRS transforms, RA/Dec catalogue, frame provenance.", f: ["ICRS", "GCRS"] }
+];
+function renderObjects(rows) {
+  var b = $("#objBody");
+  if (!b) return;
+  function draw(list) {
+    b.innerHTML = list.length ? list.map(function (r) {
+      return '<tr class="clk" data-obj="' + esc(r.id) + '"><td><b>' + esc(r.name) +
+        '</b><span class="tsub">' + esc(r.id) + "</span></td><td>" + esc(r.type) + "</td><td>" +
+        esc(r["class"] || "—") + '</td><td class="num">' + n2(r.ra_deg, 4) +
+        '</td><td class="num">' + n2(r.dec_deg, 4) + '</td><td class="num">' + n2(r.distance_ly, 1) +
+        '</td><td class="num">' + n2(r.magnitude, 2) + '</td><td class="num">' + num(r.teff_K) +
+        "</td><td>" + esc(r.catalog) + "</td></tr>";
+    }).join("")
+      : '<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:24px">No objects match this filter.</td></tr>';
+  }
+  draw(rows);
+  var f = $("#objFilters");
+  if (f) f.addEventListener("click", function (e) {
+    var c = e.target.closest(".chip");
+    if (!c) return;
+    $$(".chip", f).forEach(function (x) { x.classList.toggle("on", x === c); });
+    draw(c.dataset.t === "*" ? rows : rows.filter(function (r) { return r.type === c.dataset.t; }));
+  });
+}
+function drawSky(id, rows) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var dpr = window.devicePixelRatio || 1;
+  var w = el.clientWidth || 460, h = 280;
+  el.width = w * dpr; el.height = h * dpr;
+  var ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = cssVar("--panel2");
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = cssVar("--line");
+  ctx.lineWidth = 1;
+  var i;
+  for (i = 0; i <= 12; i++) { var x = i * w / 12; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  for (i = 0; i <= 6; i++) { var y = i * h / 6; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  ctx.strokeStyle = cssVar("--line2");
+  ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+  ctx.fillStyle = cssVar("--dim");
+  ctx.font = "9.5px Inter, sans-serif";
+  ctx.fillText("RA  24h  →  0h", 8, h - 8);
+  ctx.fillText("+Dec 90°", 8, 14);
+  ctx.fillText("−Dec 90°", 8, h - 22);
+  var acc = cssVar("--accent");
+  rows.forEach(function (r) {
+    var px = (1 - r.ra_deg / 360) * w;
+    var py = (1 - (r.dec_deg + 90) / 180) * h;
+    ctx.beginPath(); ctx.arc(px, py, 4.2, 0, 6.284);
+    ctx.fillStyle = acc; ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.fillStyle = cssVar("--muted");
+    ctx.fillText(r.name, px + 7, py + 3);
+  });
+}
+VIEWS.astronomy = function () {
+  return Promise.all([api("modules"), api("objects"), tryApi("lightcurves"),
+    tryApi("photometry"), tryApi("spectroscopy")]).then(function (r) {
+    var mods = r[0], obj = r[1], lc = r[2], ph = r[3], sp = r[4];
+
+    var html = pageHead("ASTRONOMY.MORS — Astronomical Data",
+      "Stars, planets, exoplanets, galaxies and nebulae, plus the products derived from them: light curves, " +
+      "photometry, spectroscopy, FITS headers and images. Each data type is its own module with a full details " +
+      "page — nothing is collapsed into a single dashboard.", "");
+
+    html += '<div class="mods">';
+    ASTRO_TILES.forEach(function (t) {
+      html += '<div class="mod" data-open="' + t.k + '"><div class="ic">' + svg(t.ic) + "</div><h4>" +
+        esc(t.t) + "</h4><p>" + esc(t.d) + '</p><div class="fx">' +
+        t.f.map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("") + "</div></div>";
+    });
+    html += "</div>";
+
+    if (mods && mods.modules && mods.modules.length) {
+      html += '<div class="card"><div class="chd"><div><h3>Module registry</h3>' +
+        '<div class="sub">Field-level contracts — every module declares its columns before any data is shown</div></div>' +
+        '<div class="rt"><span class="tag">' + mods.count + " modules</span></div></div>" +
+        '<div class="tblwrap"><table><thead><tr><th>Module</th><th>Description</th><th>Fields</th></tr></thead><tbody>' +
+        mods.modules.map(function (m) {
+          return "<tr><td><b>" + esc(m.label) + '</b><span class="tsub">' + esc(m.key) + "</span></td><td>" +
+            esc(m.desc) + "</td><td>" + (m.fields || []).map(function (f) {
+              return '<span class="kpi">' + esc(f) + "</span>";
+            }).join(" ") + "</td></tr>";
+        }).join("") + "</tbody></table></div>" + traceHTML(mods.trace) + "</div>";
+    }
+
+    html += '<div class="card"><div class="chd"><div><h3>Astronomical object catalogue</h3>' +
+      '<div class="sub">Click any object for its full record, coordinates and provenance.</div></div>' +
+      '<div class="rt">' + (obj.frames || []).map(function (f) {
+        return '<span class="tag acc">' + esc(f) + "</span>";
+      }).join("") + "</div></div>" +
+      '<div class="filters" id="objFilters"><button class="chip on" data-t="*">All</button>' +
+      ["Star", "Planet", "Galaxy", "Nebula", "Cluster"].map(function (t) {
+        return '<button class="chip" data-t="' + t + '">' + t + "</button>";
+      }).join("") + "</div>" +
+      '<div class="tblwrap"><table><thead><tr><th>Name</th><th>Type</th><th>Class</th>' +
+      '<th class="num">RA (deg)</th><th class="num">Dec (deg)</th><th class="num">Dist (ly)</th>' +
+      '<th class="num">mag</th><th class="num">T_eff (K)</th><th>Catalogue</th></tr></thead>' +
+      '<tbody id="objBody"></tbody></table></div>' + traceHTML(obj.trace) + "</div>";
+
+    html += '<div class="grid g2">' +
+      '<div class="card"><div class="chd"><div><h3>Sky distribution (RA–Dec)</h3>' +
+      '<div class="sub">Equirectangular projection — each point is one catalogue object</div></div></div>' +
+      '<canvas id="skyMap" style="width:100%;height:280px"></canvas>' +
+      '<div class="cap"><b>Frame</b>ICRS <b>Units</b>degrees <b>Source</b>Hipparcos / Gaia / RC3 / Sharpless / JPL</div></div>' +
+      '<div class="card"><div class="chd"><div><h3>Magnitude vs distance</h3>' +
+      '<div class="sub">Scatter · apparent magnitude against distance (log scale)</div></div></div>' +
+      '<div class="cbox h280" style="height:280px"><canvas id="magDist"></canvas></div>' +
+      '<div class="cap"><b>x</b>distance (ly, log) <b>y</b>apparent magnitude (inverted) <b>Source</b>catalogue</div></div>' +
+      "</div>";
+
+    html += '<div class="grid g3">' +
+      '<div class="card"><div class="chd"><div><h3>Light curve preview</h3><div class="sub">' +
+      esc(lc && lc.rows && lc.rows[0] ? lc.rows[0].curve_id : "—") + '</div></div>' +
+      '<div class="rt"><button class="btn" data-open="lightcurves">Open</button></div></div>' +
+      '<div class="cbox h220"><canvas id="lcPrev"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>relative flux <b>Source</b>MORS Light-Curve Engine</div></div>' +
+      '<div class="card"><div class="chd"><div><h3>Photometry preview</h3><div class="sub">' +
+      esc(ph && ph.rows && ph.rows[0] ? ph.rows[0].target_name : "—") + '</div></div>' +
+      '<div class="rt"><button class="btn" data-open="photometry">Open</button></div></div>' +
+      '<div class="cbox h220"><canvas id="phPrev"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>magnitude (V) <b>Source</b>MORS Photometry Simulator</div></div>' +
+      '<div class="card"><div class="chd"><div><h3>Spectrum preview</h3><div class="sub">' +
+      esc(sp && sp.rows && sp.rows[0] ? sp.rows[0].name : "—") + '</div></div>' +
+      '<div class="rt"><button class="btn" data-open="spectroscopy">Open</button></div></div>' +
+      '<div class="cbox h220"><canvas id="spPrev"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>norm. flux vs wavelength (Å) <b>Source</b>NIST ASD + MORS RT model</div></div>' +
+      "</div>";
+
+    $("#view").innerHTML = html;
+    var rows = obj.rows || [];
+    renderObjects(rows);
+
+    var pts = rows.filter(function (x) { return x.ra_deg != null && x.dec_deg != null; });
+    drawSky("skyMap", pts);
+    mkChart("magDist", { type: "scatter",
+      data: { datasets: [{ label: "objects",
+        data: pts.map(function (x2) { return { x: Math.max(1, x2.distance_ly), y: x2.magnitude }; }),
+        backgroundColor: cssVar("--accent"), pointRadius: 6 }] },
+      options: { plugins: { legend: { display: false } },
+        scales: { x: { type: "logarithmic", title: { display: true, text: "distance (ly, log)" } },
+          y: { reverse: true, title: { display: true, text: "apparent magnitude" } } } } });
+
+    if (lc && lc.rows && lc.rows[0]) {
+      var lr = lc.rows[0];
+      mkChart("lcPrev", { type: "line",
+        data: { labels: (lr.phase || []).map(function (v) { return n2(v, 2); }),
+          datasets: [{ label: "relative flux", data: lr.relative_flux || [],
+            borderColor: cssVar("--accent"), pointRadius: 0, borderWidth: 1.6, tension: 0.2 }] },
+        options: { plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: "phase" }, ticks: { maxTicksLimit: 7 } } } } });
+    }
+    if (ph && ph.rows && ph.rows[0]) {
+      var pr2 = ph.rows[0];
+      mkChart("phPrev", { type: "line",
+        data: { labels: ((pr2.curve && pr2.curve.t) || []).map(function (v) { return n2(v, 2); }),
+          datasets: [{ label: "magnitude (V)", data: (pr2.curve && pr2.curve.mag) || [],
+            borderColor: "#FBBF24", pointRadius: 0, borderWidth: 1.6, tension: 0.2 }] },
+        options: { plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: "time (d)" }, ticks: { maxTicksLimit: 7 } } } } });
+    }
+    if (sp && sp.rows && sp.rows[0]) {
+      var sr = sp.rows[0];
+      var step = Math.max(1, Math.floor((sr.wavelength_A || []).length / 420));
+      var wl = [], fl = [];
+      for (var i = 0; i < (sr.wavelength_A || []).length; i += step) {
+        wl.push(sr.wavelength_A[i]); fl.push(sr.flux_density[i]);
+      }
+      mkChart("spPrev", { type: "line",
+        data: { labels: wl.map(function (v) { return n2(v, 0); }),
+          datasets: [{ label: "normalised flux", data: fl, borderColor: "#A78BFA",
+            pointRadius: 0, borderWidth: 1.3, fill: false }] },
+        options: { plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: "wavelength (Å)" }, ticks: { maxTicksLimit: 7 } },
+            y: { title: { display: true, text: "F_λ (norm.)" } } } } });
+    }
+  });
+};
+/* ================================================================ MODULE DETAIL */
+function kvGrid(pairs) {
+  return '<div class="kv">' + pairs.map(function (p) {
+    return '<div class="c"><div class="k">' + esc(p[0]) + '</div><div class="v' +
+      (p[2] ? " sm" : "") + '">' + esc(p[1] == null ? "—" : p[1]) + "</div></div>";
+  }).join("") + "</div>";
+}
+function tableMod(rows, cols) {
+  var html = '<div class="tblwrap"><table><thead><tr>' +
+    cols.map(function (c) { return '<th class="' + (c[2] === "num" ? "num" : "") + '">' + esc(c[1]) + "</th>"; }).join("") +
+    "</tr></thead><tbody>";
+  html += rows.map(function (r, i) {
+    return '<tr class="clk" data-row="' + i + '">' +
+      cols.map(function (c) {
+        var v = r[c[0]];
+        return '<td class="' + (c[2] === "num" ? "num" : "") + '">' + esc(v == null ? "—" : v) + "</td>";
+      }).join("") + "</tr>";
+  }).join("");
+  return html + "</tbody></table></div>";
+}
+function imagesGrid(rows) {
+  return '<div class="grid g3">' + rows.map(function (r) {
+    return '<div class="card soft" style="cursor:pointer" data-img="' + esc(r.image_id) + '">' +
+      '<img class="imgthumb" loading="lazy" src="' + esc(r.thumbnail || r.url || "") + '" alt="' + esc(r.title) +
+      '" onerror="this.classList.add(\'broken\')">' +
+      '<h4 style="margin:10px 0 4px;font-size:13.4px">' + esc(r.title) + "</h4>" +
+      '<div class="hint">' + esc(r.date) + " · " + esc(r.channel) + " · " + esc(r.pipeline_status) + "</div>" +
+      '<div class="pill-row"><span class="kpi">' + esc(r.filters || "—") + "</span>" +
+      '<span class="kpi">' + esc(r.source || "—") + "</span></div></div>";
+  }).join("") + "</div>";
+}
+var MODULE_META = {
+  photometry:   { t: "Photometry", d: "Brightness · magnitude · light curve · variability · observation time · object ID · instrument" },
+  spectroscopy: { t: "Spectroscopy", d: "Wavelength · flux · spectral lines · redshift · temperature indicators · chemical composition" },
+  lightcurves:  { t: "Light Curves", d: "Time · flux · magnitude · transit events · variations · noise · detected events" },
+  exoplanets:   { t: "Exoplanets", d: "Planet · host star · radius · mass · period · distance · discovery method · habitability indicators" },
+  satellite:    { t: "Satellite Data", d: "Name · mission · orbit · altitude · resolution · sensor · data type · location · timestamp · status" },
+  images:       { t: "Astronomical Images", d: "Telescope · object · exposure · wavelength · resolution · observation date · processing status" },
+  fits:         { t: "FITS Data", d: "Header cards · WCS · exposure · instrument · pipeline status" },
+  objects:      { t: "Astronomical Objects", d: "Name · type · class · RA/Dec · distance · magnitude · catalogue" }
+};
+function openModule(key) {
+  var meta = MODULE_META[key];
+  if (!meta) { toast("No detail page for “" + key + "”"); return; }
+  openModal(meta.t, esc(meta.d), '<div class="hint"><span class="spin"></span> loading module…</div>');
+  api(key).then(function (data) {
+    var rows = data.rows || [], body = "";
+    if (key === "photometry") {
+      body = tableMod(rows, [["target_name", "Target"], ["class", "Class"], ["band", "Band"],
+        ["cadence_min", "Cadence (min)", "num"], ["n_points", "Points", "num"],
+        ["magnitude_mag", "mag", "num"], ["amplitude_mag", "Δmag", "num"],
+        ["rms_mag", "RMS (mag)", "num"], ["snr", "S/N", "num"], ["instrument_id", "Instrument"]]);
+    } else if (key === "spectroscopy") {
+      body = tableMod(rows, [["name", "Object"], ["teff_K", "T_eff (K)", "num"], ["log_g", "log g", "num"],
+        ["metallicity_dex", "[Fe/H]", "num"], ["redshift_z", "z", "num"], ["velocity_kms", "v (km/s)", "num"],
+        ["total_equivalent_width_A", "ΣEW (Å)", "num"], ["spectrum_id", "ID"]]);
+    } else if (key === "lightcurves") {
+      body = tableMod(rows, [["curve_id", "Curve"], ["band", "Band"], ["period_d", "P (d)", "num"],
+        ["depth", "Depth", "num"], ["ingress_duration_d", "Ingress (d)", "num"],
+        ["noise_floor_sigma", "σ_noise", "num"], ["n_points", "Points", "num"],
+        ["n_flags", "Flags", "num"], ["instrument_id", "Instrument"]]);
+    } else if (key === "exoplanets") {
+      body = tableMod(rows, [["planet_name", "Planet"], ["host_star", "Host"], ["discovery_method", "Method"],
+        ["discovery_year", "Year", "num"], ["radius_re", "R⊕", "num"], ["mass_me", "M⊕", "num"],
+        ["period_d", "P (d)", "num"], ["distance_pc", "d (pc)", "num"],
+        ["equilibrium_temp_k", "T_eq (K)", "num"], ["habitability_index", "Habitability", "num"]]);
+    } else if (key === "satellite") {
+      body = tableMod(rows, [["name", "Satellite"], ["group", "Group"], ["orbit_class", "Orbit"],
+        ["altitude_km", "Alt (km)", "num"], ["velocity_kms", "v (km/s)", "num"],
+        ["inclination_deg", "i (deg)", "num"], ["period_min", "Period (min)", "num"],
+        ["resolution_m", "Res (m)", "num"], ["norad_id", "NORAD"]]);
+    } else if (key === "images") {
+      body = imagesGrid(rows);
+    } else if (key === "fits") {
+      body = tableMod(rows, [["title", "Object"], ["image_id", "Image ID"],
+        ["instrument", "Instrument"], ["pipeline_status", "Status"]]);
+    } else if (key === "objects") {
+      body = tableMod(rows, [["name", "Name"], ["type", "Type"], ["class", "Class"],
+        ["ra_deg", "RA (deg)", "num"], ["dec_deg", "Dec (deg)", "num"],
+        ["distance_ly", "Dist (ly)", "num"], ["magnitude", "mag", "num"], ["teff_K", "T_eff (K)", "num"]]);
+    }
+    var plot = (key === "photometry" || key === "lightcurves" || key === "spectroscopy") ?
+      '<div class="card" style="margin-top:14px"><div class="chd"><div><h3>Module plot</h3>' +
+      '<div class="sub">Full series of the first record</div></div></div>' +
+      '<div class="cbox h300"><canvas id="modChart"></canvas></div>' +
+      '<div class="cap"><b>Source</b>' + esc(data.trace ? data.trace.source : "—") +
+      " <b>Updated</b>" + esc(data.trace ? jsDate(data.trace.last_updated) : "—") + "</div></div>" : "";
+
+    $("#mSub").innerHTML = esc(MODULE_META[key].t) + " · " + rows.length + " records" +
+      (data.source ? ' <span class="tag ' + (data.source.via === "api" ? "low" : "med") + '">' +
+        esc(data.source.via === "api" ? "live API" : "local model") + "</span>" : "");
+    $("#mBody").innerHTML = body + plot +
+      (data.model ? '<div class="note"><b>Model:</b> <span class="mono">' + esc(data.model) + "</span></div>" : "") +
+      (data.formula ? '<div class="note"><b>Formula:</b> <span class="mono">' + esc(data.formula) + "</span></div>" : "") +
+      badgeHTML(data.badge) + traceHTML(data.trace);
+
+    $$("#mBody tr.clk").forEach(function (tr) {
+      tr.addEventListener("click", function () { showRowDetail(key, rows[Number(tr.dataset.row)]); });
+    });
+    $$("#mBody [data-img]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var rec = rows.filter(function (x) { return x.image_id === el.dataset.img; })[0];
+        if (rec) showImageDetail(rec);
+      });
+    });
+
+    if (key === "photometry" && rows[0]) {
+      var r1 = rows[0];
+      mkChart("modChart", { type: "line",
+        data: { labels: (r1.curve.t || []).map(function (v) { return n2(v, 2); }),
+          datasets: [{ label: "flux (V)", data: r1.curve.flux, borderColor: cssVar("--accent"),
+            pointRadius: 0, borderWidth: 1.6 }] },
+        options: { plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: "time (d)" }, ticks: { maxTicksLimit: 10 } },
+            y: { title: { display: true, text: "relative flux" } } } } });
+    } else if (key === "lightcurves" && rows[0]) {
+      var r2 = rows[0];
+      mkChart("modChart", { type: "line",
+        data: { labels: (r2.phase || []).map(function (v) { return n2(v, 2); }),
+          datasets: [{ label: "relative flux", data: r2.relative_flux || [],
+            borderColor: cssVar("--accent"), pointRadius: 0, borderWidth: 1.4 },
+            { label: "magnitude", data: r2.magnitude || [], borderColor: "#FBBF24",
+              pointRadius: 0, borderWidth: 1.2, yAxisID: "y1" }] },
+        options: { scales: { x: { title: { display: true, text: "phase" }, ticks: { maxTicksLimit: 10 } },
+          y: { title: { display: true, text: "relative flux" } },
+          y1: { position: "right", title: { display: true, text: "magnitude" }, grid: { display: false } } } } });
+    } else if (key === "spectroscopy" && rows[0]) {
+      var r3 = rows[0];
+      var st = Math.max(1, Math.floor((r3.wavelength_A || []).length / 500));
+      var wl = [], fl = [];
+      for (var i = 0; i < (r3.wavelength_A || []).length; i += st) {
+        wl.push(r3.wavelength_A[i]); fl.push(r3.flux_density[i]);
+      }
+      mkChart("modChart", { type: "line",
+        data: { labels: wl.map(function (v) { return n2(v, 0); }),
+          datasets: [{ label: "F_λ (norm.)", data: fl, borderColor: "#A78BFA", pointRadius: 0, borderWidth: 1.3 }] },
+        options: { plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: "wavelength (Å)" }, ticks: { maxTicksLimit: 10 } },
+            y: { title: { display: true, text: "normalised flux" } } } } });
+    }
+  }).catch(function (e) {
+    $("#mBody").innerHTML = '<div class="empty-state"><b>Module unavailable</b>' + esc(e.message) + "</div>";
+  });
+}
+function showRowDetail(key, r) {
+  if (!r) return;
+  var title = r.target_name || r.name || r.planet_name || r.curve_id || r.spectrum_id || r.image_id || "Record";
+  var pairs = [];
+  Object.keys(r).forEach(function (k) {
+    if (k === "curve" || k === "header" || k === "fits_header" || k === "next_passes" ||
+        k === "telemetry" || k === "phase" || k === "relative_flux" || k === "magnitude" ||
+        k === "flux_density" || k === "wavelength_A" || k === "flux" || k === "t" ||
+        k === "abundance" || k === "lines" || k === "anomaly_flags" || k === "bbox") return;
+    var v = r[k];
+    if (Array.isArray(v)) v = v.length > 3 ? v.slice(0, 3).join(", ") + " …" : v.join(", ");
+    if (typeof v === "object" && v !== null) v = JSON.stringify(v);
+    if (typeof v === "number") v = n2(v, 4);
+    pairs.push([k.replace(/_/g, " "), v, String(v).length > 18]);
+  });
+  openModal(title, esc(MODULE_META[key] ? MODULE_META[key].t : key) + " · record detail",
+    kvGrid(pairs) +
+    (r.explanation ? '<div class="note">' + esc(r.explanation) + "</div>" : "") +
+    (r.habitable_zone_note ? '<div class="note"><b>Habitable zone:</b> ' + esc(r.habitable_zone_note) + "</div>" : "") +
+    traceHTML(r.trace) + badgeHTML(r.badge));
+}
+function showImageDetail(r) {
+  openModal(r.title, esc(r.date) + " · " + esc(r.channel) + " · " + esc(r.source),
+    (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener"><img class="imgthumb" src="' +
+      esc(r.thumbnail || r.url) + '" alt="' + esc(r.title) + '"></a>' : "") +
+    kvGrid([["image_id", r.image_id], ["date", r.date], ["channel", r.channel],
+      ["filters", r.filters], ["instrument", r.instrument], ["pipeline status", r.pipeline_status, true],
+      ["exposure", r.exposure_s == null ? "—" : r.exposure_s + " s"],
+      ["resolution", r.resolution_px == null ? "—" : r.resolution_px]]) +
+    '<div class="note">' + esc(r.explanation || "") + "</div>" +
+    (r.fits_header ? '<div class="card soft" style="margin-top:12px"><div class="chd"><div><h3>FITS header</h3>' +
+      '<div class="sub">Standard keyword cards extracted from the record</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Keyword</th><th>Value</th></tr></thead><tbody>' +
+      Object.keys(r.fits_header).map(function (k) {
+        return '<tr><td class="mono">' + esc(k) + '</td><td class="mono">' + esc(r.fits_header[k]) + "</td></tr>";
+      }).join("") + "</tbody></table></div></div>" : ""));
+}
+/* ================================================================ SATELLITE */
+var SAT_SEL = null;
+function drawGroundTrack(el, sat) {
+  if (!el) return;
+  var dpr = window.devicePixelRatio || 1;
+  var w = el.clientWidth || 520, h = 300;
+  el.width = w * dpr; el.height = h * dpr;
+  var ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = cssVar("--panel2");
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = cssVar("--line");
+  ctx.lineWidth = 1;
+  var i;
+  for (i = 0; i <= 18; i++) { var x = i * w / 18; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  for (i = 0; i <= 8; i++) { var y = i * h / 8; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  ctx.strokeStyle = cssVar("--line2");
+  ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+  ctx.setLineDash([4, 4]);
+  [-1, 1].forEach(function (s) {
+    var yy = h / 2 - s * (sat.inclination_deg / 90) * (h / 2);
+    ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  var inc = sat.inclination_deg || 0, amp = (inc / 90) * (h / 2), acc = cssVar("--accent");
+  ctx.strokeStyle = acc; ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  for (i = 0; i <= 240; i++) {
+    var t = i / 240;
+    var px = t * w;
+    var py = h / 2 - Math.sin(2 * Math.PI * t * 1.6) * amp;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.fillStyle = cssVar("--dim");
+  ctx.font = "9.5px Inter, sans-serif";
+  ctx.fillText("equirectangular ground-track schematic (1.6 rev shown)", 8, h - 8);
+  ctx.fillText("inclination ±" + n2(inc, 1) + "°", 8, 14);
+  ctx.fillText("0°", w / 2 + 4, h / 2 - 4);
+}
+function showSatellite(r) {
+  if (!r) return;
+  SAT_SEL = r;
+  var passes = (r.next_passes || []).map(function (p) {
+    return "<tr><td>" + esc(p.start) + '</td><td class="num">' + n2(p.max_elevation_deg, 1) +
+      '°</td><td class="num">' + p.duration_min + " min" +
+      (p.estimate ? '<span class="tsub">period-derived estimate</span>' : "") + "</td></tr>";
+  }).join("");
+  openModal(r.name, esc(r.mission) + " · " + esc(r.orbit_class) + " · NORAD " + esc(r.norad_id),
+    kvGrid([
+      ["orbit class", r.orbit_class], ["altitude", n2(r.altitude_km, 1) + " km"],
+      ["velocity", n2(r.velocity_kms, 1) + " km/s"], ["inclination", n2(r.inclination_deg, 2) + "°"],
+      ["period", n2(r.period_min, 2) + " min"], ["mean motion", n2(r.mean_motion_rev_day, 4) + " rev/d"],
+      ["eccentricity", n2(r.eccentricity, 6)], ["apogee / perigee", n2(r.apogee_km, 0) + " / " + n2(r.perigee_km, 0) + " km"],
+      ["sensor", r.sensor_type, true], ["resolution", r.resolution_m + " m"],
+      ["swath", r.swath_km + " km"], ["processing level", r.processing_level, true],
+      ["country", r.country, true], ["group", r.group, true], ["object type", r.object_type, true],
+      ["epoch", jsDate(r.epoch)]
+    ]) +
+    '<div class="grid g2" style="margin-top:14px">' +
+    '<div class="card soft"><div class="chd"><div><h3>Ground-track schematic</h3>' +
+    '<div class="sub">Equirectangular projection with the inclination limits marked</div></div></div>' +
+    '<canvas id="satMap" style="width:100%;height:280px"></canvas>' +
+    '<div class="cap"><b>Note</b>schematic — not a tiled basemap <b>Frame</b>WGS84 lon/lat</div></div>' +
+    '<div class="card soft"><div class="chd"><div><h3>Telemetry state</h3>' +
+    '<div class="sub">Last reported values from the element set</div></div></div>' +
+    kvGrid([["mode", r.telemetry && r.telemetry.mode, true],
+      ["battery", r.telemetry && r.telemetry.battery_pct == null ? "not reported" : (r.telemetry || {}).battery_pct],
+      ["drag flag", r.telemetry && r.telemetry.drag_flag ? "set" : "clear", true],
+      ["TLE epoch", r.telemetry ? jsDate(r.telemetry.last_tle_epoch) : "—", true]]) +
+    "</div></div>" +
+    '<div class="card soft" style="margin-top:14px"><div class="chd"><div><h3>Upcoming passes</h3>' +
+    '<div class="sub">Derived from the orbital period — flagged as estimates, not TLE propagations</div></div></div>' +
+    '<div class="tblwrap"><table><thead><tr><th>Start (UTC)</th><th class="num">Max elevation</th>' +
+    '<th class="num">Duration</th></tr></thead><tbody>' + (passes || '<tr><td colspan="3">none</td></tr>') +
+    "</tbody></table></div></div>" +
+    '<div class="card soft" style="margin-top:14px"><div class="chd"><div><h3>Orbit physics</h3>' +
+    '<div class="sub">How altitude and velocity were derived from the element set</div></div></div>' +
+    '<div class="steps"><li>semi-major axis<b class="mono"> a = (GM / n²)^(1/3)</b></li>' +
+    "<li>circular velocity<b class=\"mono\"> v = sqrt(GM / a)</b></li>" +
+    "<li>orbit class from altitude<b class=\"mono\"> LEO &lt; 2 000 ≤ MEO &lt; 35 586 ≤ GEO</b></li></div>" +
+    '<div class="note">GM = 3.986004418×10¹⁴ m³ s⁻² · R⊕ = 6 371 km</div></div>' +
+    traceHTML(D.satellite && D.satellite.trace));
+  drawGroundTrack($("#satMap"), r);
+}
+VIEWS.satellite = function () {
+  return api("satellite").then(function (d) {
+    var rows = d.rows || [];
+    var classes = {};
+    rows.forEach(function (r) { classes[r.orbit_class] = (classes[r.orbit_class] || 0) + 1; });
+
+    var html = pageHead("SATELLITE.MORS — Satellite Data",
+      "Live orbital elements from CelesTrak turned into altitude, velocity, inclination, orbit class and pass " +
+      "windows — with the physics used to get there shown alongside the numbers. Click any satellite for its " +
+      "full details page.",
+      '<button class="btn" data-open="satellite">Open data module</button>');
+
+    html += '<div class="grid g4">' +
+      metric("Satellites tracked", num(rows.length), "CelesTrak GP groups: science · stations · weather · geo · gnss", "acc") +
+      metric("LEO", num(classes.LEO || 0), "altitude < 2 000 km", "") +
+      metric("MEO / GEO", num((classes.MEO || 0) + (classes.GEO || 0)), "2 000 – 35 586 km / ≈35 786 km", "") +
+      metric("Element epoch", rows[0] ? jsDate(rows[0].epoch).slice(0, 16) : "—", "latest TLE epoch", "") + "</div>";
+
+    html += '<div class="grid g2">' +
+      '<div class="card"><div class="chd"><div><h3>Altitude vs orbital velocity</h3>' +
+      '<div class="sub">Every tracked object, coloured by orbit class</div></div></div>' +
+      '<div class="cbox h300"><canvas id="satScatter"></canvas></div>' +
+      '<div class="cap"><b>x</b>altitude (km) <b>y</b>circular velocity (km/s) <b>Method</b>v = sqrt(GM/a) ' +
+      "<b>Source</b>CelesTrak GP</div></div>" +
+      '<div class="card"><div class="chd"><div><h3>Orbit-class distribution</h3>' +
+      '<div class="sub">Count of objects per class</div></div></div>' +
+      '<div class="cbox h300"><canvas id="satClass"></canvas></div>' +
+      '<div class="cap"><b>Rule</b>LEO &lt; 2 000 ≤ MEO &lt; 35 586 ≤ GEO <b>Source</b>derived</div></div>' +
+      "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Satellite register</h3>' +
+      '<div class="sub">Click a row for mission, sensors, telemetry, passes and a coverage schematic.</div></div>' +
+      '<div class="rt"><span class="tag acc">' + rows.length + " objects</span></div></div>" +
+      '<div class="filters" id="satFilters"><button class="chip on" data-t="*">All</button>' +
+      ["LEO", "MEO", "GEO"].map(function (c) {
+        return '<button class="chip" data-t="' + c + '">' + c + "</button>";
+      }).join("") + '<input type="search" id="satQ" placeholder="filter by name…" style="margin-left:auto;min-width:180px"></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Satellite</th><th>NORAD</th><th>Group</th><th>Orbit</th>' +
+      '<th class="num">Alt (km)</th><th class="num">v (km/s)</th><th class="num">i (deg)</th>' +
+      '<th class="num">Period (min)</th><th class="num">Res (m)</th><th>Mission</th></tr></thead>' +
+      '<tbody id="satBody"></tbody></table></div>' + traceHTML(d.trace) + "</div>";
+
+    $("#view").innerHTML = html;
+
+    function fill(list) {
+      $("#satBody").innerHTML = list.length ? list.map(function (r, i) {
+        return '<tr class="clk" data-sat="' + esc(r.norad_id) + '"><td><b>' + esc(r.name) + "</b></td>" +
+          '<td class="num">' + esc(r.norad_id) + "</td><td>" + esc(r.group) + "</td>" +
+          '<td><span class="tag ' + (r.orbit_class === "LEO" ? "low" : r.orbit_class === "GEO" ? "info" : "med") +
+          '">' + esc(r.orbit_class) + '</span></td><td class="num">' + n2(r.altitude_km, 0) +
+          '</td><td class="num">' + n2(r.velocity_kms, 1) + '</td><td class="num">' + n2(r.inclination_deg, 1) +
+          '</td><td class="num">' + n2(r.period_min, 1) + '</td><td class="num">' + num(r.resolution_m) +
+          "</td><td>" + esc(r.mission) + "</td></tr>";
+      }).join("") : '<tr><td colspan="10" style="text-align:center;color:var(--dim);padding:24px">No satellites match.</td></tr>';
+      $$("#satBody tr.clk").forEach(function (tr) {
+        tr.addEventListener("click", function () {
+          var rec = rows.filter(function (x) { return x.norad_id === tr.dataset.sat; })[0];
+          showSatellite(rec);
+        });
+      });
+    }
+    fill(rows);
+    var f = $("#satFilters");
+    function refresh() {
+      var t = (f.querySelector(".chip.on") || {}).dataset;
+      t = t ? t.t : "*";
+      var q = ($("#satQ").value || "").toUpperCase();
+      fill(rows.filter(function (r) {
+        return (t === "*" || r.orbit_class === t) && (!q || r.name.toUpperCase().indexOf(q) >= 0);
+      }));
+    }
+    f.addEventListener("click", function (e) {
+      var c = e.target.closest(".chip");
+      if (!c) return;
+      $$(".chip", f).forEach(function (x) { x.classList.toggle("on", x === c); });
+      refresh();
+    });
+    $("#satQ").addEventListener("input", refresh);
+
+    var clsColors = { LEO: "#34D399", MEO: "#FBBF24", GEO: "#818CF8" };
+    mkChart("satScatter", { type: "scatter",
+      data: { datasets: Object.keys(classes).map(function (c) {
+        return { label: c, data: rows.filter(function (r) { return r.orbit_class === c; })
+            .map(function (r) { return { x: r.altitude_km, y: r.velocity_kms }; }),
+          backgroundColor: clsColors[c] || cssVar("--accent"), pointRadius: 5 };
+      }) },
+      options: { plugins: { legend: { position: "bottom" } },
+        scales: { x: { type: "logarithmic", title: { display: true, text: "altitude (km, log)" } },
+          y: { title: { display: true, text: "velocity (km/s)" } } } } });
+
+    mkChart("satClass", { type: "doughnut",
+      data: { labels: Object.keys(classes),
+        datasets: [{ data: Object.keys(classes).map(function (c) { return classes[c]; }),
+          backgroundColor: Object.keys(classes).map(function (c) { return clsColors[c] || cssVar("--accent"); }),
+          borderWidth: 0 }] },
+      options: { cutout: "58%", plugins: { legend: { position: "bottom" } } } });
+  });
+};
+/* ================================================================ QUANTUM */
+function drawBloch(id, theta, phi) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var dpr = window.devicePixelRatio || 1;
+  var size = Math.min(el.clientWidth || 260, 260);
+  el.width = size * dpr; el.height = size * dpr;
+  el.style.height = size + "px";
+  var ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  var cx = size / 2, cy = size / 2, R = size * 0.36;
+  var acc = cssVar("--accent"), line = cssVar("--line2"), muted = cssVar("--muted");
+  ctx.clearRect(0, 0, size, size);
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.284); ctx.stroke();
+  ctx.setLineDash([3, 4]);
+  ctx.beginPath(); ctx.ellipse(cx, cy, R, R * 0.3, 0, 0, 6.284); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx, cy, R * 0.3, R, 0, 0, 6.284); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = muted;
+  ctx.beginPath(); ctx.moveTo(cx, cy - R - 14); ctx.lineTo(cx, cy + R + 14); ctx.stroke();
+  ctx.fillStyle = muted;
+  ctx.font = "10px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("|0⟩", cx, cy - R - 20);
+  ctx.fillText("|1⟩", cx, cy + R + 26);
+  var st = Math.sin(theta), x = cx + R * st * Math.cos(phi), y = cy - R * Math.cos(theta);
+  var x0 = cx + R * 0.3 * st * Math.cos(phi), y0 = cy - R * 0.3 * Math.cos(theta);
+  ctx.strokeStyle = acc; ctx.lineWidth = 2.4;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x, y); ctx.stroke();
+  ctx.fillStyle = acc;
+  ctx.beginPath(); ctx.arc(x, y, 6, 0, 6.284); ctx.fill();
+  ctx.fillStyle = cssVar("--muted");
+  ctx.textAlign = "left";
+  ctx.font = "9.5px ui-monospace, Consolas, monospace";
+  ctx.fillText("θ=" + n2(theta, 2), 8, size - 22);
+  ctx.fillText("φ=" + n2(phi, 2), 8, size - 8);
+}
+VIEWS.quantum = function () {
+  return api("quantum").then(function (q) {
+    var html = pageHead("QUANTUM.MORS — Quantum Science",
+      "Statevector simulation, quantum states, circuits, algorithms and noise models — computed with NumPy. " +
+      "Theory, simulation and real quantum computing are kept explicitly separate: <b>no QPU was contacted</b>.",
+      '<span class="tag info">classical simulation only</span>');
+
+    html += '<div class="card acc"><div class="chd"><div><h3>Honesty statement</h3>' +
+      '<div class="sub">What this module is, and what it is not</div></div></div>' +
+      '<div class="note">' + esc(q.honesty || "") + "</div></div>";
+
+    html += '<div class="grid g4">' +
+      metric("Circuit qubits", num(q.circuit && q.circuit.qubits), esc((q.circuit && q.circuit.name) || ""), "acc") +
+      metric("Circuit depth", num(q.circuit && q.circuit.depth), "gate layers", "") +
+      metric("Noise p1 / p2", n2(q.noise && q.noise.p1_gate, 4) + " / " + n2(q.noise && q.noise.p2_gate, 4),
+        esc((q.noise && q.noise.model) || ""), "") +
+      metric("GHZ after circuit", n2((q.noise && q.noise.ghz_fidelity_after_circuit || 0) * 100, 2) + "%",
+        "fidelity with noise", "") + "</div>";
+
+    /* states + bloch */
+    html += '<div class="grid g2">' +
+      '<div class="card"><div class="chd"><div><h3>Quantum states</h3>' +
+      '<div class="sub">Select a state to project it onto the Bloch sphere</div></div></div>' +
+      '<div class="filters" id="qsFilters">' + (q.states || []).map(function (s, i) {
+        return '<button class="chip' + (i === 0 ? " on" : "") + '" data-i="' + i + '">' + esc(s.id) + " · " + esc(s.label) + "</button>";
+      }).join("") + "</div>" +
+      '<div class="tblwrap"><table><thead><tr><th>ID</th><th>Label</th><th class="num">Qubits</th>' +
+      '<th class="num">Purity</th><th class="num">S (ebit)</th><th class="num">θ</th><th class="num">φ</th>' +
+      "</tr></thead><tbody>" + (q.states || []).map(function (s) {
+        return '<tr class="clk" data-i="' + esc(s.id) + '"><td class="mono">' + esc(s.id) + "</td><td>" + esc(s.label) +
+          '</td><td class="num">' + num(s.qubits) + '</td><td class="num">' + n2(s.purity, 3) +
+          '</td><td class="num">' + n2(s.entropy_ebit, 3) + '</td><td class="num">' + n2(s.bloch && s.bloch.theta, 3) +
+          '</td><td class="num">' + n2(s.bloch && s.bloch.phi, 3) + "</td></tr>";
+      }).join("") + "</tbody></table></div>" +
+      '<div class="cap"><b>Method</b>|ψ⟩ = U|0⟩ ; purity = Tr(ρ²) ; S = −Tr(ρ log₂ ρ)</div></div>' +
+      '<div class="card"><div class="chd"><div><h3>Bloch sphere</h3>' +
+      '<div class="sub" id="blochLbl">—</div></div></div>' +
+      '<div style="display:grid;place-items:center"><canvas id="blochCv"></canvas></div>' +
+      '<div class="cap"><b>Projection</b>2D orthographic <b>Source</b>MORS Quantum Lab (NumPy)</div></div>' +
+      "</div>";
+
+    /* circuit */
+    html += '<div class="card"><div class="chd"><div><h3>Quantum circuit</h3>' +
+      '<div class="sub">' + esc((q.circuit && q.circuit.name) || "") + "</div></div>" +
+      '<div class="rt"><span class="tag acc">' + num(q.circuit && q.circuit.qubits) + " qubits</span>" +
+      '<span class="tag">depth ' + num(q.circuit && q.circuit.depth) + "</span></div></div>" +
+      '<div class="tblwrap"><table><thead><tr><th class="num">Qubit</th><th>Gate</th><th class="num">Params</th>' +
+      '</tr></thead><tbody>' + ((q.circuit && q.circuit.gates) || []).map(function (g) {
+        return '<tr><td class="num">' + esc(g.q) + '</td><td class="mono"><b>' +
+          (g.measure ? '<span class="tag acc">MEASURE</span>' : esc(g.gate)) + "</b></td>" +
+          '<td class="num">' + esc((g.params == null || !g.params.length) ? "—" : g.params) + "</td></tr>";
+      }).join("") + "</tbody></table></div>" +
+      (q.circuit && q.circuit.ideal_output ?
+        '<div class="note">Ideal output distribution: <span class="mono">' +
+        Object.keys(q.circuit.ideal_output).map(function (k) {
+          return k + " = " + n2(q.circuit.ideal_output[k], 4);
+        }).join("  ·  ") + "</span></div>" : "") + "</div>";
+
+    /* algorithms + fidelity */
+    html += '<div class="grid g2">' +
+      '<div class="card"><div class="chd"><div><h3>Quantum algorithms</h3>' +
+      '<div class="sub">Status distinguishes simulated behaviour from real hardware runs</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Algorithm</th><th class="num">Qubits</th>' +
+      '<th>Speed-up</th><th class="num">Iter</th><th>Status</th></tr></thead><tbody>' +
+      (q.algorithms || []).map(function (a) {
+        return "<tr><td><b>" + esc(a.name) + '</b><span class="tsub">' + esc(a.detail) + '</span></td><td class="num">' +
+          num(a.qubits) + "</td><td>" + esc(a.speedup) + '</td><td class="num">' + num(a.iterations) +
+          '</td><td><span class="tag ' + (String(a.status).toLowerCase().indexOf("sim") >= 0 ? "info" : "med") +
+          '">' + esc(a.status) + "</span></td></tr>";
+      }).join("") + "</tbody></table></div></div>" +
+      '<div class="card"><div class="chd"><div><h3>Gate fidelity by layer</h3>' +
+      '<div class="sub">Layer-by-layer average gate fidelity under the noise model</div></div></div>' +
+      '<div class="cbox h260"><canvas id="qFid"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>fidelity (0–1) <b>Model</b>' + esc((q.noise && q.noise.model) || "—") + "</div></div>" +
+      "</div>";
+
+    /* rabi + qho */
+    html += '<div class="grid g2">' +
+      '<div class="card"><div class="chd"><div><h3>Rabi oscillation</h3>' +
+      '<div class="sub">Excited-state population as a function of drive angle θ</div></div></div>' +
+      '<div class="cbox h260"><canvas id="qRabi"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>population vs θ (rad) <b>Method</b>exact statevector rotation</div></div>' +
+      '<div class="card"><div class="chd"><div><h3>Quantum harmonic oscillator</h3>' +
+      '<div class="sub">Energy levels Eₙ = ℏω(n + ½)</div></div></div>' +
+      '<div class="cbox h260"><canvas id="qHO"></canvas></div>' +
+      '<div class="cap"><b>Unit</b>10⁻²⁰ J / cm⁻¹ <b>ω</b>' + num(q.qho && q.qho.omega_rad_s) +
+      " rad/s <b>Source</b>analytic</div></div>" +
+      "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Noise model &amp; formulas</h3>' +
+      '<div class="sub">Everything that was applied to the ideal circuit</div></div></div>' +
+      kvGrid([["model", q.noise && q.noise.model, true],
+        ["T₁", n2(q.noise && q.noise.t1_us, 1) + " µs"],
+        ["T₂", n2(q.noise && q.noise.t2_us, 1) + " µs"],
+        ["single-qubit p₁", n2(q.noise && q.noise.p1_gate, 5)],
+        ["two-qubit p₂", n2(q.noise && q.noise.p2_gate, 5)],
+        ["readout fidelity", n2(q.noise && q.noise.readout_fidelity, 4)]]) +
+      (q.noise && q.noise.formula ?
+        '<div class="note"><span class="mono">' + Object.keys(q.noise.formula).map(function (k) {
+          return k + ": " + q.noise.formula[k];
+        }).join("<br>") + "</span></div>" : "") +
+      badgeHTML(q.badge) + traceHTML(q.trace) + "</div>";
+
+    $("#view").innerHTML = html;
+
+    var states = q.states || [];
+    function pick(i) {
+      var s = states[i];
+      if (!s) return;
+      drawBloch("blochCv", (s.bloch && s.bloch.theta) || 0, (s.bloch && s.bloch.phi) || 0);
+      $("#blochLbl").textContent = s.id + " · " + s.label +
+        " · amplitudes [" + (s.amplitudes || []).map(function (a) { return n2(a, 4); }).join(", ") + "]";
+      $$("#qsFilters .chip").forEach(function (c, j) { c.classList.toggle("on", j === i); });
+    }
+    $("#qsFilters").addEventListener("click", function (e) {
+      var c = e.target.closest(".chip");
+      if (c) pick(Number(c.dataset.i));
+    });
+    pick(0);
+
+    mkChart("qFid", { type: "bar",
+      data: { labels: (q.fidelity || []).map(function (f) { return f.layer + " / " + f.gate; }),
+        datasets: [{ label: "fidelity", data: (q.fidelity || []).map(function (f) { return f.fidelity; }),
+          backgroundColor: (q.fidelity || []).map(function (f) {
+            return f.fidelity > 0.99 ? "#34D399" : f.fidelity > 0.95 ? "#FBBF24" : "#F87171";
+          }), borderRadius: 5 }] },
+      options: { plugins: { legend: { display: false } },
+        scales: { y: { min: 0.8, max: 1, title: { display: true, text: "avg gate fidelity" } } } } });
+
+    mkChart("qRabi", { type: "line",
+      data: { labels: (q.rabi || []).map(function (p2) { return n2(p2.theta, 2); }),
+        datasets: [{ label: "⟨P⟩", data: (q.rabi || []).map(function (p2) { return p2.population; }),
+          borderColor: cssVar("--accent"), backgroundColor: cssVar("--accentSoft"), fill: true,
+          pointRadius: 0, borderWidth: 2, tension: 0.3 }] },
+      options: { plugins: { legend: { display: false } },
+        scales: { x: { title: { display: true, text: "drive angle θ (rad)" }, ticks: { maxTicksLimit: 8 } },
+          y: { min: 0, max: 1, title: { display: true, text: "excited population" } } } } });
+
+    var lv = (q.qho && q.qho.levels_J) || [];
+    mkChart("qHO", { type: "bar",
+      data: { labels: lv.map(function (_, i) { return "n=" + i; }),
+        datasets: [{ label: "E (10⁻²⁰ J)", data: lv.map(function (v) { return v * 1e20; }),
+          backgroundColor: cssVar("--accent"), borderRadius: 5 }] },
+      options: { plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: "10⁻²⁰ J" } } } } });
+  });
+};
+/* ================================================================ PROBLEMS */
+var PRIO = "All";
+function problemCard(p) {
+  var ev = (p.evidence || []).map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("");
+  var sol = (p.fix || []).map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("");
+  var sug = (p.suggestions || []).map(function (s) { return '<span class="kpi">' + esc(s) + "</span>"; }).join(" ");
+  return '<div class="pcard" id="card-' + esc(p.id) + '">' +
+    '<div class="ph" data-toggle="' + esc(p.id) + '">' +
+    '<span class="id">' + esc(p.id) + "</span><div><h4>" + esc(p.title) + "</h4>" +
+    '<div class="why">' + esc(p.symptom) + "</div></div>" +
+    '<div class="meta">' + (p.domain ? '<span class="tag info">' + esc(p.domain) + "</span>" : "") +
+    priTag(p.priority) +
+    '<span class="tag acc">' + n2(p.priority_score, 1) + "</span>" +
+    '<span class="tag">open ▾</span></div></div>' +
+    '<div class="pbody">' +
+
+    '<div class="fld wide"><div class="fl">Problem — ما المشكلة؟</div><p>' +
+    esc(p.symptom) + "</p></div>" +
+
+    '<div class="fld wide"><div class="fl">Evidence — البيانات التي أثبتت المشكلة</div><ul>' + ev + "</ul>" +
+    (p.evidence_metric != null ? '<div class="meter"><i style="width:' +
+      Math.max(2, Math.min(100, p.evidence_metric)) + '%"></i></div>' +
+      '<div class="hint">evidence strength = ' + n2(p.evidence_metric, 1) + "/100</div>" : "") + "</div>" +
+
+    '<div class="fld"><div class="fl">Impact — التأثير</div><p>' + esc(p.impact) + "</p>" +
+    (p.impact_score != null ? '<div class="meter w"><i style="width:' +
+      Math.max(2, Math.min(100, p.impact_score)) + '%"></i></div>' +
+      '<div class="hint">impact = ' + n2(p.impact_score, 1) + "/100</div>" : "") + "</div>" +
+
+    '<div class="fld"><div class="fl">Root cause — السبب المحتمل</div><p>' + esc(p.root_cause) + "</p></div>" +
+
+    '<div class="fld wide"><div class="fl">Analysis — ماذا أظهر التحليل؟</div><p>' + esc(p.analysis) + "</p></div>" +
+
+    '<div class="fld"><div class="fl">Solution — الحل المقترح</div><ol class="steps" style="counter-reset:none">' +
+    sol + "</ol></div>" +
+
+    '<div class="fld"><div class="fl">Suggestions — مقترحات إضافية</div><div class="pill-row">' + sug + "</div></div>" +
+
+    '<div class="fld"><div class="fl">Confidence level</div>' +
+    '<p><b>' + n2(p.confidence_level, 1) + "%</b> algorithmic confidence</p>" +
+    '<div class="meter ' + (p.confidence_level >= 80 ? "g" : "w") + '"><i style="width:' +
+    Math.max(2, Math.min(100, p.confidence_level || 0)) + '%"></i></div>' +
+    '<div class="disclaim" style="margin-top:8px">' + esc(p.confidence_note ||
+      "Algorithmic estimation — not an absolute scientific proof. A percentage is a measure of internal consistency, not evidence of truth.") +
+    "</div></div>" +
+
+    '<div class="fld"><div class="fl">Priority</div><p><b>' + n2(p.priority_score, 1) + "/100</b> · " +
+    esc(p.priority) + "</p><div class=\"meter\"><i style=\"width:" +
+    Math.max(2, Math.min(100, p.priority_score || 0)) + '%"></i></div>' +
+    '<div class="hint mono" style="margin-top:7px">' + esc(p.priority_formula ||
+      "0.40·evidence + 0.35·impact + 0.25·confidence") + "</div>" +
+    '<div class="disclaim" style="margin-top:8px">Priority is derived from three measurable inputs — it is not a ' +
+    "hand-set severity label.</div></div>" +
+
+    '<div class="pfoot">' +
+    '<span class="tag">detected ' + esc(jsDate(p.detected_at).slice(0, 16)) + "</span>" +
+    '<span class="tag">severity: ' + esc(p.severity || "—") + "</span>" +
+    '<span class="tag">' + esc(p.category || "—") + "</span>" +
+    '<a class="btn pri" href="#/solutions" data-gosol="' + esc(p.id) + '">See resolution path →</a>' +
+    "</div></div></div>";
+}
+VIEWS.problems = function () {
+  return Promise.all([api("problems"), api("solutions")]).then(function (r) {
+    var pr = r[0], sol = r[1];
+    var probs = pr.problems || [];
+
+    var html = pageHead("PROBLEMS → SOLUTIONS",
+      "The centre of the platform. Every finding is written as data, not as a note: statement, evidence, impact, " +
+      "root cause, analysis, solution, suggestions, a confidence level with an explicit caveat, and a priority " +
+      "computed from measurable inputs.",
+      '<button class="btn" data-act="run">↻ Re-run pipeline</button>' +
+      '<a class="btn pri" href="#/solutions">Solutions Center</a>');
+
+    html += '<div class="card"><div class="chd"><div><h3>Lifecycle — data to action</h3>' +
+      '<div class="sub">Where each open finding currently sits in the discovery cycle</div></div>' +
+      '<div class="rt"><span class="tag acc">' + pr.count + " problems</span></div></div>" +
+      '<div class="flow">' + lifecycleHTML(pr.lifecycle || []) + "</div></div>";
+
+    html += '<div class="grid g3">' +
+      metric("Open problems", num(pr.count), (pr.by_priority && pr.by_priority.High || 0) + " high priority", "acc") +
+      metric("Resolved solutions", num(sol && sol.count), "with expected impact deltas", "") +
+      metric("By priority", "H " + ((pr.by_priority && pr.by_priority.High) || 0) +
+        " · M " + ((pr.by_priority && pr.by_priority.Medium) || 0) +
+        " · L " + ((pr.by_priority && pr.by_priority.Low) || 0), "rule-derived, not editorial", "") + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Evidence vs impact</h3>' +
+      '<div class="sub">Bubble area = priority score · colour = priority band</div></div></div>' +
+      '<div class="cbox h300"><canvas id="piBubble"></canvas></div>' +
+      '<div class="cap"><b>x</b>evidence metric (0–100) <b>y</b>impact score (0–100) ' +
+      "<b>Formula</b>" + esc(probs[0] && probs[0].priority_formula || "") + "</div></div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Findings</h3>' +
+      '<div class="sub">Click a card header to expand the full 8-field schema</div></div></div>' +
+      '<div class="filters" id="pFilters"><button class="chip on" data-t="All">All</button>' +
+      ["High", "Medium", "Low"].map(function (p) {
+        return '<button class="chip" data-t="' + p + '">' + p + "</button>";
+      }).join("") + '<span class="hint" style="margin-left:auto">' + probs.length + " records</span></div>" +
+      '<div id="pList"></div>' + traceHTML(pr.trace) + "</div>";
+
+    $("#view").innerHTML = html;
+
+    function fill(list) {
+      $("#pList").innerHTML = list.length ? list.map(problemCard).join("")
+        : '<div class="empty-state"><b>No findings in this priority band</b>Change the filter or re-run the pipeline.</div>';
+    }
+    fill(probs);
+    $("#pFilters").addEventListener("click", function (e) {
+      var c = e.target.closest(".chip");
+      if (!c) return;
+      $$("#pFilters .chip").forEach(function (x) { x.classList.toggle("on", x === c); });
+      var t = c.dataset.t;
+      fill(t === "All" ? probs : probs.filter(function (p) { return p.priority === t; }));
+    });
+
+    mkChart("piBubble", { type: "bubble",
+      data: { datasets: [
+        { label: "High", data: probs.filter(function (p) { return p.priority === "High"; })
+            .map(function (p) { return { x: p.evidence_metric, y: p.impact_score, r: Math.max(6, p.priority_score / 5), id: p.id }; }),
+          backgroundColor: "rgba(248,113,113,.72)" },
+        { label: "Medium", data: probs.filter(function (p) { return p.priority === "Medium"; })
+            .map(function (p) { return { x: p.evidence_metric, y: p.impact_score, r: Math.max(6, p.priority_score / 5), id: p.id }; }),
+          backgroundColor: "rgba(251,191,36,.72)" },
+        { label: "Low", data: probs.filter(function (p) { return p.priority === "Low"; })
+            .map(function (p) { return { x: p.evidence_metric, y: p.impact_score, r: Math.max(6, p.priority_score / 5), id: p.id }; }),
+          backgroundColor: "rgba(52,211,153,.72)" }] },
+      options: { plugins: { legend: { position: "bottom" },
+          tooltip: { callbacks: { label: function (c) { return c.raw.id + " · e=" + n2(c.raw.x, 1) + " i=" + n2(c.raw.y, 1); } } } },
+        scales: { x: { min: 0, max: 100, title: { display: true, text: "evidence metric" } },
+          y: { min: 0, max: 100, title: { display: true, text: "impact score" } } } } });
+
+    if (location.hash.indexOf("P-") > 0) {
+      var id = location.hash.split("P-")[1];
+      var el = document.getElementById("card-P-" + id);
+      if (el) { el.classList.add("open"); el.scrollIntoView({ block: "center" }); }
+    }
+  });
+};
+/* ================================================================ SOLUTIONS */
+VIEWS.solutions = function () {
+  return Promise.all([api("solutions"), tryApi("problems")]).then(function (r) {
+    var s = r[0], pr = r[1];
+    var list = s.solutions || [];
+    var probs = (pr && pr.problems) || [];
+    var byId = {};
+    probs.forEach(function (p) { byId[p.id] = p; });
+
+    var html = pageHead("SOLUTIONS CENTER",
+      "The full resolution path, one card per problem: <b>Problem → Evidence → Analysis → Possible causes → " +
+      "Solution → Suggestions → Expected impact</b>. Each step names what changed and what should change.",
+      '<a class="btn" href="#/problems">← Problems</a>');
+
+    html += '<div class="card acc"><div class="chd"><div><h3>Resolution flow</h3>' +
+      '<div class="sub">The canonical sequence every finding is pushed through</div></div></div>' +
+      '<div class="flow">' +
+      ["Problem", "Evidence", "Analysis", "Possible causes", "Solution", "Suggestions", "Expected impact", "Action"]
+        .map(function (x, i) {
+          return '<div class="st ' + (i < 4 ? "hot" : "done") + '"><i></i><b>' + esc(x) + "</b></div>";
+        }).join("") + "</div></div>";
+
+    html += '<div class="grid g4">' +
+      metric("Resolution paths", num(s.count), "one per open finding", "acc") +
+      metric("Automated steps", num(list.reduce(function (a, x) {
+        return a + (x.steps || []).filter(function (st) { return st.type === "automated"; }).length; }, 0)),
+        "runnable without a human", "") +
+      metric("Manual steps", num(list.reduce(function (a, x) {
+        return a + (x.steps || []).filter(function (st) { return st.type !== "automated"; }).length; }, 0)),
+        "require an operator", "") +
+      metric("Effort mix", list.map(function (x) { return x.effort; }).join(" "),
+        "S = small · M = medium · L = large", "") + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Solution index</h3>' +
+      '<div class="sub">Jump straight to a resolution path</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>ID</th><th>Finding</th><th>Priority</th>' +
+      '<th class="num">Confidence</th><th>Owner</th><th>Effort</th><th class="num">Steps</th>' +
+      "</tr></thead><tbody>" + list.map(function (x, i) {
+        return '<tr class="clk" data-sol="' + i + '"><td class="mono">' + esc(x.problem_id) + "</td><td>" +
+          esc(x.title) + "</td><td>" + priTag(x.priority) + '</td><td class="num">' + n2(x.confidence_level, 0) +
+          "%</td><td>" + esc(x.owner) + '</td><td><span class="tag">' + esc(x.effort) + '</span></td><td class="num">' +
+          (x.steps || []).length + "</td></tr>";
+      }).join("") + "</tbody></table></div>" + traceHTML(s.trace) + "</div>";
+
+    html += '<div class="tl">' + list.map(function (x, i) {
+      var p = byId[x.problem_id] || {};
+      var imp = (x.expected_impact || [])[0];
+      return '<div class="ev acc" id="sol-' + esc(x.problem_id) + '">' +
+        '<h5><span class="mono" style="color:var(--accent)">' + esc(x.problem_id) + "</span>" +
+        esc(x.title) + priTag(x.priority) +
+        '<span class="tag">' + esc(x.owner) + "</span>" +
+        '<span class="tag">effort ' + esc(x.effort) + "</span></h5>" +
+
+        '<div class="row"><b>Problem</b><span>' + esc(p.symptom || x.title) + "</span></div>" +
+        '<div class="row"><b>Evidence</b><span>' + esc((p.evidence || []).join(" · ") || "—") + "</span></div>" +
+        '<div class="row"><b>Analysis</b><span>' + esc(p.analysis || "—") + "</span></div>" +
+        '<div class="row"><b>Possible causes</b><span>' + esc(p.root_cause || "—") + "</span></div>" +
+
+        '<div class="row"><b>Solution</b><span><ol class="steps" style="margin-top:4px">' +
+        (x.steps || []).map(function (st) {
+          return "<li>" + esc(st.action) + "<em>" + esc(st.type) + "</em></li>";
+        }).join("") + "</ol></span></div>" +
+
+        '<div class="row"><b>Suggestions</b><span>' +
+        (x.suggestions || []).map(function (g) { return '<span class="kpi">' + esc(g) + "</span>"; }).join(" ") +
+        "</span></div>" +
+
+        '<div class="row"><b>Confidence</b><span>' + n2(x.confidence_level, 1) +
+        "% — algorithmic, not proof</span></div>" +
+
+        (imp ? '<div class="row"><b>Expected impact</b><span class="mono">' + esc(imp.metric) + ": " +
+          '<span style="color:var(--bad)">' + esc(imp.now) + "</span> → " +
+          '<span style="color:var(--ok)">' + esc(imp.target) + "</span> · " + esc(imp.delta || "") + "</span></div>" : "") +
+
+        '<div class="row"><b>Next action</b><span>' +
+        ((x.steps || []).filter(function (st) { return st.type !== "automated"; })[0] ||
+          { action: "re-run the pipeline and confirm the delta" }).action + "</span></div>" +
+        "</div>";
+    }).join("") + "</div>";
+
+    $("#view").innerHTML = html;
+
+    $$("#view tr.clk").forEach(function (tr) {
+      tr.addEventListener("click", function () {
+        var x = list[Number(tr.dataset.sol)];
+        if (!x) return;
+        var node = document.getElementById("sol-" + x.problem_id);
+        if (node) { node.scrollIntoView({ block: "center", behavior: "smooth" }); node.classList.add("open"); }
+      });
+    });
+  });
+};
+
+/* ================================================================ PROJECTS */
+VIEWS.projects = function () {
+  return api("projects").then(function (d) {
+    var list = d.projects || [];
+    var html = pageHead("PROJECTS.MORS — Research Dossiers",
+      "Every project is a full dossier: overview, problem, dataset, methodology, analysis, visualisation, results, " +
+      "problems found, solutions, team, technologies, sources and documentation.",
+      '<span class="tag acc">' + list.length + " active dossiers</span>");
+
+    html += '<div class="mods">' + list.map(function (p, i) {
+      return '<div class="mod" data-prj="' + i + '"><div class="ic">' + svg("projects") + "</div><h4>" +
+        esc(p.name) + "</h4><p>" + esc(p.problem) + '</p><div class="fx">' +
+        '<span class="kpi">' + esc(p.id) + "</span>" +
+        '<span class="kpi">' + (p.issues || []).length + " problems</span>" +
+        '<span class="kpi">' + (p.technologies || []).length + " tech</span></div></div>";
+    }).join("") + "</div>";
+
+    html += list.map(function (p) {
+      return '<div class="card" id="prj-' + esc(p.id) + '"><div class="chd"><div><h3>' + esc(p.id) + " · " +
+        esc(p.name) + '</h3><div class="sub">' + esc(p.problem) + "</div></div>" +
+        '<div class="rt"><span class="tag low">' + esc(p.results || "—") + "</span></div></div>" +
+        '<div class="grid g2">' +
+        '<div class="fld"><div class="fl">Dataset</div><p>' + esc(p.dataset) + "</p></div>" +
+        '<div class="fld"><div class="fl">Methodology</div><p>' + esc(p.methodology) + "</p></div>" +
+        '<div class="fld"><div class="fl">Analysis</div><p>' + esc(p.analysis) + "</p></div>" +
+        '<div class="fld"><div class="fl">Visualization</div><div class="pill-row">' +
+        (p.visuals || []).map(function (v) { return '<span class="kpi">' + esc(v) + "</span>"; }).join("") +
+        "</div></div>" +
+        '<div class="fld"><div class="fl">Problems found</div><ul>' +
+        (p.issues || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" +
+        '<div class="fld"><div class="fl">Solutions</div><ul>' +
+        (p.solutions || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" +
+        '<div class="fld"><div class="fl">Technologies</div><div class="pill-row">' +
+        (p.technologies || []).map(function (x) { return '<span class="kpi">' + esc(x) + "</span>"; }).join("") +
+        "</div></div>" +
+        '<div class="fld"><div class="fl">Documentation</div><div class="pill-row">' +
+        (p.source_docs || []).map(function (x) { return '<span class="kpi mono">' + esc(x) + "</span>"; }).join("") +
+        "</div></div></div>" + traceHTML(d.trace) + "</div>";
+    }).join("");
+
+    $("#view").innerHTML = html;
+    $$("#view [data-prj]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var p = list[Number(el.dataset.prj)];
+        if (!p) return;
+        var node = document.getElementById("prj-" + p.id);
+        if (node) { node.scrollIntoView({ block: "start", behavior: "smooth" }); node.classList.add("acc"); }
+      });
+    });
+  });
+};
+
+/* ================================================================ SOURCES */
+var CAT_LABEL = {
+  ai_basics: "AI & ML basics",
+  data_handling: "Working with data",
+  analysis_modelling: "Data analysis & model building",
+  computer_vision: "Computer Vision",
+  astronomical_data: "Astronomical data",
+  generative_ai: "AI / Generative-AI applications",
+  predictive_automation: "Predictive & automation",
+  inspiration_research: "Inspiration & research"
+};
+var PHASE_META = {
+  Preparation: { t: "Phase 1 · before the event", c: "low" },
+  During: { t: "Phase 2 · during the event", c: "acc" },
+  Research: { t: "Phase 3 · research & inspiration", c: "med" }
+};
+var SRC_ORDER = ["Preparation", "During", "Research"];
+var SRC_FILTER = "All";
+
+function phaseTag(p) {
+  var m = PHASE_META[p] || { t: p || "—", c: "" };
+  return '<span class="tag ' + m.c + '">' + esc(m.t) + "</span>";
+}
+function srcLink(s) {
+  return s.url
+    ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.url) + "</a>"
+    : '<span class="hint">open the platform directly — no stable deep link</span>';
+}
+function srcCard(s) {
+  return '<div class="card" data-phase="' + esc(s.phase) + '"><div class="chd"><div><h3>' +
+    esc(s.id) + " · " + esc(s.title) + '</h3><div class="sub">' + esc(s.kind) + " · " + esc(s.level) +
+    "</div></div><div class=\"rt\">" + phaseTag(s.phase) +
+    '<span class="tag">' + esc(CAT_LABEL[s.category] || s.category) + "</span></div></div>" +
+    '<div class="ar ttl">' + esc(s.title_ar) + "</div>" +
+    '<div class="fld"><div class="fl">goal</div><div class="ar sm">' + esc(s.goal_ar) + "</div></div>" +
+    '<div class="grid g2">' +
+    '<div class="fld"><div class="fl">you will learn</div><div class="ar sm">' + esc(s.learn_ar) + "</div></div>" +
+    '<div class="fld"><div class="fl">who is it for</div><div class="ar sm">' + esc(s.for_ar) + "</div></div>" +
+    '<div class="fld"><div class="fl">when to use it</div><div class="ar sm">' + esc(s.when_ar) + "</div></div>" +
+    '<div class="fld"><div class="fl">link</div><div class="mono sm">' + srcLink(s) + "</div></div>" +
+    "</div>" +
+    '<div class="fld"><div class="fl">used in this project</div><div class="pill-row">' +
+    (s.used_in || []).map(function (u) { return '<span class="kpi mono">' + esc(u) + "</span>"; }).join("") +
+    "</div></div></div>";
+}
+function renderSrcGrid(list) {
+  var box = $("#srcGrid");
+  if (!box) return;
+  var rows = (list || []).filter(function (s) { return SRC_FILTER === "All" || s.phase === SRC_FILTER; });
+  box.innerHTML = rows.map(srcCard).join("") ||
+    '<div class="card"><div class="empty-state">No source in this phase.</div></div>';
+}
+function condCard(c) {
+  return '<div class="card"><div class="chd"><div><h3>' + esc(c.n) + " · " + esc(c.name) + "</h3>" +
+    '<div class="sub">' + esc(c.evidence) + '</div></div><div class="rt">' +
+    '<span class="tag ' + (c.status === "core" ? "low" : "med") + '">' +
+    esc(c.status === "core" ? "core in build" : "documented extension") + "</span></div></div>" +
+    '<div class="ar ttl">' + esc(c.name_ar) + "</div>" +
+    '<div class="ar sm">' + esc(c.helps_ar) + "</div>" +
+    '<div class="fld"><div class="fl">sources that support it</div><div class="pill-row">' +
+    (c.sources || []).map(function (id) { return '<span class="kpi mono">' + esc(id) + "</span>"; }).join("") +
+    "</div></div>" +
+    '<div class="fld"><div class="fl">evidence in this repo</div><ul>' +
+    (c.used_in || []).map(function (u) { return "<li class=\"mono sm\">" + esc(u) + "</li>"; }).join("") +
+    "</ul></div></div>";
+}
+VIEWS.sources = function () {
+  return api("sources").then(function (d) {
+    var A = d.aggregates || {}, hs = d.hackathon || [], ds = d.data_sources || [];
+    var html = pageHead("SOURCES.MORS — Scientific Sources &amp; Hackathon Conditions",
+      "The official ASI Hackathon source list, each entry tagged with the condition it supports and with the " +
+      "exact file in this repository that uses it — plus the live data sources this build actually calls.",
+      '<span class="tag acc">' + hs.length + " curated sources</span>" +
+      '<span class="tag low">' + A.live_data_sources + " live endpoints</span>");
+
+    html += '<div class="grid g4">' +
+      metric("Hackathon sources", num(A.total), "Preparation / During / Research", "acc") +
+      metric("Conditions covered", A.conditions_covered + "/" + A.conditions_total, "categories from the brief", "") +
+      metric("Live data sources", num(A.live_data_sources), "fetched through api acquisition", "") +
+      metric("Total data sources", num(ds.length), "APIs, catalogues and references", "") + "</div>";
+
+    html += '<div class="grid g2">' +
+      chartCard("srcPhase", "Sources by phase", "Preparation 7 · During 7 · Research 2 — pick by when you need them",
+                "static registry · /api/mors/sources") +
+      chartCard("srcLevel", "Sources by level", "Beginner → Advanced, so a newcomer and a veteran both have an entry point",
+                "static registry · /api/mors/sources", "h300") +
+      chartCard("srcCat", "Sources per condition", "How the 16 sources distribute over the 8 required categories",
+                "static registry · /api/mors/sources", "h300") +
+      chartCard("srcVia", "Data sources by acquisition path",
+                "api → ai_synthesis → local_model, the strict fallback order used everywhere in this build",
+                "static registry · /api/mors/sources") + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Brief rule</h3>' +
+      '<div class="sub">Quoted from the hackathon instructions</div></div></div>' +
+      '<div class="ar ttl">' + esc(d.disclaimer_ar || "") + "</div></div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>The 8 conditions — how the sources help the team</h3>' +
+      '<div class="sub">Each condition lists its supporting sources <b>and</b> the file in this repo where it is applied.</div>' +
+      '</div></div><div class="grid g2">' +
+      (d.conditions || []).map(condCard).join("") + "</div>" + traceHTML(d.trace) + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Official source list</h3>' +
+      '<div class="sub">Filter by phase, then read the Arabic guidance on each card.</div></div>' +
+      '<div class="rt" id="srcFilters">' + ["All"].concat(SRC_ORDER).map(function (p) {
+        var lab = p === "All" ? "All 16" : (PHASE_META[p] ? PHASE_META[p].t : p);
+        return '<button class="btn ' + (SRC_FILTER === p ? "pri" : "") + '" data-sp="' + esc(p) + '">' + esc(lab) + "</button>";
+      }).join("") + "</div></div>" +
+      '<div class="srcgrid" id="srcGrid"></div></div>';
+
+    html += '<div class="card"><div class="chd"><div><h3>Live data sources used by this build</h3>' +
+      '<div class="sub">What is actually called at runtime, and which module calls it.</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>ID</th><th>Source</th><th>Kind</th><th>Via</th>' +
+      '<th>Gives</th><th>Used in</th></tr></thead><tbody>' +
+      ds.map(function (r) {
+        return '<tr><td class="mono">' + esc(r.id) + "</td><td>" + esc(r.name) +
+          (r.url ? '<span class="tsub mono">' + esc(r.url) + "</span>" : "") + "</td>" +
+          "<td>" + esc(r.kind) + "</td><td>" + srcPill({ via: r.via }) + "</td><td>" + esc(r.gives) +
+          '</td><td class="mono sm">' + esc(r.used_in) + "</td></tr>";
+      }).join("") + "</tbody></table></div></div>";
+
+    $("#view").innerHTML = html;
+    renderSrcGrid(hs);
+
+    mkChart("srcPhase", { type: "doughnut", data: {
+      labels: SRC_ORDER.map(function (p) { return (PHASE_META[p] || {}).t || p; }),
+      datasets: [{ data: SRC_ORDER.map(function (p) { return A.by_phase[p] || 0; }),
+        backgroundColor: PALETTE(), borderWidth: 0 }] },
+      options: { plugins: { legend: { position: "bottom" } } } });
+
+    var lv = Object.keys(A.by_level || {}).map(function (k) { return [k, A.by_level[k]]; })
+      .sort(function (a, b) { return b[1] - a[1]; });
+    mkChart("srcLevel", { type: "bar", data: {
+      labels: lv.map(function (x) { return x[0]; }),
+      datasets: [{ label: "sources", data: lv.map(function (x) { return x[1]; }),
+        backgroundColor: PALETTE()[1], borderRadius: 4, barPercentage: .68 }] },
+      options: { indexAxis: "y", plugins: { legend: { display: false } },
+        scales: { x: { grid: { color: cssVar("--line") }, ticks: { precision: 0, stepSize: 1 } },
+                  y: { grid: { display: false }, ticks: { color: cssVar("--text") } } } } });
+
+    var cats = Object.keys(CAT_LABEL).map(function (k) { return [CAT_LABEL[k], A.by_category[k] || 0]; });
+    mkChart("srcCat", { type: "bar", data: {
+      labels: cats.map(function (x) { return x[0]; }),
+      datasets: [{ label: "sources", data: cats.map(function (x) { return x[1]; }),
+        backgroundColor: PALETTE()[2], borderRadius: 4, barPercentage: .7 }] },
+      options: { indexAxis: "y", plugins: { legend: { display: false } },
+        scales: { x: { grid: { color: cssVar("--line") }, ticks: { precision: 0, stepSize: 1 } },
+                  y: { grid: { display: false }, ticks: { color: cssVar("--text"), font: { size: 10 } } } } } });
+
+    var via = { api: 0, ai_synthesis: 0, local_model: 0 };
+    ds.forEach(function (r) { if (via[r.via] != null) via[r.via]++; });
+    mkChart("srcVia", { type: "doughnut", data: {
+      labels: ["api — live call", "ai_synthesis — Gemini", "local_model — deterministic"],
+      datasets: [{ data: [via.api, via.ai_synthesis, via.local_model],
+        backgroundColor: [PALETTE()[0], PALETTE()[4], PALETTE()[3]], borderWidth: 0 }] },
+      options: { plugins: { legend: { position: "bottom" } } } });
+
+    var f = $("#srcFilters");
+    if (f) f.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-sp]");
+      if (!b) return;
+      SRC_FILTER = b.dataset.sp;
+      $$("#srcFilters .btn").forEach(function (x) { x.classList.toggle("pri", x.dataset.sp === SRC_FILTER); });
+      renderSrcGrid(hs);
+    });
+  });
+};
+
+/* ================================================================ TEAM */
+VIEWS.team = function () {
+  return api("team").then(function (d) {
+    var list = d.members || [];
+    var html = pageHead("TEAM.MORS — Roles &amp; Specialisation",
+      "MORS — Data • Space • Quantum. Each member owns a module and the findings attached to it, so every " +
+      "problem on this platform has a named owner.",
+      '<span class="tag acc">' + list.length + " roles</span>");
+
+    html += '<div class="card"><div class="chd"><div><h3>Scientific identity</h3>' +
+      '<div class="sub">The domains this team applies — chosen per project, not all at once</div></div></div>' +
+      '<div class="pill-row">' +
+      ["Data Science", "Astronomy", "Space Science", "Quantum Science", "Scientific Computing",
+       "Scientific Visualization", "Artificial Intelligence", "Scientific UI/UX"].map(function (x) {
+        return '<span class="kpi">' + esc(x) + "</span>";
+      }).join("") + "</div></div>";
+
+    html += '<div class="mods">' + list.map(function (m) {
+      return '<div class="mod" style="cursor:default"><div class="ic">' + svg("team") + "</div><h4>" +
+        esc(m.name) + '</h4><p>' + esc(m.role) + '</p><div class="pill-row">' +
+        (m.skills || []).map(function (s) { return '<span class="kpi">' + esc(s) + "</span>"; }).join("") +
+        "</div>" + (m.lead ? '<div class="hint" style="margin-top:9px">lead · ' + esc(m.lead) + "</div>" : "") +
+        (m.owns && m.owns.length ? '<div class="hint" style="margin-top:5px">owns: ' +
+          esc(m.owns.join(", ")) + "</div>" : "") + "</div>";
+    }).join("") + "</div>";
+
+    html += '<div class="card"><div class="chd"><div><h3>Ownership matrix</h3>' +
+      '<div class="sub">Who is accountable for which module and which finding</div></div></div>' +
+      '<div class="tblwrap"><table><thead><tr><th>Role</th><th>Responsibility</th><th>Lead</th><th>Owns</th>' +
+      "</tr></thead><tbody>" + list.map(function (m) {
+        return "<tr><td><b>" + esc(m.name) + '</b><span class="tsub mono">' + esc(m.id) + "</span></td><td>" +
+          esc(m.role) + "</td><td>" + esc(m.lead || "—") + "</td><td>" +
+          (m.owns || []).map(function (o) { return '<span class="kpi">' + esc(o) + "</span>"; }).join(" ") +
+          "</td></tr>";
+      }).join("") + "</tbody></table></div>" + traceHTML(d.trace) + "</div>";
+
+    $("#view").innerHTML = html;
+  });
+};
+/* ================================================================ HEALTH BAR */
+function renderHealth() {
+  var dh = D.datahealth, pr = D.problems, a = D.ai;
+  var q = dh ? dh.data_quality_score : 0;
+  var cls = q >= 85 ? "ok" : q >= 60 ? "warn" : "bad";
+  var items = [
+    ["Data quality", dh ? n2(q, 1) : "—", cls],
+    ["Missing", dh ? pct(dh.missing_pct) : "—", dh && dh.missing_pct < 5 ? "ok" : "warn"],
+    ["Duplicates", dh ? pct(dh.duplicate_pct) : "—", dh && dh.duplicate_pct < 2 ? "ok" : "warn"],
+    ["Completeness", dh ? pct(dh.completeness_pct) : "—", dh && dh.completeness_pct > 95 ? "ok" : "warn"],
+    ["Accuracy", dh ? pct(dh.accuracy_score) : "—", dh && dh.accuracy_score > 90 ? "ok" : "warn"],
+    ["Last updated", dh ? jsDate(dh.last_sync).slice(0, 16) : "—", ""]
+  ];
+  $("#health").innerHTML = items.map(function (it) {
+    return '<div class="h"><div class="k">' + esc(it[0]) + '</div><div class="v">' + esc(it[1]) + "</div>" +
+      '<div class="bar ' + it[2] + '"><i style="width:' +
+      (it[2] === "ok" ? 96 : it[2] === "warn" ? 70 : it[2] === "bad" ? 40 : 8) + '%"></i></div></div>';
+  }).join("");
+  if (a && a.engine) {
+    $("#pillEngine").innerHTML = '<span class="dot"></span>' + esc(a.engine.council || "—");
+    $("#pillEngine").className = "pill " + (a.engine.council === "gemini" ? "ok" : "warn");
+    $("#sfEngine").textContent = "council: " + (a.engine.council || "—");
+  }
+  if (dh) {
+    $("#pillQuality").textContent = "quality " + n2(dh.data_quality_score, 1) + "/100";
+    $("#pillQuality").className = "pill " + (dh.data_quality_score >= 85 ? "ok" : dh.data_quality_score >= 60 ? "warn" : "bad");
+    $("#sfSync").textContent = "last sync " + (dh.last_sync === "—" ? "—" : jsDate(dh.last_sync).slice(0, 16));
+  }
+  if (pr) {
+    $("#pillOpen").textContent = pr.count + " open problems";
+  }
+}
+
+/* ================================================================ SEARCH */
+var SEARCH_DONE = false;
+function buildIndex() {
+  if (SEARCH_DONE) return Promise.resolve();
+  SEARCH_DONE = true;
+  var jobs = ["objects", "exoplanets", "satellite", "problems", "solutions", "projects",
+    "team", "modules", "ai", "datahealth", "lightcurves", "photometry", "spectroscopy", "images", "fits",
+    "sources"]
+    .map(function (k) { return tryApi(k); });
+  return Promise.all(jobs).then(function () {
+    IDX.length = 0;
+    function add(ty, name, sub, view, id) { IDX.push({ ty: ty, n: name, s: sub, v: view, id: id || "" }); }
+    (D.objects && D.objects.rows || []).forEach(function (r) {
+      add("Object", r.name, r.type + " · " + (r["class"] || "") + " · " + r.catalog, "astronomy", r.id);
+    });
+    (D.exoplanets && D.exoplanets.rows || []).forEach(function (r) {
+      add("Exoplanet", r.planet_name, "host " + r.host_star + " · " + r.discovery_method + " " + r.discovery_year, "astronomy", r.planet_name);
+    });
+    (D.satellite && D.satellite.rows || []).forEach(function (r) {
+      add("Satellite", r.name, r.orbit_class + " · " + n2(r.altitude_km, 0) + " km · " + r.mission, "satellite", r.norad_id);
+    });
+    (D.problems && D.problems.problems || []).forEach(function (r) {
+      add("Problem", r.id + " — " + r.title, r.priority + " · " + n2(r.priority_score, 1) + "/100 · " + r.domain, "problems", r.id);
+    });
+    (D.solutions && D.solutions.solutions || []).forEach(function (r) {
+      add("Solution", r.problem_id + " — " + r.title, r.owner + " · effort " + r.effort, "solutions", r.problem_id);
+    });
+    (D.projects && D.projects.projects || []).forEach(function (r) {
+      add("Project", r.name, r.results + " · " + r.dataset, "projects", r.id);
+    });
+    (D.team && D.team.members || []).forEach(function (r) {
+      add("Role", r.name, r.role, "team", r.id);
+    });
+    (D.ai && D.ai.research || []).forEach(function (r) {
+      add("Research", r.topic, r.owner + " · " + r.status, "ai", "");
+    });
+    (D.ai && D.ai.tools || []).forEach(function (r) {
+      add("Dataset", r.name, r.type + " · " + num(r.records) + " records", "ai", "");
+    });
+    (D.modules && D.modules.modules || []).forEach(function (r) {
+      add("Dataset", r.label, r.desc, "astronomy", r.key);
+    });
+    (D.datahealth && D.datahealth.per_source || []).forEach(function (r) {
+      add("Dataset", r.source, num(r.rows) + " rows · " + n2(r.missing_pct, 2) + "% missing", "data", r.source);
+    });
+    (D.sources && D.sources.hackathon || []).forEach(function (r) {
+      add("Source", r.no + ". " + r.title,
+        r.phase + " · " + r.level + " · " + (CAT_LABEL[r.category] || r.category), "sources", r.id);
+    });
+    (D.sources && D.sources.data_sources || []).forEach(function (r) {
+      add("Dataset", r.name, "data source · " + r.via + " · " + r.used_in, "sources", r.id);
+    });
+    ["lightcurves", "photometry", "spectroscopy"].forEach(function (k) {
+      (D[k] && D[k].rows || []).forEach(function (r) {
+        add("Dataset", r.curve_id || r.target_name || r.spectrum_id || r.name,
+          k + " · " + (r.band || ""), "astronomy", "");
+      });
+    });
+    (D.images && D.images.rows || []).forEach(function (r) {
+      add("Dataset", r.title, "image · " + r.date, "astronomy", r.image_id);
+    });
+    (D.fits && D.fits.rows || []).forEach(function (r) {
+      add("Dataset", r.title, "FITS header · " + r.pipeline_status, "astronomy", r.image_id);
+    });
+  });
+}
+var SFILTER = "All";
+function runSearch() {
+  var q = ($("#q").value || "").trim().toLowerCase();
+  var box = $("#sres");
+  if (!q) { box.classList.remove("on"); box.innerHTML = ""; return; }
+  var hits = IDX.filter(function (x) {
+    var okF = SFILTER === "All" || x.ty === SFILTER;
+    return okF && (x.n.toLowerCase().indexOf(q) >= 0 || String(x.s).toLowerCase().indexOf(q) >= 0);
+  }).slice(0, 40);
+  if (!hits.length) {
+    box.innerHTML = '<div class="empty">No match for “' + esc($("#q").value) + '”' +
+      (SFILTER !== "All" ? " in " + esc(SFILTER) : "") +
+      "<br><span class='hint'>Datasets · stars · planets · exoplanets · satellites · problems · solutions · projects · research</span></div>";
+    box.classList.add("on");
+    return;
+  }
+  var groups = {};
+  hits.forEach(function (h) { (groups[h.ty] = groups[h.ty] || []).push(h); });
+  var html = '<div class="filters" style="padding:10px 12px 4px;margin:0">' +
+    ["All", "Dataset", "Object", "Exoplanet", "Satellite", "Problem", "Solution", "Project", "Research", "Role", "Source"]
+      .map(function (t) {
+        return '<button class="chip' + (SFILTER === t ? " on" : "") + '" data-sf="' + t + '">' + t + "</button>";
+      }).join("") + "</div>";
+  Object.keys(groups).forEach(function (g) {
+    html += '<div class="grp">' + esc(g) + " · " + groups[g].length + "</div>";
+    groups[g].forEach(function (h) {
+      html += '<div class="it" data-view="' + esc(h.v) + '"><div><b>' + esc(h.n) + "</b><small>" +
+        esc(h.s) + "</small></div><span class=\"tag ty\">" + esc(h.ty) + "</span></div>";
+    });
+  });
+  box.innerHTML = html;
+  box.classList.add("on");
+}
+
+/* ================================================================ EVENTS */
+function bindEvents() {
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+
+    var chip = t.closest && t.closest("[data-sf]");
+    if (chip) { SFILTER = chip.dataset.sf; runSearch(); return; }
+
+    var res = t.closest && t.closest(".sres .it");
+    if (res) {
+      $("#sres").classList.remove("on");
+      $("#q").value = "";
+      if (res.dataset.view) location.hash = "#/" + res.dataset.view;
+      return;
+    }
+
+    var nav = t.closest && t.closest("[data-nav]");
+    if (nav) { e.preventDefault(); location.hash = "#/" + nav.dataset.nav; return; }
+
+    var tog = t.closest && t.closest("[data-toggle]");
+    if (tog) {
+      var c = document.getElementById("card-" + tog.dataset.toggle);
+      if (c) c.classList.toggle("open");
+      return;
+    }
+
+    var gp = t.closest && t.closest("[data-goproblem]");
+    if (gp) {
+      e.preventDefault();
+      var pid = gp.dataset.goproblem;
+      location.hash = "#/problems";
+      setTimeout(function () {
+        var el = document.getElementById("card-" + pid);
+        if (el) { el.classList.add("open"); el.scrollIntoView({ block: "center" }); }
+      }, 420);
+      return;
+    }
+
+    var gs = t.closest && t.closest("[data-gosol]");
+    if (gs) {
+      e.preventDefault();
+      var sid = gs.dataset.gosol;
+      if (CURRENT !== "solutions") location.hash = "#/solutions";
+      setTimeout(function () {
+        var el2 = document.getElementById("sol-" + sid);
+        if (el2) el2.scrollIntoView({ block: "center" });
+      }, 420);
+      return;
+    }
+
+    var op = t.closest && t.closest("[data-open]");
+    if (op) { e.preventDefault(); openModule(op.dataset.open); return; }
+
+    var act = t.closest && t.closest("[data-act]");
+    if (act) {
+      if (act.dataset.act === "run") {
+        fetch("/api/pipeline/run", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: "{}" }).then(function (r) { return r.json(); }).then(function () {
+          toast("Pipeline started — results will refresh when it completes");
+          setTimeout(function () { Object.keys(D).forEach(function (k) { delete D[k]; }); go(CURRENT); }, 12000);
+        }).catch(function () { toast("Could not start the pipeline"); });
+      }
+      if (act.dataset.act === "insight") runInsight();
+      if (act.dataset.act === "chat") runMorsChat();
+      return;
+    }
+
+    if (t.closest && t.closest("[data-close]")) { closeAll(); return; }
+    if (t.id === "scrim") { closeAll(); return; }
+    if (t.id === "btnCustom") { $("#drawer").classList.add("on"); openScrim(true); return; }
+    if (t.closest && t.closest("#btnTheme")) { cycleTheme(); return; }
+    if (t.id === "burger") { $("#sidebar").classList.toggle("on"); return; }
+    if (t.id === "btnReset") {
+      localStorage.removeItem(LS);
+      S.theme = "dark"; S.planet = "earth"; S.accent = null; S.grid = "off"; S.particles = "low";
+      S.compact = S.density = S.contrast = S.bigtext = false;
+      S.sci = true; S.motion = true; S.rmotion = true;
+      applySettings(); toast("MORS defaults restored");
+      return;
+    }
+
+    var opt = t.closest && t.closest("#drawer .opt button");
+    if (opt) {
+      var set = opt.parentNode.dataset.set;
+      if (set === "theme") S.theme = opt.dataset.v;
+      if (set === "planet") { S.planet = opt.dataset.v; S.theme = "planet"; }
+      if (set === "grid") S.grid = opt.dataset.v;
+      if (set === "particles") S.particles = opt.dataset.v;
+      applySettings();
+      return;
+    }
+    var swi = t.closest && t.closest("#drawer .sw i");
+    if (swi) { S.accent = swi.dataset.v; applySettings(); return; }
+    var tg = t.closest && t.closest("#drawer .sw2");
+    if (tg) { S[tg.dataset.t] = !S[tg.dataset.t]; applySettings(); return; }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closeAll(); $("#sres").classList.remove("on"); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault(); $("#q").focus();
+    }
+  });
+
+  $("#q").addEventListener("focus", function () { buildIndex().then(runSearch); });
+  $("#q").addEventListener("input", function () { buildIndex().then(runSearch); });
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest(".searchwrap")) $("#sres").classList.remove("on");
+  });
+  window.addEventListener("resize", function () {
+    clearTimeout(bindEvents._r);
+    bindEvents._r = setTimeout(function () {
+      seedFX();
+      if (CURRENT === "astronomy" && D.objects) drawSky("skyMap", D.objects.rows || []);
+      if (SAT_SEL && $("#satMap")) drawGroundTrack($("#satMap"), SAT_SEL);
+    }, 220);
+  });
+}
+
+/* ================================================================ BOOT */
+function routeFromHash() {
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  var parts = h.split("/");
+  return parts[0] || "home";
+}
+window.addEventListener("hashchange", function () { go(routeFromHash()); });
+
+function boot() {
+  loadSettings();
+  applySettings();
+  renderNav();
+  bindEvents();
+  go(routeFromHash());
+  Promise.all([tryApi("datahealth"), tryApi("problems"), tryApi("ai")]).then(renderHealth);
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else boot();
+</script>
+</body>
+</html>

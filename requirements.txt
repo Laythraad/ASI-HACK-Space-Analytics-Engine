@@ -1,0 +1,18 @@
+# ASI-HACK Space Analytics Engine - Required Libraries
+# Python 3.11+ (tested on 3.12)
+google-generativeai>=0.8.0
+astropy>=6.0
+scikit-learn>=1.4
+pandas>=2.0
+numpy>=1.26
+requests>=2.31
+flask>=3.0
+python-dotenv>=1.0
+
+# Optional - only needed to regenerate the PDF documents
+#   python tools/build_report.py   -> docs/MORS_REPORT.pdf
+#   python tools/build_guide.py    -> docs/PROJECT_GUIDE.pdf
+# reportlab>=4.0
+# arabic-reshaper>=3.0
+# python-bidi>=0.4
+# matplotlib>=3.8

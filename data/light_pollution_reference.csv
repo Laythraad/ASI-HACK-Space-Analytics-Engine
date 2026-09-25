@@ -1,0 +1,10 @@
+class,radiance_nw_cm2_sr,sqm_mag_arcsec2,nelm_mag,bortle,source
+bortle_1_pristine,0.018,22.2,7.6,1,Bortle, Sky & Telescope 2001
+bortle_2_true_dark,0.0237,21.9,7.3,2,Bortle, Sky & Telescope 2001
+bortle_3_rural,0.0312,21.6,7.0,3,Bortle, Sky & Telescope 2001
+bortle_4_rural-urban,0.0451,21.2,6.6,4,Bortle, Sky & Telescope 2001
+bortle_5_suburban,0.0715,20.7,6.1,5,Bortle, Sky & Telescope 2001
+bortle_6_bright_suburb,0.1243,20.1,5.5,6,Bortle, Sky & Telescope 2001
+bortle_7_suburban-urban,0.2159,19.5,4.9,7,Bortle, Sky & Telescope 2001
+bortle_8_urban,0.4116,18.8,4.2,8,Bortle, Sky & Telescope 2001
+bortle_9_inner_city,0.86,18.0,3.4,9,Bortle, Sky & Telescope 2001

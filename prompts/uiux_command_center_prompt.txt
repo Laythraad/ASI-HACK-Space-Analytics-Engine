@@ -1,0 +1,99 @@
+================================================================================
+SECTION 2: FRONTEND UI/UX DESIGN & SATELLITE COMMAND CENTER SPECIFICATIONS
+================================================================================
+
+TARGET HACKATHON CONTEXT (ASI HACK 2026):
+- Selected Challenge: "AI for Space Challenges" (Addressing massive space & satellite data growth, predictive pattern recognition, and telemetry processing).
+- Primary Data Spectrum: Satellite Imagery, FITS / Light Curves, Solar & Space Weather Data.
+- Selected AI Domains: Space Data Analysis, Computer Vision & Satellite Imagery, Predictive Systems, Process Automation.
+
+--------------------------------------------------------------------------------
+A. NAVIGATION SYSTEM & DROPDOWN SIDEBAR (COLLAPSIBLE DROPDOWN MENU)
+--------------------------------------------------------------------------------
+Build a multi-level collapsible accordion sidebar (Dropdown Menu) designed for a high-density scientific UI structure:
+
+Sidebar Layout (Collapsible Dropdowns):
+|- MORS HOME (Command Dashboard Overview)
+|- AI.MORS (Scientific AI Engine & Interactive Workspace)
+|- DATA.MORS Dropdown
+|  |- Overview & Data Health Audit
+|  |- Data Cleaning & Preprocessing
+|  |- Time Series & Signal Filtering
+|  |- Outlier & Anomaly Diagnostic
+|- SATELLITE.MORS Dropdown [PRIMARY FEATURE FOCUS]
+|  |- Fleet Operations & Telemetry Overview
+|  |- Satellite Details & Orbit Tracker (3D GIS Map)
+|  |- Remote Sensing & Sensor Band Explorer (RGB/NIR/SWIR)
+|  |- Coverage Gap & Signal Degradation Analysis
+|- ASTRONOMY.MORS Dropdown
+|  |- FITS Image Viewer & Photometry
+|  |- Spectroscopy & Spectral Lines
+|  |- Exoplanet Transit & Light Curves
+|- QUANTUM.MORS Dropdown
+|  |- Quantum State Simulation & Bloch Sphere
+|  |- Quantum Data Noise Modeling
+|- PROBLEMS -> SOLUTIONS CENTER (Primary Pipeline Engine)
+|- PROJECTS.MORS
+|- TEAM.MORS
+|- CUSTOMIZE MORS (Theme & UI Settings Panel)
+
+--------------------------------------------------------------------------------
+B. DEEP-DIVE: SATELLITE.MORS MODULE (PRIMARY SATELLITE FOCUS)
+--------------------------------------------------------------------------------
+The Satellite Module must serve as a high-precision Earth Observation & Orbit Command Dashboard:
+
+1. Satellite Fleet Grid & Selector:
+   - Dynamic Selector: Switch between Earth Observation Satellites (e.g., Sentinel, Landsat, MODIS) and Custom Mission Satellites.
+   - Status Indicators: Operational (Green), Degraded Sensor (Yellow), Signal Gap (Red), Calibration Mode (Blue).
+
+2. Real-Time Telemetry & Spatial Metrics Panel:
+   - Metrics Display: NORAD ID, Mission Type, Altitude (km), Orbital Velocity (km/s), Inclination (deg), Spatial Resolution (m/pixel), Revisit Period (Days), Sensor Temperature (deg C).
+
+3. Interactive Geospatial GIS Coverage Map:
+   - Interactive 3D/2D Globe displaying live orbital footprints, swath paths, satellite trajectories, and coverage gaps.
+   - Layer Controls: Toggle Nighttime Lights, Optical RGB, Thermal Surface Bands, Vegetation Index (NDVI), Cloud Coverage overlays.
+
+4. Sensor Band Radiance & Signal Inspector:
+   - Multi-Spectral Band Spectrum Visualizer (Plotting Band Wavelength vs. Radiance Flux).
+   - Sensor Noise Diagnostic (Signal-to-Noise Ratio SNR calculation over time).
+
+5. Satellite Detailed Inspection Modal / Page:
+   - Granular breakdown of individual satellite passes, raw telemetry logs, acquired image frames, and anomaly flags.
+
+--------------------------------------------------------------------------------
+C. PROBLEMS -> SOLUTIONS CENTER (Visual Pipeline Engine)
+--------------------------------------------------------------------------------
+A dedicated full-screen analytical timeline visualizer connecting Satellite Data Anomalies to Measurable Verifications:
+
+Problem Node Example (Satellite Domain):
+- Problem: Critical SNR Drop & Frame Loss in Thermal Sensor (Band 10).
+- Evidence: 24.3% packet loss recorded between 2026-09-20 and 2026-09-22; SNR dropped below 2.8 dB.
+- Impact: Inability to monitor surface thermal anomalies accurately.
+- Root Cause: Sensor thermal degradation caused by solar orientation shift during orbital inclination adjustment.
+- Solution: Automated Sensor Recalibration Script + Adaptive Wavelet Filtering Pipeline.
+- Verification Metrics (Before vs After): Frame Loss (Before: 24.3% -> Target: <2.0%), SNR (Before: 2.8 dB -> Target: >12.0 dB).
+- Confidence Score: 94.2% (Derived via Time-Series Anomaly Correlation).
+- Priority Level: HIGH (Based on Data Integrity Loss Metrics).
+
+--------------------------------------------------------------------------------
+D. VISUAL AESTHETICS & DESIGN SYSTEM
+--------------------------------------------------------------------------------
+- Aesthetic Standard: Futuristic Scientific Control Center. Ultra-crisp typography, subtle borders, high-density metric displays, dark space atmosphere.
+- Prohibited: No childish icons, no gaming elements, no excessive star particles, no unreadable neon clutter.
+- Dark Space Color Palette (Default):
+  * Background: Deep Vacuum Navy (#030712, #0B0F19)
+  * Card Surfaces: Translucent Dark Slate (rgba(15, 23, 42, 0.75))
+  * Primary Accent: Laser Cyan (#38BDF8)
+  * Data Verified / Safe: Emerald Green (#34D399)
+  * Anomaly / Evidence Warning: Amber Gold (#FBBF24)
+  * Critical Problem: Deep Rose (#F43F5E)
+  * Text / Metrics: Crisp White (#F8FAFC) & Slate Gray (#94A3B8)
+- Planet Theme Engine: Supports switching dynamic ambient backgrounds and accent colors (Earth, Mars, Jupiter, Saturn, Moon) inside "Customize MORS" while maintaining WCAG accessibility and contrast standards.
+
+--------------------------------------------------------------------------------
+E. CODE GENERATION DELIVERABLES
+--------------------------------------------------------------------------------
+Generate clean, modular, production-ready frontend web code (index.html, styles.css, app.js):
+1. HTML5 structure with a collapsible dropdown accordion sidebar.
+2. Responsive CSS styling implementing dark space glassmorphism panels and scientific grids.
+3. JavaScript layout logic driving sidebar dropdown toggles, tab navigation, and dynamic rendering for satellite telemetry, charts, and the Problems -> Solutions center.

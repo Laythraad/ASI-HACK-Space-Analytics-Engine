@@ -1,0 +1,98 @@
+================================================================================
+MASTER UI/UX DESIGN & VISUALIZATION PROMPT: ASTRONOMICAL & SATELLITE COMMAND
+Domain: Scientific Visualization • Space UI/UX • Satellite & Astronomical Graphics
+Target Paradigm: Ultra-Professional Futuristic Space Control Platform
+================================================================================
+
+[ROLE & DESIGN IDENTITY]
+Act as the Principal Scientific UI/UX Lead and Data Visualization Architect for "MORS".
+Your mission is to design a high-density, professional, space-themed command interface tailored for Astronomy, Remote Sensing, Satellite Telemetry, and Quantum Data Analysis.
+
+STRICT DESIGN RULES:
+- MUST look like a real-world space agency / satellite control center research platform.
+- PROHIBITED: No gaming/eSports tropes, no childish star particles, no unreadable neon overload, no useless decorative Sci-Fi clutter.
+- PRIORITIZE: Readability, scientific density, precise grid alignment, data traceability, and responsive data charts.
+
+================================================================================
+1. VISUAL THEME ENGINE & SPACE ATMOSPHERE
+================================================================================
+Implement a sleek Dark Space UI with dynamic "Celestial Theme Engine":
+
+- Base Dark Space Palette (Default):
+  * Primary Background: Vacuum Space Dark (#030712, #0B0F19)
+  * Panel Surfaces: Translucent Glassmorphism (rgba(15, 23, 42, 0.75) with backdrop-filter: blur(12px))
+  * Borders & Dividers: Subdued Orbital Blue (rgba(56, 189, 248, 0.15))
+  * Accent Colors:
+    - Primary Data / Satellite Accent: Cyan Blue (#38BDF8)
+    - Photometry & Stellar Accent: Electric Amber (#FBBF24)
+    - Verified Status: Emerald (#34D399)
+    - Anomaly Flag: Rose Red (#F43F5E)
+  * Typography: Clean Monospace for metrics (JetBrains Mono / Fira Code) & Modern Sans-Serif for interface text (Inter / Plus Jakarta Sans).
+
+- Dynamic "Planet Mode" Themes:
+  * Earth Theme: Deep Ocean Navy + Atmosphere Cyan.
+  * Mars Theme: Dark Basalt + Rust Red Accents.
+  * Jupiter Theme: Warm Amber/Ochre Gradients + Storm Gold Accents.
+  * Neptune Theme: Deep Azure Blue + Electric Cyan Accents.
+  * Moon Theme: High-Contrast Monochromatic Slate & White.
+
+================================================================================
+2. COMPONENT SPECIFICATIONS: ASTRONOMY & SATELLITE VISUALIZATIONS
+================================================================================
+
+A. SATELLITE & REMOTE SENSING VISUALS (SATELLITE.MORS):
+1. Interactive GIS Orbit Globe / Canvas:
+   - 2D/3D Map rendering satellite ground tracks, orbital swaths, solar terminator lines, and coverage gap overlays.
+   - Live telemetry status badges (Altitude, Velocity, Inclination, Sensor Temp, SNR dB).
+2. Multi-Spectral Band Analyzer:
+   - Spectral Band Selector (RGB, Near-Infrared NIR, Short-Wave Infrared SWIR, Thermal).
+   - Dynamic Radiance Flux graph vs Wavelength.
+
+B. ASTRONOMICAL DATA VISUALS (ASTRONOMY.MORS):
+1. Light Curve & Photometry Plotter:
+   - High-precision phase-folded Light Curve viewer with ingress/egress transit highlights, error bar overlays (sigma), and noise floor indicators.
+2. FITS Image & Spectroscopy Viewer:
+   - Astronomical FITS image renderer with stretch controls (Log, Linear, Sqrt), False Color Mapping, and Sky Coordinate Grids (RA / Dec).
+   - Spectroscopy chart displaying flux vs wavelength (Angstrom) with key emission/absorption spectral line tags.
+
+C. QUANTUM STATE VISUALIZER (QUANTUM.MORS):
+1. Bloch Sphere & Matrix Density Visuals:
+   - Interactive 3D Bloch Sphere vector visualization for single-qubit state representation.
+   - Probability amplitude heatmap matrix for multi-qubit registers.
+
+================================================================================
+3. CORE PIPELINE UI: PROBLEMS -> EVIDENCE -> SOLUTIONS CENTER
+================================================================================
+Design a high-density, step-by-step visual pipeline flow diagram:
+
+Visual Layout Node Sequence:
+[ DATA ANOMALY DETECTED ] --> [ QUANTITATIVE EVIDENCE ] --> [ ROOT CAUSE ANALYSIS ] --> [ PROPOSED SOLUTION ] --> [ MEASURABLE VERIFICATION ]
+
+Card Design Standard:
+- Header: Problem Title + Priority Badge (HIGH / MED / LOW) + System Confidence Score %.
+- Section 1 (Evidence): Metrics highlight (e.g., "Missing Data: 18.4%", "SNR Loss: -4.2 dB").
+- Section 2 (Root Cause): Linked source diagnostic text.
+- Section 3 (Solution & Action): Concrete fix steps + "Before vs After" target verification metrics.
+
+================================================================================
+4. COLLAPSIBLE DROPDOWN NAVIGATION SIDEBAR
+================================================================================
+Build a compact, accordion-style collapsible sidebar:
+
+Sidebar Accordion Items:
+- MORS Overview
+- AI.MORS (Scientific AI Workspace)
+- DATA.MORS (Dropdown: Quality Audit, Time Series, Anomaly Detection)
+- SATELLITE.MORS (Dropdown: Fleet Operations, Orbit GIS Tracker, Band Inspector)
+- ASTRONOMY.MORS (Dropdown: Photometry, FITS Viewer, Spectroscopy, Exoplanets)
+- QUANTUM.MORS (Dropdown: State Simulator, Noise Modeling)
+- PROBLEMS -> SOLUTIONS (Primary Command Center Node)
+- CUSTOMIZE MORS (Theme Switcher: Light / Dark / Planet Mode)
+
+================================================================================
+5. DELIVERABLES
+================================================================================
+Generate modular frontend code (HTML5, CSS3, JavaScript) incorporating:
+1. CSS Grid layout with Glassmorphism space theme.
+2. Sidebar Dropdown Accordion functionality.
+3. Interactive Chart/Map placeholders (Chart.js / Plotly / Leaflet JS ready).

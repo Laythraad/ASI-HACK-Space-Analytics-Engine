@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASI-HACK · Space Analytics Engine — Ai.Mors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Cairo:wght@400;600;700&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#050515; --bg2:#0a0e1d; --panel:rgba(13,18,42,.74);
+  --cyan:#38bdf8; --violet:#a06bff; --green:#3dff9e; --amber:#ffc857;
+  --red:#ff5d73; --text:#dfe7ff; --muted:#8b97c4; --border:rgba(56,189,248,.24);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(160,107,255,.16), transparent 60%),
+    radial-gradient(1000px 600px at 110% 10%, rgba(56,189,248,.12), transparent 55%),
+    var(--bg);
+  color:var(--text); font-family:'Cairo',sans-serif; overflow-x:hidden;
+}
+h1,h2,h3,.mono-t{font-family:'Orbitron',sans-serif;letter-spacing:.5px}
+button{font-family:'Cairo',sans-serif;cursor:pointer;border:none;outline:none}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--cyan),var(--violet));border-radius:9px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
+
+/* ---------- header ---------- */
+header{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:14px 22px;background:linear-gradient(90deg,rgba(8,10,30,.94),rgba(8,10,30,.7));
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(10px);
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .orb{
+  width:38px;height:38px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%,#9ff3ff,#38bdf8 40%,#5b39ff 90%);
+  box-shadow:0 0 22px rgba(56,189,248,.65);animation:pulse 3.4s ease-in-out infinite;
+}
+@keyframes pulse{50%{box-shadow:0 0 34px rgba(160,107,255,.8)}}
+.logo h1{font-size:16px;line-height:1.35}
+.logo small{display:block;font-family:'IBM Plex Mono';font-size:10.5px;color:var(--muted)}
+.spacer{flex:1}
+.pill{
+  font-size:11.5px;padding:6px 12px;border-radius:99px;border:1px solid var(--border);
+  background:rgba(56,189,248,.08);color:var(--cyan);font-family:'IBM Plex Mono'
+}
+.pill.warn{background:rgba(255,200,87,.1);color:var(--amber);border-color:rgba(255,200,87,.35)}
+.pill.off{background:rgba(255,93,115,.1);color:var(--red);border-color:rgba(255,93,115,.35)}
+.btn{
+  padding:10px 18px;border-radius:11px;font-weight:700;font-size:13.5px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));color:#061021;
+  box-shadow:0 6px 20px rgba(56,189,248,.28);transition:.18s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(160,107,255,.4)}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);box-shadow:none}
+.btn.ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* ---------- progress ---------- */
+#progWrap{width:100%;display:none;padding:0 22px 10px}
+#progBar{height:9px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}
+#progFill{height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .6s}
+#progLabel{font-size:11.5px;color:var(--muted);margin-top:6px;font-family:'IBM Plex Mono'}
+
+/* ---------- layout ---------- */
+main{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;padding:16px 22px}
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  padding:14px 16px;backdrop-filter:blur(9px);position:relative;overflow:hidden
+}
+.card h2{font-size:13px;color:var(--cyan);margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.card h2 .tag{font-size:9.5px;color:var(--muted);font-family:'IBM Plex Mono';font-weight:400}
+#vizCard{grid-row:span 2;min-height:520px;display:flex;flex-direction:column}
+#viz{flex:1;border-radius:12px;overflow:hidden;background:#030311;position:relative;min-height:440px}
+#viz canvas{display:block}
+.hud{
+  position:absolute;left:12px;top:12px;font-family:'IBM Plex Mono';font-size:10.5px;
+  color:var(--cyan);background:rgba(3,4,17,.6);padding:7px 10px;border-radius:9px;
+  border:1px solid var(--border);line-height:1.7;pointer-events:none
+}
+.viz-ctrls{position:absolute;right:12px;top:12px;display:flex;gap:8px}
+.legend{
+  position:absolute;left:12px;bottom:12px;display:flex;gap:14px;font-size:10.5px;
+  font-family:'IBM Plex Mono';color:var(--muted);background:rgba(3,4,17,.55);
+  padding:7px 11px;border-radius:9px;border:1px solid var(--border)
+}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.right-col{display:flex;flex-direction:column;gap:16px}
+.chart-\boxed{height:190px;position:relative}
+
+/* ---------- extended science widgets ---------- */
+#scienceCard{grid-column:1 / -1}
+.sci-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.sci-item{
+  background:rgba(255,255,255,.035);border:1px solid var(--border);
+  border-radius:13px;padding:12px 13px;position:relative;overflow:hidden
+}
+.sci-item::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),transparent 70%);opacity:.7
+}
+.sci-item h3{
+  font-size:11.5px;color:var(--cyan);margin-bottom:9px;
+  display:flex;gap:8px;align-items:baseline;flex-wrap:wrap
+}
+.sci-item h3 .tag{font-size:9.5px;color:var(--muted);font-family:'IBM Plex Mono';font-weight:400}
+.chart-box.tall{height:252px}
+.sci-meta{
+  font-family:'IBM Plex Mono';font-size:9.5px;color:var(--muted);margin-top:9px;
+  line-height:1.8;border-top:1px dashed rgba(56,189,248,.22);padding-top:7px;
+  word-break:break-word
+}
+.sci-meta b{color:var(--cyan);font-weight:400}
+.sci-meta .ok{color:var(--green)}
+.sci-meta .warn{color:var(--amber)}
+@media(max-width:780px){.sci-grid{grid-template-columns:1fr}}
+
+/* ---------- verdict ---------- */
+#verdict{
+  display:none;grid-column:1 / -1;border-radius:16px;padding:14px 18px;
+  border:1px solid var(--border);background:var(--panel);
+  display:none;align-items:center;gap:18px;flex-wrap:wrap
+}
+#verdict.show{display:flex}
+#verdict .score{
+  font-family:'Orbitron';font-size:34px;font-weight:700;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent
+}
+#verdict .v-state{font-family:'Orbitron';font-size:15px;padding:7px 14px;border-radius:9px}
+.v-CERTIFIED .v-state{background:rgba(61,255,158,.14);color:var(--green);border:1px solid rgba(61,255,158,.4)}
+.v-CERTIFIED_WITH_CORRECTIONS .v-state{background:rgba(255,200,87,.14);color:var(--amber);border:1px solid rgba(255,200,87,.4)}
+.v-REJECTED .v-state{background:rgba(255,93,115,.14);color:var(--red);border:1px solid rgba(255,93,115,.4)}
+.experts{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.expert{
+  font-size:10.5px;padding:6px 10px;border-radius:9px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);font-family:'IBM Plex Mono'
+}
+.expert b{color:var(--cyan)}
+
+/* ---------- chat ---------- */
+#chatCard{grid-column:1 / -1}
+#chatLog{height:270px;overflow-y:auto;padding:10px 6px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:86%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(160,107,255,.22));border:1px solid rgba(56,189,248,.35)}
+.msg.bot{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid var(--border)}
+.greeting{
+  display:block;font-weight:700;color:var(--cyan);font-size:14.5px;margin-bottom:7px;
+  font-family:'Cairo';border-bottom:1px dashed rgba(56,189,248,.4);padding-bottom:6px
+}
+.step{display:block;margin:5px 0;padding-left:9px;border-left:2px solid rgba(160,107,255,.55)}
+.eq{
+  display:block;font-family:'IBM Plex Mono';font-size:12.5px;color:var(--green);
+  background:rgba(61,255,158,.07);border:1px solid rgba(61,255,158,.25);
+  padding:6px 9px;border-radius:8px;margin:6px 0;overflow-x:auto;direction:ltr;text-align:left
+}
+.cite{display:inline-block;font-family:'IBM Plex Mono';font-size:10.5px;color:var(--amber);
+  background:rgba(255,200,87,.1);border:1px solid rgba(255,200,87,.3);padding:2px 7px;border-radius:7px;margin:3px 4px 0 0}
+#chatForm{display:flex;gap:10px;margin-top:10px}
+#chatInput{
+  flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:11px;
+  color:var(--text);padding:11px 14px;font-family:'Cairo';font-size:13.5px;resize:none;height:52px
+}
+#chatInput:focus{border-color:var(--cyan)}
+.typing{display:none;gap:5px;align-items:center;color:var(--muted);font-size:12px;margin-top:8px}
+.typing.show{display:flex}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:b 1s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+
+/* ---------- toasts ---------- */
+#toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:9px;z-index:99}
+.toast{
+  padding:11px 15px;border-radius:11px;font-size:12.5px;max-width:340px;
+  background:rgba(8,10,30,.96);border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.5);
+  animation:slide .3s ease
+}
+.toast.err{border-color:rgba(255,93,115,.5);color:var(--red)}
+.toast.ok{border-color:rgba(61,255,158,.5);color:var(--green)}
+@keyframes slide{from{transform:translateX(40px);opacity:0}}
+
+footer{text-align:center;color:var(--muted);font-size:11px;padding:14px;font-family:'IBM Plex Mono'}
+@media(max-width:1050px){main{grid-template-columns:1fr}#vizCard{grid-row:auto}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="mors-cta" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:9px 16px;background:#083344;border-bottom:1px solid #0e7490;color:#CFF6FF;font:600 12.5px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif">
+  <span style="margin:0">هذا هو اللوحة القديمة (ASI-HACK). الواجهة الجديدة الكاملة هي <b style="color:#7DD3FC">MORS Scientific Command Center</b> — 18 وحدة علمية.</span>
+  <a href="mors.html" style="display:inline-block;padding:6px 14px;border-radius:999px;background:#38BDF8;color:#052432;text-decoration:none;font-weight:700;white-space:nowrap">افتح مركز MORS ←</a>
+</div>
+<header>
+  <div class="logo">
+    <div class="orb"></div>
+    <h1>ASI-HACK · SPACE ANALYTICS ENGINE
+      <small>Multi-Agent Verified Pipeline — Ai.Mors 3D Dashboard</small></h1>
+  </div>
+  <div class="spacer"></div>
+  <span id="pillGemini" class="pill">Gemini …</span>
+  <span id="pillNasa" class="pill">NASA …</span>
+  <button id="btnSound" class="btn ghost" aria-label="Toggle ambient space audio">🔊 Space Ambience</button>
+  <button id="btnRefresh" class="btn ghost" aria-label="Refresh data">⟳ Refresh</button>
+  <button id="btnRun" class="btn" aria-label="Run the full AI pipeline">▶ تشغيل المخطط / Run Pipeline</button>
+</header>
+
+<div id="progWrap">
+  <div id="progBar"><div id="progFill"></div></div>
+  <div id="progLabel">idle</div>
+</div>
+
+<main>
+  <!-- ============ 3D VISUALIZER ============ -->
+  <section class="card" id="vizCard">
+    <h2>🪐 3D CELESTIAL VISUALIZER <span class="tag">three.js · orbit controls · live ephemeris</span></h2>
+    <div id="viz">
+      <div class="hud" id="hud">FRAME: ICRS heliocentric<br>EPOCH: —<br>SOURCE: —</div>
+      <div class="viz-ctrls">
+        <button class="btn ghost" id="btnAuto" style="padding:7px 12px;font-size:11.5px">⏸ Auto-Rotate</button>
+      </div>
+      <div class="legend">
+        <span><i style="background:#ffd257"></i>Sun</span>
+        <span><i style="background:#4d9dff"></i>Earth</span>
+        <span><i style="background:#ff7043"></i>Mars</span>
+        <span><i style="background:#ff5d73"></i>Hazardous NEO</span>
+        <span><i style="background:#9aa7d9"></i>NEO</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RIGHT COLUMN: charts ============ -->
+  <div class="right-col">
+    <section class="card">
+      <h2>📈 SPACE WEATHER — CME SPEEDS <span class="tag">DONKI · NASA</span></h2>
+      <div class="chart-box"><canvas id="chartCme"></canvas></div>
+    </section>
+    <section class="card">
+      <h2>☄️ NEO COUNT / DAY <span class="tag">NEOWS · NASA</span></h2>
+      <div class="chart-box"><canvas id="chartNeo"></canvas></div>
+    </section>
+    <section class="card">
+      <h2>🛰️ HELIOCENTRIC TRAJECTORY <span class="tag">JPL Horizons</span></h2>
+      <div class="chart-box"><canvas id="chartOrbit"></canvas></div>
+    </section>
+    <section class="card">
+      <h2>🧑‍🔬 COUNCIL OF 5 — EXPERT SCORES <span class="tag">Gemini verification</span></h2>
+      <div class="chart-box"><canvas id="chartCouncil"></canvas></div>
+    </section>
+  </div>
+
+  <!-- ============ EXTENDED SCIENCE MATRIX (4 widgets) ============ -->
+  <section class="card" id="scienceCard">
+    <h2>🔬 EXTENDED SCIENCE MATRIX
+      <span class="tag">light pollution · hazard matrix · Kp &amp; flares · multi-spectral</span></h2>
+    <div class="sci-grid">
+
+      <div class="sci-item">
+        <h3>🌙 LIGHT POLLUTION vs STELLAR VISIBILITY
+          <span class="tag">NASA GIBS · VIIRS Black Marble</span></h3>
+        <div class="chart-box tall"><canvas id="chartLight"></canvas></div>
+        <div class="sci-meta" id="lightMeta">loading…</div>
+      </div>
+
+      <div class="sci-item">
+        <h3>☄️ NEO HAZARD BUBBLE MATRIX
+          <span class="tag">NEOWS · NASA (distance × velocity × size)</span></h3>
+        <div class="chart-box tall"><canvas id="chartHaz"></canvas></div>
+        <div class="sci-meta" id="hazMeta">loading…</div>
+      </div>
+
+      <div class="sci-item">
+        <h3>☀️ SPACE WEATHER &amp; Kp-INDEX
+          <span class="tag">DONKI flare class + NOAA SWPC Kp (dual axis)</span></h3>
+        <div class="chart-box tall"><canvas id="chartKp"></canvas></div>
+        <div class="sci-meta" id="kpMeta">loading…</div>
+      </div>
+
+      <div class="sci-item">
+        <h3>🛰️ MULTI-SPECTRAL BAND RADAR
+          <span class="tag">Sentinel-2 · B2 B3 B4 B8 B11</span></h3>
+        <div class="chart-box tall"><canvas id="chartSpec"></canvas></div>
+        <div class="sci-meta" id="specMeta">loading…</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ VERDICT BANNER ============ -->
+  <section id="verdict">
+    <div>
+      <div style="font-size:10.5px;color:var(--muted);font-family:'IBM Plex Mono'">CERTIFICATION</div>
+      <div class="v-state" id="vState">—</div>
+    </div>
+    <div class="score"><span id="vScore">–</span><span style="font-size:16px">/100</span></div>
+    <div class="experts" id="vExperts"></div>
+  </section>
+
+  <!-- ============ Ai.Mors CHAT ============ -->
+  <section class="card" id="chatCard">
+    <h2>🤖 Ai.Mors — CERTIFIED SPACE AGENT <span class="tag">answers restricted to council-certified data</span></h2>
+    <div id="chatLog">
+      <div class="msg bot"><span class="greeting">أهلاً وسهلاً بكم في الفضاء</span>
+1- أنا <b>Ai.Mors</b>، وكيل الفضاء المعتمد داخل منصة ASI-HACK.
+2- اضغط <b>«▶ تشغيل المخطط»</b> لبناء قاعدة المعرفة من بيانات NASA الحية (DONKI / NEOWS / JPL Horizons).
+3- بعدها اسألني أي سؤال فلكي، وسأجيب بخطوات مرقّمة مع المعادلات ومعرّفات التتبع (Traceability IDs) والمراجع العلمية.
+الخلاصة: كل إجابة أقدمها مُوثّقة من مجلس الخبراء الخمسة.</div>
+    </div>
+    <div class="typing" id="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span>&nbsp;Ai.Mors يفكر…</div>
+    <form id="chatForm">
+      <textarea id="chatInput" dir="auto" placeholder="اكتب سؤالك الفلكي… (مثال: ما سرعة أسرع كميات CME هذا الشهر؟)" aria-label="Chat message"></textarea>
+      <button class="btn" type="submit" aria-label="Send">إرسال ✈</button>
+    </form>
+  </section>
+</main>
+
+<footer>ASI-HACK · AI for Space Challenges — Agent Pipeline: Ingestion → Council of 5 → Citations → Ai.Mors · Data: NASA DONKI / NEOWS / JPL Horizons</footer>
+<div id="toasts"></div>
+
+<!-- ================= THREE.JS ================= -->
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+"three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let scene, camera, renderer, controls, sun, earth, mars, belt, neos;
+let autoRotate = !reduced;
+const extraBodies = [];
+
+function glowTexture(){
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(64,64,4,64,64,64);
+  grd.addColorStop(0,'rgba(255,255,210,1)');
+  grd.addColorStop(.35,'rgba(255,196,80,.75)');
+  grd.addColorStop(1,'rgba(255,140,20,0)');
+  g.fillStyle = grd; g.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+
+/* procedural planet texture — no external images (works behind firewalls) */
+function planetTexture(base, spot){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0,0,256,128);
+  for(let i=0;i<40;i++){
+    g.fillStyle = spot.replace('A', (0.15+Math.random()*0.4).toFixed(2));
+    const y = Math.random()*128, h = 3+Math.random()*14;
+    g.fillRect(0, y, 256, h);
+  }
+  return new THREE.CanvasTexture(c);
+}
+
+function initViz(){
+  const el = document.getElementById('viz');
+  try{
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(52, el.clientWidth/el.clientHeight, 0.1, 4000);
+    camera.position.set(0, 22, 46);
+    renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(el.clientWidth, el.clientHeight);
+    el.appendChild(renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.autoRotate = autoRotate; controls.autoRotateSpeed = .55;
+
+    scene.add(new THREE.AmbientLight(0x8899ff, .35));
+    const sunLight = new THREE.PointLight(0xfff0c0, 2.6, 0, 1.6);
+    scene.add(sunLight);
+
+    // starfield
+    const N = 4200, pos = new Float32Array(N*3);
+    for(let i=0;i<N;i++){
+      const r = 600 + Math.random()*1400;
+      const th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+      pos[i*3]   = r*Math.sin(ph)*Math.cos(th);
+      pos[i*3+1] = r*Math.sin(ph)*Math.sin(th);
+      pos[i*3+2] = r*Math.cos(ph);
+    }
+    const sg = new THREE.BufferGeometry();
+    sg.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    scene.add(new THREE.Points(sg, new THREE.PointsMaterial({color:0xbfd0ff,size:1.7,sizeAttenuation:false,transparent:true,opacity:.9})));
+
+    // sun
+    sun = new THREE.Mesh(new THREE.SphereGeometry(3.1,48,48),
+      new THREE.MeshBasicMaterial({color:0xffcf57}));
+    scene.add(sun);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+    glow.scale.set(19,19,1); scene.add(glow);
+
+    // orbits (a = au => scene units)
+    const ring = (r, color, op) => {
+      const pts = [];
+      for(let i=0;i<=128;i++){const t=i/128*Math.PI*2; pts.push(new THREE.Vector3(r*Math.cos(t),0,r*Math.sin(t)));}
+      const g = new THREE.BufferGeometry().setFromPoints(pts);
+      const m = new THREE.LineBasicMaterial({color, transparent:true, opacity:op});
+      scene.add(new THREE.LineLoop(g,m));
+    };
+    ring(10, 0x4d9dff, .5); ring(15.2, 0xff7043, .4);
+
+    // Earth / Mars
+    earth = new THREE.Mesh(new THREE.SphereGeometry(1.05,40,40),
+      new THREE.MeshStandardMaterial({map:planetTexture('#2f6fd0','rgba(90,200,140,A)'),roughness:.85}));
+    earth.position.set(10,0,0); scene.add(earth);
+    mars = new THREE.Mesh(new THREE.SphereGeometry(.72,36,36),
+      new THREE.MeshStandardMaterial({map:planetTexture('#c1502e','rgba(90,40,25,A)'),roughness:.95}));
+    mars.position.set(15.2,0,0); scene.add(mars);
+
+    // asteroid belt
+    const BN = 900, bp = new Float32Array(BN*3);
+    for(let i=0;i<BN;i++){
+      const r = 20 + Math.random()*7, t = Math.random()*Math.PI*2;
+      bp[i*3] = r*Math.cos(t); bp[i*3+1]=(Math.random()-.5)*1.6; bp[i*3+2]=r*Math.sin(t);
+    }
+    const bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.BufferAttribute(bp,3));
+    belt = new THREE.Points(bg, new THREE.PointsMaterial({color:0x8b93b8,size:.28,transparent:true,opacity:.75}));
+    scene.add(belt);
+
+    // NEOS layer (filled by data)
+    neos = new THREE.Group(); scene.add(neos);
+
+    addEventListener('resize', ()=>{
+      camera.aspect = el.clientWidth/el.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(el.clientWidth, el.clientHeight);
+    });
+
+    (function loop(){
+      requestAnimationFrame(loop);
+      if(earth) earth.rotation.y += .006;
+      if(mars) mars.rotation.y += .005;
+      if(belt) belt.rotation.y += .0007;
+      if(controls) controls.autoRotate = autoRotate, controls.update();
+      // animate pipeline-fed bodies along their ephemeris samples
+      extraBodies.forEach(b=>{
+        b.i = (b.i + 0.0025) % b.path.length;
+        const p = b.path[Math.floor(b.i)];
+        if(p) b.mesh.position.set(p.x*10, p.y*10, p.z*10);
+      });
+      renderer.render(scene, camera);
+    })();
+  }catch(err){
+    document.getElementById('viz').innerHTML =
+      '<div style="padding:30px;color:#ff8fa3;font-family:IBM Plex Mono">WebGL unavailable — 3D visualizer disabled.<br>'+err.message+'</div>';
+  }
+}
+
+/* expose hooks for the main (non-module) script */
+window.__viz = {
+  setEphemeris(path){
+    if(!scene || !path || !path.length) return;
+    extraBodies.forEach(b=>scene.remove(b.mesh));
+    extraBodies.length = 0;
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(.62,24,24),
+      new THREE.MeshStandardMaterial({color:0x3dff9e,emissive:0x0a5f3a,emissiveIntensity:.6}));
+    scene.add(mesh);
+    extraBodies.push({mesh, path:path.filter(p=>p && p.x!=null), i:0});
+  },
+  setNeos(items){
+    if(!scene || !neos) return;
+    while(neos.children.length) neos.remove(neos.children[0]);
+    (items||[]).slice(0,70).forEach(n=>{
+      const au = Math.min(Math.max(n.miss_distance_au||.12, .04), .6);
+      const r = 10 + au*40;
+      const t = Math.random()*Math.PI*2;
+      const geo = new THREE.SphereGeometry(n.hazardous?.34:.22, 10, 10);
+      const mat = new THREE.MeshBasicMaterial({color:n.hazardous?0xff5d73:0x9aa7d9});
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(r*Math.cos(t), (Math.random()-.5)*3, r*Math.sin(t));
+      neos.add(m);
+    });
+  },
+  setAuto(v){ autoRotate = v; if(controls) controls.autoRotate = v; },
+  setHud(lines){ document.getElementById('hud').innerHTML = lines; }
+};
+initViz();
+</script>
+
+<!-- ================= APP LOGIC ================= -->
+<script>
+const $ = s => document.querySelector(s);
+const charts = {};
+let pollTimer = null;
+
+/* ---------------- toasts ---------------- */
+function toast(msg, kind=''){
+  const d = document.createElement('div');
+  d.className = 'toast '+kind; d.textContent = msg;
+  $('#toasts').appendChild(d);
+  setTimeout(()=>d.remove(), 4600);
+}
+function markSnapshot(){
+  if(window.__SNAP__) return; window.__SNAP__ = true;
+  const d=document.createElement('div');
+  d.textContent='Static demo — no backend here, showing the JSON snapshot captured at build time (Run Pipeline / chat disabled).';
+  d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center';
+  document.addEventListener('DOMContentLoaded',()=>document.body.appendChild(d));
+  if(document.body) document.body.appendChild(d);
+  const a=document.querySelector('a[href="/mors"]'); if(a) a.href='mors.html';
+}
+async function snapshot(path){
+  const rel=String(path).replace(/^\/+/,'');
+  const r=await fetch(rel+'.json',{cache:'no-cache'});
+  if(!r.ok) throw new Error('snapshot missing -> '+rel+'.json');
+  const j=await r.json(); markSnapshot(); return j;
+}
+async function api(path, opts){
+  try{
+    const r = await fetch(path, opts);
+    let data = null;
+    try{ data = await r.json(); }catch(e){}
+    if(!r.ok){
+      const err = new Error((data && (data.error||data.message)) || (r.status+' '+r.statusText));
+      err.status = r.status; err.data = data; throw err;
+    }
+    return data;
+  }catch(e){
+    if(typeof path === 'string' && path.indexOf('/api/') === 0 && !opts){
+      try{ return await snapshot(path); }catch(e2){ /* fall through */ }
+    }
+    throw e;
+  }
+}
+
+/* ---------------- health ---------------- */
+async function loadHealth(){
+  try{
+    const h = await api('/api/health');
+    $('#pillGemini').textContent = h.gemini_configured ? 'Gemini ✓ configured' : 'Gemini ✗ fallback';
+    $('#pillGemini').className = 'pill'+(h.gemini_configured?'':' warn');
+    $('#pillNasa').textContent = 'NASA '+(h.nasa_key_mode==='live'?'key ✓ live':'DEMO (limited)');
+    $('#pillNasa').className = 'pill'+(h.nasa_key_mode==='live'?'':' warn');
+  }catch(e){
+    $('#pillGemini').textContent = 'Backend offline'; $('#pillGemini').className='pill off';
+    $('#pillNasa').textContent = 'Backend offline';   $('#pillNasa').className='pill off';
+    toast('تعذّر الاتصال بالخادم — تأكد من تشغيل main.py','err');
+  }
+}
+
+/* ---------------- charts ---------------- */
+Chart.defaults.color = '#8b97c4';
+Chart.defaults.borderColor = 'rgba(56,124,220,.14)';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size = 10;
+
+function mkChart(id, cfg){
+  const el = document.getElementById(id);
+  if(charts[id]) charts[id].destroy();
+  charts[id] = new Chart(el, cfg);
+}
+function grad(ctx, color){
+  const g = ctx.createLinearGradient(0,0,0,190);
+  g.addColorStop(0, color+'aa'); g.addColorStop(1, color+'08');
+  return g;
+}
+
+function drawSpaceWeather(d){
+  const labels = d.series.map(s=>(s.t||'').slice(5,16));
+  const vals   = d.series.map(s=>s.value);
+  const ctx = document.getElementById('chartCme').getContext('2d');
+  mkChart('chartCme',{type:'line',data:{labels,datasets:[{
+    label:'CME speed (km/s)',data:vals,borderColor:'#38bdf8',
+    backgroundColor:grad(ctx,'#38bdf8'),fill:true,tension:.35,
+    pointRadius:3,pointBackgroundColor:'#a06bff'}]},
+    options:opt({suggestedMin:0})});
+}
+function drawNeo(d){
+  const ctx = document.getElementById('chartNeo').getContext('2d');
+  mkChart('chartNeo',{type:'bar',data:{
+    labels:d.series.map(s=>s.t.slice(5)),
+    datasets:[{label:'NEOs / day',data:d.series.map(s=>s.value),
+      backgroundColor:grad(ctx,'#a06bff'),borderColor:'#a06bff',borderWidth:1}]},
+    options:opt({})});
+}
+function drawOrbit(d){
+  const PAL=['#4d9dff','#ff5d73','#3dff9e','#ffc857','#a06bff','#38bdf8'];
+  const orbits=d.orbits&&Object.keys(d.orbits).length?d.orbits:{[d.body||'Earth']:(d.series||[])};
+  const keys=Object.keys(orbits);
+  mkChart('chartOrbit',{type:'scatter',data:{datasets:keys.map((k,i)=>({
+    label:k, data:orbits[k].map(s=>({x:s.x_au,y:s.y_au})),
+    borderColor:PAL[i%PAL.length],backgroundColor:PAL[i%PAL.length]+'59',
+    showLine:true,tension:.4,pointRadius:2}))},
+  options:{...opt({}),aspectRatio:2.2,plugins:{legend:{display:keys.length>1,position:'bottom'}},
+    scales:{x:{title:{display:true,text:'X (au)'},grid:{color:'rgba(56,124,220,.1)'}},
+            y:{title:{display:true,text:'Y (au)'},grid:{color:'rgba(56,124,220,.1)'}}}}});
+}
+function drawCouncil(rep){
+  const ex = ((rep.council||{}).experts)||[];
+  mkChart('chartCouncil',{type:'bar',data:{
+    labels:ex.map(e=>e.name),
+    datasets:[{label:'score',data:ex.map(e=>e.score),
+      backgroundColor:['#38bdf8','#a06bff','#3dff9e','#ffc857','#ff5d73'],borderRadius:7}]},
+    options:{...opt({}),indexAxis:'y',plugins:{legend:{display:false}},
+      scales:{x:{min:0,max:100,grid:{color:'rgba(56,124,220,.1)'}},y:{grid:{display:false}}}}});
+}
+
+/* =============== WIDGET 1 — light pollution vs stellar visibility =============== */
+const BORTLE_COLOR = b => b<=2 ? '#3dff9e' : b<=4 ? '#7ef7c1'
+                        : b<=6 ? '#ffc857' : b<=7 ? '#ff9f5a' : '#ff5d73';
+function drawLight(d){
+  const m = d.model||{}, src = d.source||{};
+  const sites = d.sites||[];
+  const pts = sites.map(s=>({x:s.radiance_nw_cm2_sr, y:s.nelm_mag, s}));
+  const curve = (d.reference_curve||[]).map(p=>({x:p.radiance_nw_cm2_sr, y:p.nelm_mag}));
+  mkChart('chartLight',{type:'scatter',data:{datasets:[
+    {label:'model curve', data:curve, type:'line', showLine:true, fill:false,
+     borderColor:'rgba(56,189,248,.8)', backgroundColor:'rgba(56,189,248,.10)',
+     borderWidth:2, pointRadius:0, tension:.35, order:2},
+    {label:'measured site', data:pts, order:1,
+     backgroundColor:pts.map(p=>BORTLE_COLOR(p.s.bortle_model)),
+     borderColor:'#030311', borderWidth:1.5, pointRadius:6, pointHoverRadius:9}
+  ]}, options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:9,usePointStyle:true,font:{size:9}}},
+      tooltip:{callbacks:{label:c=>{
+        const s = c.raw.s;
+        if(!s) return `L = ${c.parsed.x.toFixed(4)} nW/cm²/sr → NELM ${c.parsed.y.toFixed(2)} mag`;
+        return `${s.name}: L=${s.radiance_nw_cm2_sr} nW/cm²/sr → NELM ${s.nelm_mag} mag`
+             + ` (Bortle ${s.bortle_model} model / ${s.bortle_published} published)`;
+      }}}
+    },
+    scales:{
+      x:{type:'logarithmic', grid:{color:'rgba(56,124,220,.12)'},
+         title:{display:true,text:'Sky radiance L (nW cm⁻² sr⁻¹) — log scale',color:'#8b97c4'},
+         ticks:{color:'#8b97c4',font:{size:9}}},
+      y:{grid:{color:'rgba(56,124,220,.14)'},
+         title:{display:true,text:'NELM — naked-eye limiting magnitude (mag)',color:'#8b97c4'},
+         ticks:{color:'#8b97c4',font:{size:9}}}
+    }}})
+  const live = src.live ? '<span class="ok">LIVE NASA pixels</span>'
+                        : '<span class="warn">partial</span>';
+  $('#lightMeta').innerHTML =
+    `<b>${m.radiance_to_sqm||''}</b> · <b>${m.nelm_formula||''}</b><br>` +
+    `calibration: <span class="ok">${m.calibration||''}</span> (de-gamma ${m.gamma_de_rendering||''})<br>` +
+    `${m.calibration_anchors||''}<br>` +
+    `sites ${sites.length} · layer <b>${src.layer||''}</b> · ${src.time||''} · ${live}`;
+}
+
+/* ================== WIDGET 2 — NEO hazard bubble matrix ======================= */
+function drawHaz(d){
+  const all = (d.points||[]).filter(p=>p.x_ld>0 && p.y_kms>0);
+  const rad = m => Math.max(3.5, Math.min(24, Math.sqrt(Math.max(m||1,1))*1.35));
+  const mk = (arr,label,color,fill) => ({label, data:arr.map(p=>({
+      x:p.x_ld, y:p.y_kms, r:rad(p.diameter_m), p})),
+      backgroundColor:fill, borderColor:color, borderWidth:1.4, hoverBorderWidth:2.5});
+  const haz = all.filter(p=>p.hazardous), ok = all.filter(p=>!p.hazardous);
+  mkChart('chartHaz',{type:'bubble',data:{datasets:[
+    mk(ok,'potentially hazardous','#ff5d73','rgba(255,93,115,.55)'),
+    mk(haz,'not hazardous','#38bdf8','rgba(56,189,248,.45)')
+  ]}, options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:9,usePointStyle:true,font:{size:9}}},
+      tooltip:{callbacks:{label:c=>{
+        const p=c.raw.p;
+        return `${p.name}: ${p.x_ld} LD · ${p.y_kms} km/s · Ø ${Math.round(p.diameter_m)} m`
+             + (p.hazardous?' · POTENTIALLY HAZARDOUS':'');
+      }}}
+    },
+    scales:{
+      x:{type:'logarithmic', grid:{color:'rgba(56,124,220,.12)'},
+         title:{display:true,text:'Miss distance (lunar distances, LD) — log scale',color:'#8b97c4'},
+         ticks:{color:'#8b97c4',font:{size:9}}},
+      y:{grid:{color:'rgba(56,124,220,.14)'},
+         title:{display:true,text:'Relative velocity (km s⁻¹)',color:'#8b97c4'},
+         ticks:{color:'#8b97c4',font:{size:9}}}
+    }}})
+  $('#hazMeta').innerHTML =
+    `points <b>${all.length}</b> · hazardous <span class="warn">${haz.length}</span>`
+    + ` · size ∝ √diameter<br>conversion: <span class="ok">${(d.conversions||{}).formula||''}</span>`
+    + ` (${(d.conversions||{}).ld_km||384400} km = 1 LD)<br>source: ${(d.source||{}).endpoint||''}`;
+}
+
+/* ============ WIDGET 3 — space weather flare class × Kp (dual axis) =========== */
+function drawKp(d){
+  const days = (d.daily||[]).slice(-31);
+  const labels = days.map(x=>String(x.t).slice(5));
+  const flares = days.map(x=>x.flare_max_flux);
+  const kps    = days.map(x=>x.kp_max);
+  const hasFlare = flares.some(v=>v!==null && v!==undefined);
+  const hasKp    = kps.some(v=>v!==null && v!==undefined);
+  const ds = [];
+  if(hasFlare) ds.push({type:'bar', label:'flare peak flux (W/m²)', data:flares,
+    yAxisID:'yFlare', backgroundColor:'rgba(255,159,90,.78)',
+    borderColor:'#ff9f5a', borderWidth:1, borderRadius:4, order:2});
+  if(hasKp) ds.push({type:'line', label:'Kp index (daily max)', data:kps,
+    yAxisID:'yKp', borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,.16)',
+    fill:true, tension:.3, borderWidth:2, pointRadius:3,
+    pointBackgroundColor:'#a06bff', order:1});
+  const s = d.scale||{};
+  const scales = {x:{grid:{color:'rgba(56,124,220,.12)'},
+    ticks:{color:'#8b97c4',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:16}}};
+  if(hasFlare) scales.yFlare = {
+    type:'logarithmic', position:'left', min:3e-7, max:3e-4,
+    title:{display:true,text:'GOES flare peak flux (W/m²)',color:'#ff9f5a'},
+    grid:{color:'rgba(255,159,90,.14)'}, ticks:{color:'#ff9f5a',font:{size:9},
+      callback:v=>{const e=Math.round(Math.log10(v));
+        return ({'-7':'B','-6':'C','-5':'M','-4':'X'})[e]||'';}}};
+  if(hasKp) scales.yKp = {
+    type:'linear', position:'right', min:0, max:9,
+    title:{display:true,text:'Planetary Kp (0–9)',color:'#38bdf8'},
+    grid:{display:false}, ticks:{stepSize:1,color:'#38bdf8',font:{size:9}}};
+  mkChart('chartKp',{type:'bar',data:{labels,datasets:ds}, options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:9,usePointStyle:true,font:{size:9}}},
+      tooltip:{callbacks:{label:c=>{
+        const row = days[c.dataIndex]||{};
+        if(row.no_data) return 'no source record on this day';
+        if(c.dataset.yAxisID==='yFlare')
+          return `flare ${row.flare_class||'—'} = ${(c.parsed.y||0).toExponential(2)} W/m²`
+               + ` (${row.flare_count||0} event/day)`;
+        return `Kp max ${c.parsed.y}` + (row.kp_mean!==null&&row.kp_mean!==undefined
+               ? ` · mean ${row.kp_mean}` : '');
+      }}}},
+    scales}})
+  const src = d.source||{};
+  $('#kpMeta').innerHTML =
+    `<b>${s.class_formula||''}</b><br><b>${s.kp_definition||''}</b> · storm ≥ Kp ${s.kp_threshold_storm}<br>`
+    + `provider: ${(src.provider||'').replace(' + ',' + ')}`
+    + ` · Kp <span class="${src.kp_live?'ok':'warn'}">${src.kp_live?'LIVE':'fallback'}</span>`
+    + ` · flares <span class="${src.flare_live?'ok':'warn'}">${src.flare_live?'LIVE':'fallback'}</span>`
+    + ` · ${(d.flares||[]).length} flares / 30 d`;
+}
+
+/* =================== WIDGET 4 — multi-spectral band radar ==================== */
+function drawSpec(d){
+  const bands = d.bands||[], profs = d.profiles||[];
+  const palette = ['#3dff9e','#38bdf8','#ffc857','#ff5d73','#a06bff','#7ef7c1'];
+  mkChart('chartSpec',{type:'radar',data:{
+    labels:bands.map(b=>`${b.band} · ${b.nm}nm`),
+    datasets:profs.map((p,i)=>({
+      label:p.land_cover, data:p.reflectance,
+      borderColor:palette[i%palette.length],
+      backgroundColor:(palette[i%palette.length])+'2b',
+      borderWidth:2, pointRadius:2.5, pointHoverRadius:5,
+      pointBackgroundColor:palette[i%palette.length]}))
+  }, options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:9,usePointStyle:true,font:{size:9}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ρ = ${c.parsed.r} (band ${bands[c.dataIndex].band})`}}},
+    scales:{r:{min:0,max:1,
+      angleLines:{color:'rgba(56,124,220,.22)'},
+      grid:{color:'rgba(56,124,220,.22)'},
+      pointLabels:{color:'#8b97c4',font:{size:9.5}},
+      ticks:{backdropColor:'transparent',color:'#5f6ba0',font:{size:8},
+        stepSize:0.2,showLabelBackdrop:false}}}}})
+  const pr = d.processing||{}, pv = pr.explained_variance_ratio||[];
+  const prov = d.provenance||{};
+  $('#specMeta').innerHTML =
+    `pipeline: <span class="ok">${pr.pipeline||''}</span><br>`
+    + `explained variance PCA1 ${(pv[0]||0).toFixed(3)} · PCA2 ${(pv[1]||0).toFixed(3)} `
+    + `· ${pr.n_samples||0} endmembers × ${pr.n_features||0} bands<br>`
+    + `<span class="warn">${prov.honesty_note||''}</span>`;
+}
+function opt(extra){
+  return Object.assign({responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:10,usePointStyle:true}}},
+    scales:{x:{grid:{color:'rgba(56,124,220,.08)'}},y:{beginAtZero:true,grid:{color:'rgba(56,124,220,.1)'}}},
+  }, extra.__raw||extra);
+}
+
+async function loadCharts(){
+  const [sw, neo, hor, haz, lp, kp, spec] = await Promise.all([
+    api('/api/data/space-weather').catch(()=>null),
+    api('/api/data/neo').catch(()=>null),
+    api('/api/data/horizons').catch(()=>null),
+    api('/api/data/neo-matrix').catch(()=>null),
+    api('/api/data/light-pollution').catch(()=>null),
+    api('/api/data/kp-index').catch(()=>null),
+    api('/api/data/spectral').catch(()=>null),
+  ]);
+  if(sw && sw.series && sw.series.length){ drawSpaceWeather(sw); }
+  if(neo && neo.series && neo.series.length){
+    drawNeo(neo);
+    window.__viz && window.__viz.setNeos(neo.items);
+  }
+  if(hor && hor.series && hor.series.length){
+    drawOrbit(hor);
+    window.__viz && window.__viz.setEphemeris(hor.series);
+    window.__viz && window.__viz.setHud(
+      'FRAME: '+(hor.frame||'ICRS')+'<br>BODY: '+(hor.body||'Earth')+
+      '<br>EPOCH: JD '+((hor.series[hor.series.length-1]||{}).t||'—')+
+      '<br>SOURCE: JPL Horizons');
+  }
+  if(haz && haz.points && haz.points.length){ drawHaz(haz); }
+  if(lp && lp.sites && lp.sites.length){ drawLight(lp); }
+  if(kp && (kp.daily||[]).length){ drawKp(kp); }
+  if(spec && spec.profiles && spec.profiles.length){ drawSpec(spec); }
+}
+
+/* ---------------- verdict ---------------- */
+function showVerdict(rep){
+  const c = rep.council||{};
+  if(!c.verdict) return;
+  const v = $('#verdict');
+  v.className = 'show v-'+c.verdict;
+  $('#vState').textContent = c.verdict.replace(/_/g,' ');
+  $('#vScore').textContent = c.overall_score ?? '–';
+  $('#vExperts').innerHTML = (c.experts||[]).map(e=>
+    `<span class="expert"><b>${e.name}</b> ${e.score}/100</span>`).join('');
+}
+async function loadReport(){
+  try{
+    const rep = await api('/api/report');
+    showVerdict(rep); drawCouncil(rep);
+    return rep;
+  }catch(e){ return null; }
+}
+
+/* ---------------- pipeline ---------------- */
+async function runPipeline(){
+  const btn = $('#btnRun'); btn.disabled = true;
+  $('#progWrap').style.display='block';
+  $('#progFill').style.width='5%'; $('#progLabel').textContent='starting…';
+  try{
+    await api('/api/pipeline/run',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({quick:false})});
+    toast('انطلق المخطط — Agent 1 → Council → Citations','ok');
+    clearInterval(pollTimer);
+    pollTimer = setInterval(async ()=>{
+      try{
+        const s = await api('/api/pipeline/status');
+        $('#progFill').style.width=(s.progress||0)+'%';
+        $('#progLabel').textContent = `${s.status} · ${s.current_stage} · ${s.progress}%`;
+        if(s.status==='completed' || s.status==='failed'){
+          clearInterval(pollTimer); btn.disabled=false;
+          $('#progLabel').textContent = s.status==='completed'
+            ? '✅ completed — certified report ready'
+            : '❌ failed — see server logs';
+          toast(s.status==='completed'?'اكتمل المخطط والتقرير معتمد ✅':'فشل المخطط','err');
+          if(s.status==='completed'){ await loadReport(); await loadCharts(); }
+        }
+      }catch(e){ clearInterval(pollTimer); btn.disabled=false; }
+    },1000);
+  }catch(e){ btn.disabled=false; toast('تعذّر بدء المخطط: '+e.message,'err'); }
+}
+
+/* ---------------- Ai.Mors chat ---------------- */
+function renderReply(text){
+  const wrap = document.createElement('div'); wrap.className='msg bot';
+  const lines = String(text).split('\n');
+  let first = true, buf = [];
+  const flush = ()=>{
+    if(!buf.length) return;
+    const s = document.createElement('span'); s.className='step';
+    s.textContent = buf.join(' '); wrap.appendChild(s); buf=[];
+  };
+  lines.forEach(line=>{
+    const t = line.trim();
+    if(first && t.startsWith('أهلاً')){
+      const g = document.createElement('span'); g.className='greeting'; g.textContent=t;
+      wrap.appendChild(g); first=false; return;
+    }
+    if(/^\d+[-.)]/.test(t)){
+      flush();
+      const s = document.createElement('span'); s.className='step'; s.textContent=t;
+      wrap.appendChild(s);
+      // equation chips inside the step
+      const eqs = t.match(/\$\$[^$]+\$\$/g);
+      if(eqs) eqs.forEach(eq=>{const c=document.createElement('span');c.className='eq';c.textContent=eq.replace(/\$\$/g,'');wrap.appendChild(c);});
+      return;
+    }
+    if(t.startsWith('الخلاصة')){
+      flush(); const s=document.createElement('span');
+      s.className='step'; s.style.color='#3dff9e'; s.textContent=t;
+      wrap.appendChild(s); return;
+    }
+    if(/TRC-\d+/.test(t)){
+      const chips = t.match(/TRC-\d+/g)||[];
+      const c=document.createElement('span'); c.className='cite';
+      c.textContent='trace: '+chips.join(', '); wrap.appendChild(c); return;
+    }
+    buf.push(line);
+  });
+  flush();
+  return wrap;
+}
+
+async function sendChat(message){
+  const log = $('#chatLog');
+  const u = document.createElement('div'); u.className='msg user'; u.textContent=message;
+  log.appendChild(u); log.scrollTop = log.scrollHeight;
+  $('#typing').classList.add('show');
+  try{
+    const r = await api('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message})});
+    log.appendChild(renderReply(r.reply));
+    if(r.trace && r.trace.length){
+      const c=document.createElement('span'); c.className='cite';
+      c.textContent='verified: '+r.trace.join(', '); log.appendChild(c);
+    }
+  }catch(e){
+    const err = document.createElement('div'); err.className='msg bot';
+    err.innerHTML = '<span class="greeting">أهلاً وسهلاً بكم في الفضاء</span>'+
+      (e.status===503 ? 'شغّل المخطط أولاً لتتوفر قاعدة المعتمدة.' : 'خطأ: '+e.message);
+    log.appendChild(err);
+  }finally{
+    $('#typing').classList.remove('show');
+    log.scrollTop = log.scrollHeight;
+  }
+}
+$('#chatForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const v = $('#chatInput').value.trim();
+  if(!v) return;
+  $('#chatInput').value='';
+  sendChat(v);
+});
+$('#chatInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $('#chatForm').requestSubmit(); }
+});
+
+/* ---------------- ambient audio (synthesized) ---------------- */
+let audio = null;
+$('#btnSound').addEventListener('click', ()=>{
+  if(audio){ audio.ctx.close(); audio=null; $('#btnSound').textContent='🔊 Space Ambience'; return; }
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const master = ctx.createGain(); master.gain.value = 0.05; master.connect(ctx.destination);
+    const filt = ctx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=420; filt.connect(master);
+    const oscs = [55, 82.4, 110.5].map((f,i)=>{
+      const o = ctx.createOscillator(); o.type='sine'; o.frequency.value=f;
+      const g = ctx.createGain(); g.gain.value = .35;
+      o.connect(g); g.connect(filt); o.start();
+      const lfo = ctx.createOscillator(); lfo.frequency.value = .05 + i*.03;
+      const lg = ctx.createGain(); lg.gain.value = 3.5;
+      lfo.connect(lg); lg.connect(o.frequency); lfo.start();
+      return o;
+    });
+    // pink-ish noise bed
+    const buf = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const ch = buf.getChannelData(0); let last=0;
+    for(let i=0;i<ch.length;i++){ const w=Math.random()*2-1; last=(last+.02*w)/1.02; ch[i]=last*3; }
+    const noise = ctx.createBufferSource(); noise.buffer=buf; noise.loop=true;
+    const ng = ctx.createGain(); ng.gain.value=.14; noise.connect(ng); ng.connect(filt); noise.start();
+    audio = {ctx, oscs};
+    $('#btnSound').textContent='🔇 Stop Ambience';
+    toast('فضاء صوتي مُفعّل 🎧','ok');
+  }catch(e){ toast('Audio failed: '+e.message,'err'); }
+});
+
+/* ---------------- wiring ---------------- */
+$('#btnRun').addEventListener('click', runPipeline);
+$('#btnRefresh').addEventListener('click', async ()=>{
+  toast('تحديث البيانات…');
+  await Promise.all([loadHealth(), loadCharts(), loadReport()]);
+  toast('تم التحديث ✅','ok');
+});
+$('#btnAuto').addEventListener('click', ()=>{
+  const next = $('#btnAuto').textContent.includes('Auto') ?
+    !$('#btnAuto').dataset.off : false;
+  window.__viz && window.__viz.setAuto(next);
+  $('#btnAuto').dataset.off = next ? '1':'';
+  $('#btnAuto').textContent = next ? '▶ Auto-Rotate' : '⏸ Auto-Rotate';
+});
+
+(async function boot(){
+  await loadHealth();
+  const rep = await loadReport();
+  await loadCharts().catch(e=>toast('charts: '+e.message,'err'));
+  if(rep) toast('تم تحميل تقرير معتمد سابق','ok');
+})();
+</script>
+</body>
+</html>

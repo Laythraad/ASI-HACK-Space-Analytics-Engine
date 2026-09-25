@@ -1,0 +1,12 @@
+metric_name,value,unit,source
+solar_wind_speed_avg,412.0,km/s,NASA OMNI (reference)
+cme_median_speed,385.0,km/s,NASA DONKI (reference)
+neo_absolute_mag_typical,22.5,mag,NASA NEOWS (reference)
+earth_solar_distance,1.0,au,IAU 2012 definition
+stefan_boltzmann_sigma,5.670374419e-08,W/(m^2 K^2),CODATA 2018
+wien_displacement_b,0.002897771955,m K,CODATA 2018
+planck_albedo_assumed,0.14,1,Standard H-method assumption
+kp_index_threshold_storm,5.0,1,NOAA space weather scale
+light_curve_cadence,30.0,s,Reference photometry setup
+light_curve_noise_rms,0.004,mag,Reference photometry setup
+light_curve_signal_mag,0.05,mag,Reference photometry setup
