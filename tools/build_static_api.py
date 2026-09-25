@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "static" / "api"
+OUT = ROOT / "static"
 BASE = os.getenv("MORS_BASE", "http://127.0.0.1:5000").rstrip("/")
 
 try:

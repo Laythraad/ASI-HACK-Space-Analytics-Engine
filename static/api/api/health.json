@@ -1,1 +1,0 @@
-{"agents":{"agent1":true,"agent2":true,"agent3":true,"agent4":true},"data_endpoints":["/api/data/space-weather","/api/data/neo","/api/data/horizons","/api/data/neo-matrix","/api/data/light-pollution","/api/data/kp-index","/api/data/spectral","/api/data/quantum"],"gemini_configured":true,"nasa_key_mode":"live","status":"ok","timestamp":"2026-09-25T19:05:08.476874+00:00"}
