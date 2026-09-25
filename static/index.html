@@ -500,10 +500,12 @@ function toast(msg, kind=''){
 function markSnapshot(){
   if(window.__SNAP__) return; window.__SNAP__ = true;
   const d=document.createElement('div');
+  d.id='snapBanner';
   d.textContent='Static demo — no backend here, showing the JSON snapshot captured at build time (Run Pipeline / chat disabled).';
   d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center';
-  document.addEventListener('DOMContentLoaded',()=>document.body.appendChild(d));
-  if(document.body) document.body.appendChild(d);
+  const add=()=>{ if(!document.getElementById('snapBanner') && document.body) document.body.appendChild(d); };
+  document.addEventListener('DOMContentLoaded',add);
+  add();
   const a=document.querySelector('a[href="/mors"]'); if(a) a.href='mors.html';
 }
 async function snapshot(path){
