@@ -75,7 +75,8 @@ python main.py                 # leave the server running
 python tools\audit_data.py     # -> RESULT: AUDIT: PASS
 ```
 
-Read-only battery of **225+ checks** against the live API: priority-formula
+Read-only battery of **225 checks** (223–227 as problem cards activate) against
+the live API: priority-formula
 math, Kepler period/velocity consistency, habitability-gate reproduction,
 CME-vs-FLR counting, per-body Horizons radii, quantum normalisation and unit
 conversions, spectral PCA, light-pollution direction, the team roster, the
@@ -87,6 +88,18 @@ Nothing is written anywhere; the run prints one line per check and exits
 
 Every defect this audit (and earlier review rounds) caught is documented with
 its before/after numbers in **`المشكلات_التي_تم_حلها.md`** — *Problems solved*.
+
+### Option E — hosted demo (Render, free)
+
+```text
+Render → New → Blueprint → this repository → enter GEMINI_API_KEY + NASA_API_KEY → Deploy
+```
+
+`render.yaml` ships the whole service (`gunicorn main:app`, health check
+`/api/health`, Python 3.12 via `.python-version`), so the public URL runs the
+**real** backend: live Gemini chat, live NASA/NOAA/CelesTrak fetches and a real
+pipeline run, plus the documents the launcher links to (`/index.html`,
+`/docs/*.pdf`, `/presentation/*`). See `DEPLOYMENT.md` §8.
 
 ### Useful flags
 
@@ -183,7 +196,7 @@ static/
   index.html             legacy ASI-HACK dashboard
   mors.html              MORS Scientific Command Center (SPA, incl. SOURCES.MORS)
 tools/
-  audit_data.py          read-only data & analysis audit (225+ checks -> AUDIT: PASS)
+  audit_data.py          read-only data & analysis audit (225 checks -> AUDIT: PASS)
   build_report.py        generates docs/MORS_REPORT.pdf (figures + sources section)
   build_guide.py         generates docs/PROJECT_GUIDE.pdf (file-by-file guide)
   build_committee.py     generates 00_COMMITTEE_GUIDE.md + docs/COMMITTEE_GUIDE.pdf

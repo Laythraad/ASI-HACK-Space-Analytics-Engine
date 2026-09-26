@@ -43,11 +43,16 @@ if (ROOT / ".env").exists():
     except ImportError:  # pragma: no cover
         pass
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-NASA_API_KEY = os.getenv("NASA_API_KEY", "DEMO_KEY")
-GEMINI_MODEL_PRO = os.getenv("GEMINI_MODEL_PRO", "gemini-3.1-pro-preview")
-GEMINI_MODEL_FLASH = os.getenv("GEMINI_MODEL_FLASH", "gemini-3.6-flash")
-GEMINI_MODEL_FALLBACK = os.getenv("GEMINI_MODEL_FALLBACK", "gemini-flash-latest")
+# Empty strings are treated as "not set", so a host that injects blank
+# environment variables (Render, CI) still lands on the safe defaults.
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+NASA_API_KEY = os.getenv("NASA_API_KEY", "").strip() or "DEMO_KEY"
+GEMINI_MODEL_PRO = (os.getenv("GEMINI_MODEL_PRO", "").strip()
+                    or "gemini-3.1-pro-preview")
+GEMINI_MODEL_FLASH = (os.getenv("GEMINI_MODEL_FLASH", "").strip()
+                      or "gemini-3.6-flash")
+GEMINI_MODEL_FALLBACK = (os.getenv("GEMINI_MODEL_FALLBACK", "").strip()
+                         or "gemini-flash-latest")
 FLASK_HOST = os.getenv("FLASK_HOST", "127.0.0.1")
 FLASK_PORT = int(os.getenv("FLASK_PORT", "5000"))
 # SECURITY: debug defaults OFF. The Werkzeug debugger exposes a code-execution
@@ -412,7 +417,8 @@ def create_app():
             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src https://fonts.gstatic.com; "
-            "img-src 'self' data: blob:; "
+            "img-src 'self' data: blob: https://*.nasa.gov https://*.noaa.gov "
+            "https://*.copernicus.eu https://*.harvard.edu; "
             "connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net; "
             "object-src 'none'; frame-ancestors 'self'")
         return resp
@@ -444,6 +450,38 @@ def create_app():
         if not str(target).startswith(str(ROOT.resolve())) or not target.exists():
             return jsonify({"error": "not found"}), 404
         return send_from_directory(target.parent, target.name)
+
+    # -- documents (the exact URLs GitHub Pages already publishes) ----------
+    def _send(base: Path, rel: str):
+        target = (base / rel).resolve()
+        if not str(target).startswith(str(ROOT.resolve())) or not target.is_file():
+            return jsonify({"error": "not found"}), 404
+        return send_from_directory(target.parent, target.name)
+
+    def _doc_ok(name: str) -> bool:
+        return (name.lower().endswith((".md", ".txt", ".pdf", ".pptx", ".mp4",
+                                       ".csv", ".png", ".html"))
+                and "/" not in name and "\\" not in name
+                and not name.startswith(".") and not name.startswith("_"))
+
+    @app.get("/docs/<path:name>")
+    def docs_files(name: str):
+        if not _doc_ok(name):
+            return jsonify({"error": "not found"}), 404
+        return _send(ROOT / "docs", name)
+
+    @app.get("/presentation/<path:name>")
+    def presentation_files(name: str):
+        if not _doc_ok(name):
+            return jsonify({"error": "not found"}), 404
+        return _send(ROOT / "presentation", name)
+
+    @app.get("/<path:name>")
+    def root_files(name: str):
+        # README, committee guide, manifest and the Arabic front door
+        if not _doc_ok(name):
+            return jsonify({"error": "not found"}), 404
+        return _send(ROOT, name)
 
     # -- health ------------------------------------------------------------
     @app.get("/api/health")
@@ -702,6 +740,16 @@ def _warm_satellites() -> None:
         log.warning("Warm fetch skipped: %s", str(exc)[:120])
 
 
+def _load_report() -> None:
+    """Restore the last certified report so /api/report answers immediately."""
+    if LAST_REPORT_PATH.exists():
+        try:
+            STATE.set_report(json.loads(LAST_REPORT_PATH.read_text(encoding="utf-8")))
+            log.info("Loaded previous certified report from last_report.json")
+        except (OSError, json.JSONDecodeError):
+            log.warning("last_report.json exists but could not be parsed")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="ASI-HACK Space Analytics Engine")
     parser.add_argument("--selftest", action="store_true",
@@ -713,12 +761,7 @@ def main() -> None:
     if args.selftest:
         sys.exit(selftest())
 
-    if LAST_REPORT_PATH.exists():
-        try:
-            STATE.set_report(json.loads(LAST_REPORT_PATH.read_text(encoding="utf-8")))
-            log.info("Loaded previous certified report from last_report.json")
-        except (OSError, json.JSONDecodeError):
-            log.warning("last_report.json exists but could not be parsed")
+    _load_report()
 
     app = create_app()
     # Warm the only cold-cache live fetch (CelesTrak / TLE mirror) in the
@@ -743,3 +786,11 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    # WSGI entry point for hosted deployments: `gunicorn main:app`
+    # (Render) or `waitress-serve main:app`. `python main.py` keeps the
+    # banner/app.run path above, so nothing changes for local runs.
+    _load_report()
+    app = create_app()
+    threading.Thread(target=_warm_satellites, daemon=True).start()
+    log.info("WSGI app ready (gunicorn main:app)")

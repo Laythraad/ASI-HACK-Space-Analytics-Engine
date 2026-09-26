@@ -1,31 +1,33 @@
 ASI-HACK Space Analytics Engine - package manifest
 MORS Scientific Command Center
 
-generated : 2026-09-25 22:39 UTC
-files     : 43
-raw bytes : 1891454
+generated : 2026-09-26 00:19 UTC
+files     : 45
+raw bytes : 1871050
 
 Verify with:  Get-FileHash -Algorithm SHA256 <file>
 Columns: SHA-256 | bytes | path | role
 ----------------------------------------------------------------------------------------------------
-b18106a9fff493b115042b99dce30981b1d3590206787d235149577e289a7a12      27253  00_COMMITTEE_GUIDE.md                       Submission guide for the judging committee (Markdown)
-893f0daa6cfd77e6a29abbecdddf74742efdfecc7df3c3360cf3625724c2bee4      31772  main.py                                     Flask orchestrator, HTTP API and CLI entry point
+1d7cfe3a3f18d005e6e02ee5f71d811c38f9736f328a18e4d9797e428f25b961      27280  00_COMMITTEE_GUIDE.md                       Submission guide for the judging committee (Markdown)
+85d0ef9fb77faaf881d13a2f35597b2da0e5faf948be087ccf68927a27b7d43e      33986  main.py                                     Flask orchestrator, HTTP API and CLI entry point
 d67a9b78906a94ca7356b5f3c6d215de3e98de1ab1c7630542f3c38a22b35a21       4557  START.bat                                   Windows launcher with environment checks
-5a2c917c4cb9c23ddd614a73f9ea62a0ada31873d0d85ebc1d7169ffaf4ddb7e       5447  index.html                                  
-00cf429bc5ff06bd4a7a8596b26036a2f3385bb946eb37004b8743b7b5f05567      10778  README.md                                   Front door: how to run, what it does, what it does not do
-30fa2b2348725c6f2ab9ed4641c9e1dedcaaffbab450df4633b07eefd51a7fcb      23722  المشكلات_التي_تم_حلها.md                    Problems solved — data & analysis defect log (Arabic)
-cb59f3ecf5107eb8150299357ac9781f0bbedde11b539a14de0c83d116144363      17009  DEPLOYMENT.md                               Operations and deliverables manual
-25901df55afc01427862031c8d0a6c8efa86d37816ac253d20a9719c4b5c2306        469  requirements.txt                            Python dependency list
+443540e5c8ff3691187e8cf83bd621da19acccaf793917a83edead9ae989ad19       6668  index.html                                  
+d951c01958f8788b9661bfb4d4993f6a4062b53808b1616cdda002aa634da144      11348  README.md                                   Front door: how to run, what it does, what it does not do
+56b5aaacf9937aa91b6cee95cf21bf5cc0ae7f73988d1b69bd2f5b9b0978556d      23838  المشكلات_التي_تم_حلها.md                    Problems solved — data & analysis defect log (Arabic)
+af6c4242b2ef7901b49a4169e03fb9a69c6d77705a8edf0db68bdb8a670976dd      18038  DEPLOYMENT.md                               Operations and deliverables manual
+220956086c2106f3e32b7a1bf090c88f8967def521c106dae23cedcf474a9df2        531  requirements.txt                            Python dependency list
+458abc099dc7f03256b6738ccf880270909442619ab9f29ae6a64be3076ddb04        701  render.yaml                                 
+b245610104ce43d8c76ba5dcb632c0086807be9c57306c67eaefb1c2b41674a0          7  .python-version                             
 2ea0c49e6f3567c419ec22a6568c24e59e120df2969ae86f829a965b431bd5c3       1530  .env                                        Secrets — never committed
 fa1062ce8f79dc65e18923c9d545b7c8b51251f78811442593aadfeaadac7d73        190  .gitignore                                  Keeps secrets and runtime artifacts out of the repository
-a7a7a5faa0c071c102bf2764365cfde84c307b1307262a4dd66825241d84c766      84076  last_report.json                            Persisted copy of the most recent pipeline report
+65f585314c86e750c7ba3b0cca0ab492417aab8720bfd8b04c5ffd9d4d8e8ba3      53298  last_report.json                            Persisted copy of the most recent pipeline report
 737d0631a349ba97a20104189c03b37e0dcf62c290d85771deefe1889b269290        341  agents/__init__.py                          Package façade for the four agents
 6bf88b817f19520eb84ecdcff25160a7d8243806797bb529b241e9248ae1ca61      38668  agents/agent1_ingestion.py                  Agent 1 — Ingest & Clean
 805140e5bce8a0ff08e2895532ec8862fe3bf2e4ecec1822021caeef7f0c79ec      15685  agents/agent2_council.py                    Agent 2 — Council of Five
 f656add055618ea173b6a14b3f136614e1006fdac1946f2c98572c6f1e7848b1      16168  agents/agent3_citations.py                  Agent 3 — Citations & traceability
 0de91312516df48730c5f6ba4be59de3d26f5a3baa158e8172ec49a05a8f412d      12956  agents/agent4_aimors.py                     Agent 4 — Ai.Mors conversational agent
 fac18bd83af1405d33b36516d5c74bac6b5181feadd073b51037d7a771a5039d      33212  agents/datasets.py                          Dataset builders for the science widgets
-29b3fddc6c3c75a96ffeae96c32b13d454403ad3c1dde144411b4fa7c94c8b68     108135  agents/mors_data.py                         MORS data layer — the 17 science modules
+ac9e2f1d0f277b5f4c7941b2e1ec47751a9344011359887befc8f0b0a2a0af69     110598  agents/mors_data.py                         MORS data layer — the 17 science modules
 599cb42e9c874314eba69f1caf098a1c191242b916db4f451803085ae48a07ad      29479  agents/sources_data.py                      Scientific source registry and hackathon condition map
 1634c574014767cd87d47cb72fc67115bc4aacb2bdaf0e4a99e605ba0985c4a5       4867  prompts/aimors_prompt.txt                   System prompt for Agent 4 (Ai.Mors)
 9f70c6fc9043b26a317a74861b4034917a5747c30307ea851c0e17ed8d7c6eb9       5068  prompts/council_prompt.txt                  System prompt for Agent 2 (Council of Five)
@@ -36,13 +38,13 @@ ecbb949abe78d91780b8909547e54938c13fc88e4c85aeb4af63e2e29946a7a8       6691  pro
 cb9d3406c32adb6558f9f0ca41e2dbe7b4fff3e4b1393dc541b5920465a8d4cc       3021  prompts/report_generator_prompt.txt         ANALYTICS.REPORT file analysis prompt
 af770ae87693c06c2faddd37e1ef976b4b688e3e5fd6fb12c7a0d7456fcdfdb2       3659  prompts/deep_audit_prompt.txt               DEEP.AUDIT five-pass audit prompt
 91c9baf1bf266d765866c4deafbe0f863d7ca9f3bfc9967fae18766939e67665      48021  static/index.html                           Legacy ASI-HACK dashboard (single file, no build step)
-e231b278775aff36680f16e9024b3e3ae2ee568a3a5e9079066ab777df731ec1     176580  static/mors.html                            MORS Scientific Command Center SPA
+f0c1e614f6bbea3672c8a965ac1b436f9683ff3e68ca316572e49e06047986e3     176679  static/mors.html                            MORS Scientific Command Center SPA
 fb4fd5a10edc217aca26150ee3a9254e14b0f82ae34114a204eaf28bc263c9a7      14530  static/offline_assistant.js                 
-2eee1d9395967145d5cc45039d47ce5cacd77a3f176c3cd0a9dfca82ca5094f8      49650  tools/audit_data.py                         Read-only data & analysis audit (225+ checks)
+d81d1e1bfabbf1ffd18af1efb3ba89fd619e247d30fe067beeb8145723054fba      51473  tools/audit_data.py                         Read-only data & analysis audit (225+ checks)
 55cfabc3ff6909a7733877926c55e95cbc1bd29050ca01669b3282e3a7ae7d4b      86226  tools/build_report.py                       Generates docs/MORS_REPORT.pdf
 f58dac6d42d06f6a8671a9ba3d1985bc01c09166e887b25a7b62e52db60cf11e      48478  tools/build_guide.py                        Generates this document (docs/PROJECT_GUIDE.pdf)
 bc4f1ffd480eff55aea18c3ae2dffc35e3390e86fd6277fb151e2a9cda4ca896      41562  tools/build_committee.py                    Generates 00_COMMITTEE_GUIDE.md and docs/COMMITTEE_GUIDE.pdf
-cabe64f2fa07803af18214395309cfae516c265a9d31bc8bdd26cef07650253c       4229  tools/build_zip.py                          Portable packager — writes the submitted archive
+8540c94e4954395d2188e46718386856153c2b38e03bda36045a10a1749b3a2a       4271  tools/build_zip.py                          Portable packager — writes the submitted archive
 8b9cc77ed846d21d20fd27be91f811d71f3d8ee60b3658dd780c5ecaa63bfe32       4050  tools/build_static_api.py                   
 a29f4102e7127837b4c869bcd1dd9c516396ca87be124639fb23f9f0a6563321      21863  docs/API_CONTRACT.md                        Machine-readable-ish API contract
 79c683c9d6b33394dcb5058428669623c21aa75a98883fc3ccdec91f8e63a32a     562850  docs/MORS_REPORT.pdf                        Generated platform report (43 pages)

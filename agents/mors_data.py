@@ -147,10 +147,50 @@ def _ai_json(system: str, prompt: str) -> Optional[Any]:
         return None
 
 
+_SNAPSHOT_ALIAS = {"satellites": "satellite"}   # acquire key -> snapshot stem
+
+
+def _snapshot_cache(key: str) -> Optional[Dict[str, Any]]:
+    """Ladder tier between the live API and AI synthesis: last real payload.
+
+    CelesTrak, the TLE mirror and the archives fail transiently (blocked IP,
+    508, rate limit). A stale *real* observation beats a synthesised one, so
+    the payload shipped in ``static/api`` is served as-is but relabelled
+    ``via: "cache"`` / ``live: False`` — never as a live acquisition.
+    """
+    for stem in dict.fromkeys((key, _SNAPSHOT_ALIAS.get(key, key))):
+        for rel in (f"static/api/mors/{stem}.json",
+                    f"static/api/data/{stem}.json"):
+            path = _ROOT / rel
+            try:
+                if not path.is_file():
+                    continue
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not isinstance(data, dict) or len(data.get("rows") or []) < 3:
+                continue
+            src = dict(data.get("source") or {})
+            src.update({
+                "via": "cache",
+                "live": False,
+                "cached_from": rel,
+                "note": ("Live sources unreachable — serving the last real "
+                         "payload shipped with the project (" + rel + "), "
+                         "relabelled cache rather than a live acquisition."),
+            })
+            data = dict(data)
+            data.pop("trace", None)      # consumers rebuild trace/badge
+            data.pop("badge", None)
+            data["source"] = src
+            return data
+    return None
+
+
 def acquire(key: str, api_fn: Callable[[], Optional[Dict[str, Any]]],
             ai_system: str, ai_prompt: str,
             local_fn: Callable[[], Dict[str, Any]]) -> Dict[str, Any]:
-    """API -> AI -> local, with a TTL cache. Never raises.
+    """API -> shipped snapshot -> AI -> local, with a TTL cache. Never raises.
 
     The ladder runs under a per-dataset lock so two cold requests (a page
     load and the startup warm fetch, for example) share one acquisition
@@ -174,6 +214,12 @@ def acquire(key: str, api_fn: Callable[[], Optional[Dict[str, Any]]],
                 return _put(key, out, TTL)
         except Exception as exc:                       # noqa: BLE001
             log.warning("mors[%s] API failed: %s", key, str(exc)[:160])
+        try:
+            out = _snapshot_cache(key)
+            if isinstance(out, dict) and out:
+                return _put(key, out, FALLBACK_TTL)
+        except Exception as exc:                       # noqa: BLE001
+            log.warning("mors[%s] snapshot cache failed: %s", key, str(exc)[:160])
         try:
             out = _ai_json(ai_system, ai_prompt)
             if isinstance(out, dict) and out:
@@ -1239,24 +1285,32 @@ def satellites() -> Dict[str, Any]:
                       "drag_flag": bool(float(r.get("eccentricity") or 0) > 0.02)}})
         extra.append(r)
     out["rows"] = extra
-    ep = str(out.pop("endpoint", None)
-             or _CTRAK.format(g="stations|science|weather|geo|gnss"))
     src = out.setdefault("source", {})
-    if src.get("via", "api") == "api":
+    via = str(src.get("via") or "api")
+    ep = str(out.pop("endpoint", None) or src.get("endpoint")
+             or _CTRAK.format(g="stations|science|weather|geo|gnss"))
+    if via == "api":
         src["endpoint"] = ep
-    live = src.get("via", "api") == "api"
-    t = trace("TLE source: " + ("TLE API mirror (NORAD 2LE)" if _TLE_API in ep
-                                else "CelesTrak GP data (NORAD 2LE)"),
+    live = via == "api"
+    label = ("TLE API mirror (NORAD 2LE)" if _TLE_API in ep
+             else "CelesTrak GP data (NORAD 2LE)")
+    if via == "cache":
+        label = "cached " + label + " payload (static/api snapshot)"
+    t = trace("TLE source: " + label,
               "TLE → Keplerian elements → circular-orbit velocity",
               "a = (GM/n²)^⅓ , v = sqrt(GM/a) , class from altitude",
               dataset_id="MORS-SATELLITE-v1.0.0",
-              via=out.get("source", {}).get("via", "api"),
+              via=via,
               endpoint=ep,
               note=("Pass windows are period-derived estimates, not TLE "
                     "propagations (flagged estimate=true)."
                     if live else
-                    "Live TLE sources unreachable — catalog is the curated "
-                    "MORS reference set, labelled local_model."))
+                    ("Live TLE sources unreachable — catalog is the last "
+                     "real CelesTrak payload shipped with the project, "
+                     "relabelled cache (not a live acquisition)."
+                     if via == "cache" else
+                     "Live TLE sources unreachable — catalog is the curated "
+                     "MORS reference set, labelled local_model.")))
     out["trace"], out["badge"] = t, badge(t)
     out["physics"] = {
         "semi_major_axis": "a = (GM / n²)^(1/3)",

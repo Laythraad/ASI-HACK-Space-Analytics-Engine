@@ -27,6 +27,8 @@ INCLUDE = [
     "المشكلات_التي_تم_حلها.md",
     "DEPLOYMENT.md",
     "requirements.txt",
+    "render.yaml",
+    ".python-version",
     ".env",
     ".gitignore",
     "last_report.json",

@@ -728,8 +728,8 @@ function traceHTML(t, note) {
 function badgeHTML(b) { return b ? '<div class="trace">' + esc(b) + "</div>" : ""; }
 function srcPill(trace) {
   var via = (trace && trace.via) || "—";
-  var cls = via === "api" ? "ok" : (via === "ai_synthesis" ? "warn" : "");
-  var lbl = { api: "live API", ai_synthesis: "AI synthesis", local_model: "local model", pipeline: "pipeline" }[via] || via;
+  var cls = via === "api" ? "ok" : ((via === "ai_synthesis" || via === "cache") ? "warn" : "");
+  var lbl = { api: "live API", ai_synthesis: "AI synthesis", cache: "cached snapshot", local_model: "local model", pipeline: "pipeline" }[via] || via;
   return '<span class="pill ' + cls + '"><span class="dot"></span>' + esc(lbl) + "</span>";
 }
 function priTag(p) {
@@ -1716,7 +1716,7 @@ function openModule(key) {
 
     $("#mSub").innerHTML = esc(MODULE_META[key].t) + " · " + rows.length + " records" +
       (data.source ? ' <span class="tag ' + (data.source.via === "api" ? "low" : "med") + '">' +
-        esc(data.source.via === "api" ? "live API" : "local model") + "</span>" : "");
+        esc(data.source.via === "api" ? "live API" : (data.source.via === "cache" ? "cached snapshot" : "local model")) + "</span>" : "");
     $("#mBody").innerHTML = body + plot +
       (data.model ? '<div class="note"><b>Model:</b> <span class="mono">' + esc(data.model) + "</span></div>" : "") +
       (data.formula ? '<div class="note"><b>Formula:</b> <span class="mono">' + esc(data.formula) + "</span></div>" : "") +

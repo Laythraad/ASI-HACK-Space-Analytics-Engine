@@ -1,0 +1,22 @@
+# Render blueprint: full ASI-HACK MORS server (Flask + gunicorn).
+# Deploy: Render dashboard -> New -> Blueprint -> pick this repo.
+# The two keys are asked for during setup (they are never written to git).
+services:
+  - type: web
+    name: asi-hack-mors
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 1 --threads 4 --timeout 180 --bind 0.0.0.0:$PORT main:app
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: NASA_API_KEY
+        sync: false
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: MALLOC_ARENA_MAX
+        value: "2"

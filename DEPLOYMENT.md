@@ -189,6 +189,9 @@ AUDIT: 225 checks, 0 failed
 RESULT: AUDIT: PASS
 ```
 
+The exact count tracks how many problem cards are active in that run (two
+checks per card): expect **223–227**, always with `0 failed`.
+
 A read-only probe of the live API (nothing is written): priority-formula math,
 Kepler period/velocity agreement, apogee/perigee integrity, CME-vs-FLR counting,
 habitability-gate reproduction, per-body Horizons radii, quantum normalisation
@@ -211,9 +214,19 @@ Defects found this way — with before/after numbers — are documented in
   the local server. Refresh the snapshot after every pipeline run (`python main.py` in one
   terminal, then the script) and push.
 - **LAN demo:** `python main.py --host 0.0.0.0` + allow the port in Windows Firewall.
-- **Cloud (Render/Railware/Fly.io):** build command `pip install -r requirements.txt`,
-  start command `gunicorn -w 2 -b 0.0.0.0:$PORT main:app` (add `gunicorn` to requirements;
-  set `FLASK_DEBUG=0`). Provide `GEMINI_API_KEY` + `NASA_API_KEY` as environment variables.
+- **Cloud (Render — prepared):** `render.yaml` at the repo root describes the whole service.
+  Render → **New → Blueprint** → pick this repository → enter `GEMINI_API_KEY` and
+  `NASA_API_KEY` when asked → Deploy. It runs
+  `gunicorn -w 1 --threads 4 --timeout 180 -b 0.0.0.0:$PORT main:app` (one process, so the
+  in-memory report and caches stay consistent), health check `/api/health`, Python 3.12 from
+  `.python-version`, `FLASK_DEBUG=0`. Manual alternative: **New → Web Service** with the same
+  build command (`pip install -r requirements.txt`), the same start command and the same two
+  environment variables. What the hosted server adds over the static mirror: live Gemini chat,
+  live NASA/NOAA/CelesTrak data, a real `POST /api/pipeline/run`, and the same URLs Pages
+  publishes (`/index.html` launcher, `/docs/*.pdf`, `/presentation/*`, `/README.md`) — NASA APOD
+  thumbnails load because `img-src` allows `https://*.nasa.gov`. Free instances sleep after
+  ~15 minutes idle (first request then takes ~50 s).
+- **Cloud (Railway/Fly.io):** same build/start commands and the same two env vars.
 - **Docker:** `FROM python:3.12-slim` → copy → `pip install -r requirements.txt` →
   `EXPOSE 5000` → `CMD ["python","main.py","--host","0.0.0.0"]`.
 
@@ -330,7 +343,7 @@ working tree so it always matches the files on disk.
 | `/mors`, `/api/mors/*`, `/api/mors/insight` | `main.py` |
 | Scientific source registry + 8 hackathon conditions | `agents/sources_data.py` → `GET /api/mors/sources` → `SOURCES.MORS` |
 | Ai.Mors clarified (greeting, numbered steps, live chat, engine ladder) | `static/mors.html` → `AI.MORS` + `POST /api/chat` |
-| Data & analysis audit (225+ read-only checks) | `tools/audit_data.py` → `RESULT: AUDIT: PASS` |
+| Data & analysis audit (225 read-only checks, 223–227 as cards activate) | `tools/audit_data.py` → `RESULT: AUDIT: PASS` |
 | Problems solved — data/analysis defect log (Arabic) | `المشكلات_التي_تم_حلها.md` |
 | Platform report (PDF) with figures and the sources section | `docs/MORS_REPORT.pdf` via `tools/build_report.py` |
 | File-by-file project guide (PDF) | `docs/PROJECT_GUIDE.pdf` via `tools/build_guide.py` |

@@ -91,7 +91,7 @@
 | agents/sources_data.py | 28.8 KB | Scientific source registry and hackathon condition map |
 | static/index.html | 44.2 KB | Legacy ASI-HACK dashboard (single file, no build step) |
 | static/mors.html | 169.6 KB | MORS Scientific Command Center SPA |
-| tools/audit_data.py | 48.3 KB | Read-only data & analysis audit (225+ checks) |
+| tools/audit_data.py | 48.3 KB | Read-only data & analysis audit (225 checks, 223–227 range) |
 | tools/build_report.py | 83.9 KB | Generates docs/MORS_REPORT.pdf |
 | tools/build_guide.py | 47.3 KB | Generates this document (docs/PROJECT_GUIDE.pdf) |
 | tools/build_committee.py | 40.6 KB | Generates 00_COMMITTEE_GUIDE.md and docs/COMMITTEE_GUIDE.pdf |
@@ -300,7 +300,7 @@ curl http://127.0.0.1:5000/api/mors/datahealth
 | README.md | التشغيل السريع وجدول نقاط النهاية | عند أول تشغيل |
 | المشكلات_التي_تم_حلها.md | كل خلل في البيانات وتحليله: السبب، الإصلاح، الرقم قبل/بعد | عند مراجعة دقّة البيانات |
 | DEPLOYMENT.md | النشر والتشغيل وجدول التسليمات | عند النشر أو التحقق من التغطية |
-| tools/audit_data.py | 225+ فحصًا للقراءة فقط ← AUDIT: PASS | قبل أي إعادة توليد للمستندات |
+| tools/audit_data.py | 225 فحصًا للقراءة فقط (223–227) ← AUDIT: PASS | قبل أي إعادة توليد للمستندات |
 | docs/API_CONTRACT.md | عقد الـ API كاملًا (§1-§20) | عند مراجعة الواجهات أو بناء عميل |
 | docs/MORS_REPORT.pdf | التقرير العلمي: الجودة، المشكلات، الرسوم، المصادر، الحدود | للحجج والأدلة التفصيلية |
 | docs/PROJECT_GUIDE.pdf | شرح ملف-ملف للمستودع | عند البحث عن مصدر سلوك معيّن |

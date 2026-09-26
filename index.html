@@ -82,12 +82,33 @@
     </a>
   </div>
 
-  <div class="note">
+  <div class="note" id="modeNote">
     <b>وضع العرض الثابت:</b> هذه الاستضافة (GitHub Pages) تعمل بلا خادم — الواجهتان تُقرأن من لقطة
     JSON محفوظة في <code>static/api/</code>، وتعمل المحادثة و<code>Run Pipeline</code> عليها أيضاً
     (محرك <code>static:snapshot</code>). للإجابات الحيّة من Gemini/NASA والمخطط الحقيقي شغّل
     المشروع محلياً: <code>python main.py</code> ثم افتح <code>http://127.0.0.1:5000/</code>.
   </div>
+
+  <script>
+  (function () {
+    var note = document.getElementById("modeNote");
+    fetch("/api/health", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (h) {
+        if (!h || h.status !== "ok") return;   // static host: keep the note above
+        var gem = h.gemini_configured ? "متصل" : "احتياطي محلي (بلا مفتاح)";
+        var nasa = h.nasa_key_mode === "live" ? "مفتاح NASA حيّ" : "DEMO_KEY (محدود)";
+        note.style.borderColor = "rgba(52,211,153,.45)";
+        note.style.color = "#34D399";
+        note.innerHTML =
+          "<b>وضع حيّ:</b> الخادم يعمل بالكامل بلا لقطة — المحادثة و<code>Run Pipeline</code>" +
+          " عليه مباشرة، محرك Gemini: " + gem + " · بيانات NASA: " + nasa + "." +
+          " اللوحة على <a href=\"static/index.html\" style=\"color:#34D399\">static/index.html</a>" +
+          " ومركز القيادة على <a href=\"static/mors.html\" style=\"color:#34D399\">static/mors.html</a>.";
+      })
+      .catch(function () { /* offline / static hosting: keep the note above */ });
+  })();
+  </script>
 
   <footer>Team: ليث رعد (Team Leader) · Data Analyst · Astronomy Researcher · Space Systems &amp; AI Engineer</footer>
 </div>
