@@ -31,11 +31,37 @@
   .note b{color:var(--text)}
   footer{margin-top:22px;color:var(--dim);font-size:12px}
   code{background:rgba(56,189,248,.1);padding:1px 6px;border-radius:5px;font-size:12.5px}
+  /* run-locally modal — same commands as README */
+  .rlBtn{display:inline-block;margin-top:10px;background:transparent;border:1px solid var(--accent);
+      color:var(--accent);border-radius:10px;padding:6px 14px;font-size:13px;cursor:pointer;
+      font-family:inherit}
+  .rlBtn:hover{background:rgba(56,189,248,.14)}
+  .rlOverlay{position:fixed;inset:0;background:rgba(3,7,18,.8);backdrop-filter:blur(4px);
+      display:none;align-items:center;justify-content:center;z-index:90;padding:20px}
+  .rlOverlay.on{display:flex}
+  .rlBox{position:relative;background:#0B1220;border:1px solid var(--line);border-radius:14px;
+      max-width:640px;width:100%;padding:22px 22px 20px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+  .rlBox h3{margin:0 0 4px;font-size:17px;color:var(--accent);padding-right:40px}
+  .rlSub{font-size:12px;color:var(--dim);margin-bottom:14px}
+  .rlRow{display:flex;gap:8px;align-items:center;background:rgba(15,23,42,.8);
+      border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin:8px 0;direction:ltr}
+  .rlRow code{flex:1;background:none;padding:0;font:500 12.5px ui-monospace,Consolas,monospace;
+      color:var(--text);overflow-x:auto;white-space:nowrap}
+  .rlCopy{background:rgba(56,189,248,.12);border:1px solid var(--accent);color:var(--accent);
+      border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;flex:0 0 auto}
+  .rlCopy:hover{background:rgba(56,189,248,.25)}
+  .rlNote{font-size:12px;color:var(--dim);line-height:1.75;margin-top:12px;direction:rtl;
+      unicode-bidi:plaintext}
+  .rlNote b{color:var(--warn)}
+  .rlX{position:absolute;top:12px;right:14px;background:transparent;color:var(--dim);
+      border:1px solid var(--line);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:13px}
+  .rlX:hover{color:#F87171;border-color:#F87171}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <span class="badge">ASI HACK 2026 · AI FOR SPACE CHALLENGES</span>
+  <span class="badge">ASI HACK 2026 · AI FOR SPACE CHALLENGES</span><br>
+  <button type="button" class="rlBtn" data-runlocal>⌘ Run Locally — run this site on your machine</button>
   <h1>ASI-HACK — Space Analytics Engine</h1>
   <p class="sub">منصة MORS لتحليل بيانات الفضاء والأقمار الصناعية — أربعة وكلاء، 8 شروط تحدي موثّقة على 16 مصدراً، تقرير علمي مُخرَج آلياً.</p>
 
@@ -107,6 +133,72 @@
           " ومركز القيادة على <a href=\"static/mors.html\" style=\"color:#34D399\">static/mors.html</a>.";
       })
       .catch(function () { /* offline / static hosting: keep the note above */ });
+
+    /* ---------------- run-locally modal (README parity) ---------------- */
+    var RL_CMDS = [
+      "git clone https://github.com/laythraad/ASI-HACK-Space-Analytics-Engine.git",
+      "cd ASI-HACK-Space-Analytics-Engine && python3 -m http.server 8000"
+    ];
+    function copyText(t) {
+      if (navigator.clipboard && navigator.clipboard.writeText)
+        return navigator.clipboard.writeText(t).catch(function () { return copyTextFallback(t); });
+      return copyTextFallback(t);
+    }
+    function copyTextFallback(t) {
+      var ta = document.createElement("textarea");
+      ta.value = t; ta.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      ta.remove(); return Promise.resolve();
+    }
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function openRunLocal() {
+      var ov = document.getElementById("rlOverlay");
+      if (!ov) {
+        ov = document.createElement("div");
+        ov.id = "rlOverlay"; ov.className = "rlOverlay";
+        ov.setAttribute("role", "dialog");
+        ov.setAttribute("aria-label", "Run MORS locally");
+        ov.innerHTML =
+          '<div class="rlBox">' +
+          "<h3>\u25B6 Run MORS locally</h3>" +
+          '<div class="rlSub">pure static site \u00B7 no build step \u00B7 stdlib Python only</div>' +
+          RL_CMDS.map(function (c, i) {
+            return '<div class="rlRow"><code>' + esc(c) + "</code>" +
+              '<button type="button" class="rlCopy" data-cmd="' + i + '">\u23FB Copy</button></div>';
+          }).join("") +
+          '<div class="rlNote">افتح <b>http://localhost:8000/</b> بعد الأمر الثاني — ستحصل على هذه الصفحة ' +
+          "بالضبط مع اللوحتين <b>/static/index.html</b> و<b>/static/mors.html</b>.<br>" +
+          "لتشغيل <b>الخادم الكامل</b> (محادثة Gemini + المخطط الرباعي الحقيقي): " +
+          '<span class="mono" style="direction:ltr;display:inline-block">pip install -r requirements.txt && python main.py</span>' +
+          " ثم افتح <b>http://127.0.0.1:5000/</b>.</div>" +
+          '<button type="button" class="rlX" data-close aria-label="Close">\u2715</button>' +
+          "</div>";
+        document.body.appendChild(ov);
+        ov.addEventListener("click", function (e) {
+          if (e.target === ov || (e.target.closest && e.target.closest("[data-close]"))) {
+            ov.classList.remove("on"); return;
+          }
+          var cp = e.target.closest && e.target.closest(".rlCopy[data-cmd]");
+          if (cp) {
+            copyText(RL_CMDS[Number(cp.dataset.cmd)]).then(function () {
+              cp.textContent = "\u2713 Copied";
+              setTimeout(function () { cp.textContent = "\u23FB Copy"; }, 1600);
+            });
+          }
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") ov.classList.remove("on");
+        });
+      }
+      ov.classList.add("on");
+    }
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-runlocal]");
+      if (b) { e.preventDefault(); openRunLocal(); }
+    });
   })();
   </script>
 

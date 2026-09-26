@@ -184,7 +184,57 @@ main{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;padding:16px 22px}
 .toast.ok{border-color:rgba(61,255,158,.5);color:var(--green)}
 @keyframes slide{from{transform:translateX(40px);opacity:0}}
 
+/* ---------- offline simulation badge ---------- */
+#offlineBadge{animation:offPulse 2.4s ease-in-out infinite}
+@keyframes offPulse{50%{border-color:rgba(255,200,87,.85);box-shadow:0 0 12px rgba(255,200,87,.35)}}
+
+/* ---------- chat: collapse + markdown ---------- */
+#chatToggle{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid var(--border);
+  color:var(--muted);border-radius:8px;padding:3px 10px;font-size:11px;font-family:'IBM Plex Mono';transition:.18s}
+#chatToggle:hover{color:var(--cyan);border-color:var(--cyan)}
+#chatCard.collapsed #chatLog,#chatCard.collapsed #typing,#chatCard.collapsed #chatForm{display:none}
+#chatCard.collapsed #chatToggle{transform:scaleY(-1)}
+.msg .md{display:block}
+.msg ul,.msg ol{margin:5px 0 5px 20px;padding:0}
+.msg li{margin:3px 0;line-height:1.75}
+.msg pre{background:rgba(3,4,17,.72);border:1px solid var(--border);border-radius:9px;
+  padding:9px 11px;overflow-x:auto;margin:7px 0;direction:ltr;text-align:left;white-space:pre}
+.msg code{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--green);
+  background:rgba(61,255,158,.08);padding:1px 5px;border-radius:5px}
+.msg pre code{background:none;color:#cfe9dc;padding:0}
+.msg b,.msg strong{color:#bcd3ff}
+@media(max-width:640px){
+  #chatForm{flex-direction:column}
+  #chatInput{height:64px}
+  #chatLog{height:210px}
+  .msg{max-width:100%}
+}
+
+/* ---------- run locally modal ---------- */
+.rlBtn{background:rgba(56,189,248,.08);border:1px solid var(--border);color:var(--cyan);
+  border-radius:99px;padding:6px 14px;font-size:11.5px;font-family:'IBM Plex Mono';cursor:pointer;transition:.18s}
+.rlBtn:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(56,189,248,.3)}
+.rlOverlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
+  background:rgba(3,5,18,.78);backdrop-filter:blur(6px);padding:18px}
+.rlOverlay.on{display:flex}
+.rlBox{width:min(680px,96vw);background:#0A0F26;border:1px solid rgba(56,189,248,.35);
+  border-radius:16px;padding:20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.6);max-height:90vh;overflow:auto}
+.rlBox h3{font-family:'Orbitron';font-size:14px;color:var(--cyan);margin:0 0 4px}
+.rlBox .rlSub{font-size:11.5px;color:var(--muted);margin-bottom:14px;font-family:'IBM Plex Mono'}
+.rlRow{display:flex;gap:9px;align-items:center;margin:9px 0}
+.rlRow code{flex:1;font-family:'IBM Plex Mono';font-size:12px;color:#A7F3D0;background:rgba(3,4,17,.8);
+  border:1px solid var(--border);border-radius:9px;padding:10px 12px;overflow-x:auto;white-space:pre;direction:ltr;text-align:left}
+.rlRow .rlCopy{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#061021;border:none;
+  border-radius:9px;padding:10px 14px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.rlRow .rlCopy:hover{filter:brightness(1.12)}
+.rlBox .rlNote{font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.8;border-top:1px dashed rgba(56,189,248,.25);padding-top:10px}
+.rlBox .rlNote b{color:var(--amber)}
+.rlBox .rlX{position:absolute;top:12px;right:14px;background:transparent;color:var(--muted);
+  border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:13px}
+.rlBox .rlX:hover{color:var(--red);border-color:var(--red)}
+
 footer{text-align:center;color:var(--muted);font-size:11px;padding:14px;font-family:'IBM Plex Mono'}
+footer .rlBtn{margin-left:12px;vertical-align:middle}
 @media(max-width:1050px){main{grid-template-columns:1fr}#vizCard{grid-row:auto}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -204,6 +254,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px;font-fam
   <div class="spacer"></div>
   <span id="pillGemini" class="pill">Gemini …</span>
   <span id="pillNasa" class="pill">NASA …</span>
+  <span id="offlineBadge" class="pill warn" role="status" style="display:none;letter-spacing:.4px">[MORS OFFLINE SIMULATION MODE]</span>
   <button id="btnSound" class="btn ghost" aria-label="Toggle ambient space audio">🔊 Space Ambience</button>
   <button id="btnRefresh" class="btn ghost" aria-label="Refresh data">⟳ Refresh</button>
   <button id="btnRun" class="btn" aria-label="Run the full AI pipeline">▶ تشغيل المخطط / Run Pipeline</button>
@@ -302,7 +353,8 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px;font-fam
 
   <!-- ============ Ai.Mors CHAT ============ -->
   <section class="card" id="chatCard">
-    <h2>🤖 Ai.Mors — CERTIFIED SPACE AGENT <span class="tag">answers restricted to council-certified data</span></h2>
+    <h2>🤖 Ai.Mors — CERTIFIED SPACE AGENT <span class="tag">answers restricted to council-certified data</span>
+      <button type="button" id="chatToggle" aria-expanded="true" aria-controls="chatLog" title="Collapse / expand chat">▾ chat</button></h2>
     <div id="chatLog">
       <div class="msg bot"><span class="greeting">أهلاً وسهلاً بكم في الفضاء</span>
 1- أنا <b>Ai.Mors</b>، وكيل الفضاء المعتمد داخل منصة ASI-HACK.
@@ -318,7 +370,8 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:14px;font-fam
   </section>
 </main>
 
-<footer>ASI-HACK · AI for Space Challenges — Agent Pipeline: Ingestion → Council of 5 → Citations → Ai.Mors · Data: NASA DONKI / NEOWS / JPL Horizons</footer>
+<footer>ASI-HACK · AI for Space Challenges — Agent Pipeline: Ingestion → Council of 5 → Citations → Ai.Mors · Data: NASA DONKI / NEOWS / JPL Horizons
+  <button type="button" class="rlBtn" data-runlocal>⌘ Run Locally</button></footer>
 <div id="toasts"></div>
 
 <!-- ================= THREE.JS ================= -->
@@ -434,8 +487,12 @@ function initViz(){
       renderer.setSize(el.clientWidth, el.clientHeight);
     });
 
-    (function loop(){
-      requestAnimationFrame(loop);
+    /* animation lifecycle — cancel the rAF loop when the tab is hidden,
+       resume when visible again (no wasted frames, no memory churn) */
+    let vizRaf = 0, vizRunning = false;
+    function vizLoop(){
+      if(!vizRunning) return;
+      vizRaf = requestAnimationFrame(vizLoop);
       if(earth) earth.rotation.y += .006;
       if(mars) mars.rotation.y += .005;
       if(belt) belt.rotation.y += .0007;
@@ -447,7 +504,11 @@ function initViz(){
         if(p) b.mesh.position.set(p.x*10, p.y*10, p.z*10);
       });
       renderer.render(scene, camera);
-    })();
+    }
+    function startViz(){ if(vizRunning || document.hidden) return; vizRunning = true; vizLoop(); }
+    function stopViz(){ vizRunning = false; if(vizRaf) cancelAnimationFrame(vizRaf); vizRaf = 0; }
+    document.addEventListener('visibilitychange', ()=> document.hidden ? stopViz() : startViz());
+    startViz();
   }catch(err){
     document.getElementById('viz').innerHTML =
       '<div style="padding:30px;color:#ff8fa3;font-family:IBM Plex Mono">WebGL unavailable — 3D visualizer disabled.<br>'+err.message+'</div>';
@@ -498,8 +559,13 @@ function toast(msg, kind=''){
   $('#toasts').appendChild(d);
   setTimeout(()=>d.remove(), 4600);
 }
+function showOfflineBadge(){
+  const b = document.getElementById('offlineBadge');
+  if(b) b.style.display = '';
+}
 function markSnapshot(){
   if(window.__SNAP__) return; window.__SNAP__ = true;
+  showOfflineBadge();
   const d=document.createElement('div');
   d.id='snapBanner';
   d.textContent='وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).';
@@ -537,27 +603,70 @@ async function api(path, opts){
 async function loadHealth(){
   try{
     const h = await api('/api/health');
-    $('#pillGemini').textContent = h.gemini_configured ? 'Gemini ✓ configured' : 'Gemini ✗ fallback';
-    $('#pillGemini').className = 'pill'+(h.gemini_configured?'':' warn');
-    $('#pillNasa').textContent = 'NASA '+(h.nasa_key_mode==='live'?'key ✓ live':'DEMO (limited)');
-    $('#pillNasa').className = 'pill'+(h.nasa_key_mode==='live'?'':' warn');
+    const snap = !!window.__SNAP__;
+    $('#pillGemini').textContent = h.gemini_configured
+      ? (snap ? 'Gemini ✓ (snapshot)' : 'Gemini ✓ configured') : 'Gemini ✗ fallback';
+    $('#pillGemini').className = 'pill'+((h.gemini_configured && !snap)?'':' warn');
+    $('#pillNasa').textContent = 'NASA '+(h.nasa_key_mode==='live'
+      ? (snap ? 'key ✓ snapshot' : 'key ✓ live') : 'DEMO (limited)');
+    $('#pillNasa').className = 'pill'+((h.nasa_key_mode==='live' && !snap)?'':' warn');
+    if(snap) showOfflineBadge();
   }catch(e){
+    showOfflineBadge();
     $('#pillGemini').textContent = 'Backend offline'; $('#pillGemini').className='pill off';
     $('#pillNasa').textContent = 'Backend offline';   $('#pillNasa').className='pill off';
-    toast('تعذّر الاتصال بالخادم — تأكد من تشغيل main.py','err');
+    toast('وضع المحاكاة غير المتصل — تُعرض البيانات من اللقطة المحفوظة','warn');
   }
 }
 
 /* ---------------- charts ---------------- */
-Chart.defaults.color = '#8b97c4';
-Chart.defaults.borderColor = 'rgba(56,124,220,.14)';
-Chart.defaults.font.family = "'IBM Plex Mono', monospace";
-Chart.defaults.font.size = 10;
+if(window.Chart){
+  Chart.defaults.color = '#8b97c4';
+  Chart.defaults.borderColor = 'rgba(56,124,220,.14)';
+  Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+  Chart.defaults.font.size = 10;
+}
 
 function mkChart(id, cfg){
   const el = document.getElementById(id);
+  if(!el || !window.Chart) return null;
   if(charts[id]) charts[id].destroy();
+  sanitizeData(cfg);
   charts[id] = new Chart(el, cfg);
+}
+/* ---- data sanitization: null / undefined / NaN never reach Chart.js ---- */
+const finite = v => { const n = Number(v); return Number.isFinite(n) ? n : null; };
+const seriesVals = (arr, get) => Array.isArray(arr) ? arr.map(x => finite(get ? get(x) : x)) : [];
+const cleanPts = (arr, fx, fy) => Array.isArray(arr)
+  ? arr.map(o => o ? ({x:finite(fx(o)), y:finite(fy(o))}) : null)
+       .filter(p => p && p.x !== null && p.y !== null) : [];
+/* central guard: primitives → null (clean gap, alignment kept), numeric strings
+   coerced, non-numeric tooltip payloads untouched */
+function sanitizeData(cfg){
+  try{
+    const sets = (cfg.data && cfg.data.datasets) || [];
+    sets.forEach(ds=>{
+      if(!Array.isArray(ds.data)) return;
+      ds.data = ds.data.map(v=>{
+        if(v == null) return null;
+        if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+        if(typeof v === 'object'){
+          const o = {};
+          for(const k in v){
+            const vv = v[k];
+            if(typeof vv === 'number') o[k] = Number.isFinite(vv) ? vv : null;
+            else if(typeof vv === 'string' && vv !== '' && Number.isFinite(Number(vv)) &&
+                    /^[-+]?[\d.]+([eE][-+]?\d+)?$/.test(vv)) o[k] = Number(vv);
+            else o[k] = vv;
+          }
+          return o;
+        }
+        const nv = Number(v);
+        return Number.isFinite(nv) ? nv : null;
+      });
+    });
+  }catch(e){}
+  return cfg;
 }
 function grad(ctx, color){
   const g = ctx.createLinearGradient(0,0,0,190);
@@ -566,8 +675,9 @@ function grad(ctx, color){
 }
 
 function drawSpaceWeather(d){
-  const labels = d.series.map(s=>(s.t||'').slice(5,16));
-  const vals   = d.series.map(s=>s.value);
+  const rows = Array.isArray(d.series) ? d.series : [];
+  const labels = rows.map(s=>String((s&&s.t)||'').slice(5,16));
+  const vals   = seriesVals(rows, s=>s && s.value);
   const ctx = document.getElementById('chartCme').getContext('2d');
   mkChart('chartCme',{type:'line',data:{labels,datasets:[{
     label:'CME speed (km/s)',data:vals,borderColor:'#38bdf8',
@@ -576,10 +686,11 @@ function drawSpaceWeather(d){
     options:opt({suggestedMin:0})});
 }
 function drawNeo(d){
+  const rows = Array.isArray(d.series) ? d.series : [];
   const ctx = document.getElementById('chartNeo').getContext('2d');
   mkChart('chartNeo',{type:'bar',data:{
-    labels:d.series.map(s=>s.t.slice(5)),
-    datasets:[{label:'NEOs / day',data:d.series.map(s=>s.value),
+    labels:rows.map(s=>String((s&&s.t)||'').slice(5)),
+    datasets:[{label:'NEOs / day',data:seriesVals(rows,s=>s && s.value),
       backgroundColor:grad(ctx,'#a06bff'),borderColor:'#a06bff',borderWidth:1}]},
     options:opt({})});
 }
@@ -588,7 +699,7 @@ function drawOrbit(d){
   const orbits=d.orbits&&Object.keys(d.orbits).length?d.orbits:{[d.body||'Earth']:(d.series||[])};
   const keys=Object.keys(orbits);
   mkChart('chartOrbit',{type:'scatter',data:{datasets:keys.map((k,i)=>({
-    label:k, data:orbits[k].map(s=>({x:s.x_au,y:s.y_au})),
+    label:k, data:cleanPts(orbits[k], s=>s.x_au, s=>s.y_au),
     borderColor:PAL[i%PAL.length],backgroundColor:PAL[i%PAL.length]+'59',
     showLine:true,tension:.4,pointRadius:2}))},
   options:{...opt({}),aspectRatio:2.2,plugins:{legend:{display:keys.length>1,position:'bottom'}},
@@ -598,8 +709,8 @@ function drawOrbit(d){
 function drawCouncil(rep){
   const ex = ((rep.council||{}).experts)||[];
   mkChart('chartCouncil',{type:'bar',data:{
-    labels:ex.map(e=>e.name),
-    datasets:[{label:'score',data:ex.map(e=>e.score),
+    labels:ex.map(e=>e.name || 'expert'),
+    datasets:[{label:'score',data:seriesVals(ex,e=>e.score),
       backgroundColor:['#38bdf8','#a06bff','#3dff9e','#ffc857','#ff5d73'],borderRadius:7}]},
     options:{...opt({}),indexAxis:'y',plugins:{legend:{display:false}},
       scales:{x:{min:0,max:100,grid:{color:'rgba(56,124,220,.1)'}},y:{grid:{display:false}}}}});
@@ -610,9 +721,11 @@ const BORTLE_COLOR = b => b<=2 ? '#3dff9e' : b<=4 ? '#7ef7c1'
                         : b<=6 ? '#ffc857' : b<=7 ? '#ff9f5a' : '#ff5d73';
 function drawLight(d){
   const m = d.model||{}, src = d.source||{};
-  const sites = d.sites||[];
-  const pts = sites.map(s=>({x:s.radiance_nw_cm2_sr, y:s.nelm_mag, s}));
-  const curve = (d.reference_curve||[]).map(p=>({x:p.radiance_nw_cm2_sr, y:p.nelm_mag}));
+  const sites = Array.isArray(d.sites) ? d.sites : [];
+  const pts = sites
+    .filter(s=>s && finite(s.radiance_nw_cm2_sr)!==null && finite(s.nelm_mag)!==null)
+    .map(s=>({x:finite(s.radiance_nw_cm2_sr), y:finite(s.nelm_mag), s}));
+  const curve = cleanPts(d.reference_curve||[], p=>p && p.radiance_nw_cm2_sr, p=>p && p.nelm_mag);
   mkChart('chartLight',{type:'scatter',data:{datasets:[
     {label:'model curve', data:curve, type:'line', showLine:true, fill:false,
      borderColor:'rgba(56,189,248,.8)', backgroundColor:'rgba(56,189,248,.10)',
@@ -650,7 +763,9 @@ function drawLight(d){
 
 /* ================== WIDGET 2 — NEO hazard bubble matrix ======================= */
 function drawHaz(d){
-  const all = (d.points||[]).filter(p=>p.x_ld>0 && p.y_kms>0);
+  const all = (Array.isArray(d.points)?d.points:[])
+    .filter(p=>p && finite(p.x_ld)!==null && finite(p.y_kms)!==null && p.x_ld>0 && p.y_kms>0)
+    .map(p=>Object.assign({},p,{x_ld:finite(p.x_ld),y_kms:finite(p.y_kms),diameter_m:finite(p.diameter_m)}));
   const rad = m => Math.max(3.5, Math.min(24, Math.sqrt(Math.max(m||1,1))*1.35));
   const mk = (arr,label,color,fill) => ({label, data:arr.map(p=>({
       x:p.x_ld, y:p.y_kms, r:rad(p.diameter_m), p})),
@@ -685,12 +800,12 @@ function drawHaz(d){
 
 /* ============ WIDGET 3 — space weather flare class × Kp (dual axis) =========== */
 function drawKp(d){
-  const days = (d.daily||[]).slice(-31);
-  const labels = days.map(x=>String(x.t).slice(5));
-  const flares = days.map(x=>x.flare_max_flux);
-  const kps    = days.map(x=>x.kp_max);
-  const hasFlare = flares.some(v=>v!==null && v!==undefined);
-  const hasKp    = kps.some(v=>v!==null && v!==undefined);
+  const days = (Array.isArray(d.daily)?d.daily:[]).slice(-31);
+  const labels = days.map(x=>String((x&&x.t)||'').slice(5));
+  const flares = seriesVals(days, x=>x && x.flare_max_flux);   // null → gap, never NaN
+  const kps    = seriesVals(days, x=>x && x.kp_max);
+  const hasFlare = flares.some(v=>v!==null);
+  const hasKp    = kps.some(v=>v!==null);
   const ds = [];
   if(hasFlare) ds.push({type:'bar', label:'flare peak flux (W/m²)', data:flares,
     yAxisID:'yFlare', backgroundColor:'rgba(255,159,90,.78)',
@@ -736,12 +851,12 @@ function drawKp(d){
 
 /* =================== WIDGET 4 — multi-spectral band radar ==================== */
 function drawSpec(d){
-  const bands = d.bands||[], profs = d.profiles||[];
+  const bands = Array.isArray(d.bands)?d.bands:[], profs = Array.isArray(d.profiles)?d.profiles:[];
   const palette = ['#3dff9e','#38bdf8','#ffc857','#ff5d73','#a06bff','#7ef7c1'];
   mkChart('chartSpec',{type:'radar',data:{
-    labels:bands.map(b=>`${b.band} · ${b.nm}nm`),
-    datasets:profs.map((p,i)=>({
-      label:p.land_cover, data:p.reflectance,
+    labels:bands.map(b=>`${(b&&b.band)||'—'} · ${(b&&b.nm)!=null?b.nm:'?'}nm`),
+    datasets:profs.filter(p=>p && Array.isArray(p.reflectance)).map((p,i)=>({
+      label:p.land_cover || ('profile '+(i+1)), data:seriesVals(p.reflectance),
       borderColor:palette[i%palette.length],
       backgroundColor:(palette[i%palette.length])+'2b',
       borderWidth:2, pointRadius:2.5, pointHoverRadius:5,
@@ -864,43 +979,41 @@ async function runPipeline(){
 }
 
 /* ---------------- Ai.Mors chat ---------------- */
+/* safe markdown: escape HTML first, then promote code/bold/lists/eq */
+function mdHtml(s){
+  s = String(s==null?'':s);
+  const blocks = [];
+  s = s.replace(/```([\s\S]*?)```/g, (m,c)=>{ blocks.push(c); return '\u0000B'+(blocks.length-1)+'\u0000'; });
+  let e = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  e = e.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  e = e.replace(/\$\$([^$]+)\$\$/g,'<span class="eq">$1</span>');
+  e = e.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  e = e.replace(/(^|[^*\w])\*([^*\n]+)\*/g,'$1<i>$2</i>');
+  e = e.replace(/(?:^|\n)((?:[-*•] [^\n]*(?:\n|$))+)/g, (m,list)=>{
+    const items = list.trim().split(/\n/).map(l=>'<li>'+l.replace(/^[-*•]\s*/,'')+'</li>').join('');
+    return '\n<ul>'+items+'</ul>';
+  });
+  e = e.replace(/(?:^|\n)((?:\d+[-.)] [^\n]*(?:\n|$))+)/g, (m,list)=>{
+    const items = list.trim().split(/\n/).map(l=>'<li>'+l.replace(/^\d+[-.)]\s*/,'')+'</li>').join('');
+    return '\n<ol>'+items+'</ol>';
+  });
+  e = e.replace(/\n{2,}/g,'\n').replace(/\n/g,'<br>');
+  e = e.replace(/<br>(?=<ul>|<ol>|\u0000B)/g,'').replace(/(<\/ul>|<\/ol>)<br>/g,'$1');
+  e = e.replace(/\u0000B(\d+)\u0000/g, (m,i)=>'<pre><code>'+
+    String(blocks[+i]).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</code></pre>');
+  return e;
+}
 function renderReply(text){
   const wrap = document.createElement('div'); wrap.className='msg bot';
-  const lines = String(text).split('\n');
-  let first = true, buf = [];
-  const flush = ()=>{
-    if(!buf.length) return;
-    const s = document.createElement('span'); s.className='step';
-    s.textContent = buf.join(' '); wrap.appendChild(s); buf=[];
-  };
-  lines.forEach(line=>{
-    const t = line.trim();
-    if(first && t.startsWith('أهلاً')){
-      const g = document.createElement('span'); g.className='greeting'; g.textContent=t;
-      wrap.appendChild(g); first=false; return;
-    }
-    if(/^\d+[-.)]/.test(t)){
-      flush();
-      const s = document.createElement('span'); s.className='step'; s.textContent=t;
-      wrap.appendChild(s);
-      // equation chips inside the step
-      const eqs = t.match(/\$\$[^$]+\$\$/g);
-      if(eqs) eqs.forEach(eq=>{const c=document.createElement('span');c.className='eq';c.textContent=eq.replace(/\$\$/g,'');wrap.appendChild(c);});
-      return;
-    }
-    if(t.startsWith('الخلاصة')){
-      flush(); const s=document.createElement('span');
-      s.className='step'; s.style.color='#3dff9e'; s.textContent=t;
-      wrap.appendChild(s); return;
-    }
-    if(/TRC-\d+/.test(t)){
-      const chips = t.match(/TRC-\d+/g)||[];
-      const c=document.createElement('span'); c.className='cite';
-      c.textContent='trace: '+chips.join(', '); wrap.appendChild(c); return;
-    }
-    buf.push(line);
-  });
-  flush();
+  let lines = String(text==null?'':text).split('\n');
+  if(lines.length && lines[0].trim().startsWith('أهلاً')){
+    const g = document.createElement('span'); g.className='greeting';
+    g.textContent = lines[0].trim(); wrap.appendChild(g);
+    lines = lines.slice(1);
+  }
+  const body = document.createElement('div'); body.className='md';
+  body.innerHTML = mdHtml(lines.join('\n').replace(/^\n+|\n+$/g,''));
+  wrap.appendChild(body);
   return wrap;
 }
 
@@ -952,6 +1065,77 @@ $('#chatForm').addEventListener('submit', e=>{
 });
 $('#chatInput').addEventListener('keydown', e=>{
   if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $('#chatForm').requestSubmit(); }
+});
+
+/* ---------------- chat collapse (never obscures charts on small screens) --- */
+$('#chatToggle').addEventListener('click', ()=>{
+  const card = $('#chatCard');
+  const collapsed = card.classList.toggle('collapsed');
+  $('#chatToggle').setAttribute('aria-expanded', String(!collapsed));
+  $('#chatToggle').textContent = collapsed ? '▴ chat' : '▾ chat';
+});
+
+/* ---------------- run-locally modal ---------------- */
+const RL_CMDS = [
+  'git clone https://github.com/laythraad/ASI-HACK-Space-Analytics-Engine.git',
+  'cd ASI-HACK-Space-Analytics-Engine && python3 -m http.server 8000'
+];
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText)
+    return navigator.clipboard.writeText(t).catch(()=>copyTextFallback(t));
+  return copyTextFallback(t);
+}
+function copyTextFallback(t){
+  const ta = document.createElement('textarea');
+  ta.value = t; ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  ta.remove(); return Promise.resolve();
+}
+function openRunLocal(){
+  let ov = document.getElementById('rlOverlay');
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = 'rlOverlay'; ov.className = 'rlOverlay';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-label','Run MORS locally');
+    ov.innerHTML =
+      '<div class="rlBox" style="position:relative">' +
+      '<h3>▶ Run MORS locally</h3>' +
+      '<div class="rlSub">pure static site · no build step · stdlib Python only</div>' +
+      RL_CMDS.map((c,i)=>'<div class="rlRow"><code>'+c.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</code>' +
+        '<button type="button" class="rlCopy" data-i="'+i+'" data-cmd="'+i+'">⧉ Copy</button></div>').join('') +
+      '<div class="rlNote">open <b>http://localhost:8000/</b> → launcher with both UIs, dashboards at ' +
+      '<b>/static/index.html</b> and <b>/static/mors.html</b> (identical to the live site — snapshot mode).<br>' +
+      'For the <b>full live backend</b> (Gemini chat + real 4-agent pipeline): ' +
+      '<span class="mono" style="color:#A7F3D0">pip install -r requirements.txt && python main.py</span> → http://127.0.0.1:5000</div>' +
+      '<button type="button" class="rlX" data-close aria-label="Close">✕</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e=>{
+      if(e.target === ov || e.target.closest('[data-close]')){ ov.classList.remove('on'); return; }
+      const cp = e.target.closest('.rlCopy[data-cmd]');
+      if(cp){
+        copyText(RL_CMDS[Number(cp.dataset.cmd)]).then(()=>{
+          cp.textContent = '✓ Copied';
+          setTimeout(()=>{ cp.textContent = '⧉ Copy'; }, 1600);
+        });
+      }
+    });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') ov.classList.remove('on'); });
+  }
+  ov.classList.add('on');
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-runlocal]');
+  if(b){ e.preventDefault(); openRunLocal(); }
+});
+
+/* ---------------- resilience: never leave a silent blank state ------------ */
+window.addEventListener('offline', showOfflineBadge);
+window.addEventListener('online', ()=>{ /* badge stays until next live response */ });
+window.addEventListener('unhandledrejection', ev=>{
+  const m = String((ev.reason && ev.reason.message) || ev.reason || '');
+  if(/fetch|network|Failed to load|load failed/i.test(m)) showOfflineBadge();
 });
 
 /* ---------------- ambient audio (synthesized) ---------------- */

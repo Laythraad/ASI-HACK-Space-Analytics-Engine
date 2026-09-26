@@ -11,18 +11,20 @@
 :root{
   --bg:#030712; --bg2:#0F172A; --panel:#0A101F; --panel2:#111A2C;
   --line:rgba(148,163,184,.16); --line2:rgba(148,163,184,.28);
-  --text:#E2E8F0; --muted:#93A3B8; --dim:#64748B;
+  --text:#E2E8F0; --muted:#93A3B8; --dim:#8A97AD;
   --accent:#38BDF8; --accent2:#0EA5E9; --accentSoft:rgba(56,189,248,.14);
   --ok:#34D399; --warn:#FBBF24; --bad:#F87171; --info:#818CF8;
+  --onAcc:#04121B;
   --shadow:0 10px 30px rgba(0,0,0,.45);
   --r:12px; --sb:264px; --fs:14px; --grid-op:.35;
 }
 html[data-theme="light"]{
   --bg:#FFFFFF; --bg2:#E0F7FA; --panel:#F7FCFD; --panel2:#EEF6F9;
   --line:rgba(15,23,42,.10); --line2:rgba(15,23,42,.18);
-  --text:#0F172A; --muted:#475569; --dim:#64748B;
+  --text:#0F172A; --muted:#475569; --dim:#5D6C84;
   --accent:#0E7490; --accent2:#0891B2; --accentSoft:rgba(14,116,144,.10);
-  --ok:#059669; --warn:#B45309; --bad:#DC2626; --info:#4F46E5;
+  --ok:#047857; --warn:#B45309; --bad:#DC2626; --info:#4F46E5;
+  --onAcc:#FFFFFF;
   --shadow:0 8px 24px rgba(15,23,42,.10);
 }
 html[data-theme="earth"]  {--bg:#04121B;--bg2:#0A2432;--panel:#071A26;--panel2:#0C2A3A;--accent:#38BDF8;--accent2:#22C55E;--accentSoft:rgba(56,189,248,.14)}
@@ -31,12 +33,20 @@ html[data-theme="jupiter"]{--bg:#16100A;--bg2:#251B10;--panel:#1C140C;--panel2:#
 html[data-theme="saturn"] {--bg:#16130B;--bg2:#262014;--panel:#1D180E;--panel2:#2B2416;--accent:#E7C97B;--accent2:#FACC15;--accentSoft:rgba(231,201,123,.14)}
 html[data-theme="neptune"]{--bg:#050C1C;--bg2:#0B1630;--panel:#080F23;--panel2:#0E1A38;--accent:#60A5FA;--accent2:#818CF8;--accentSoft:rgba(96,165,250,.14)}
 html[data-theme="moon"]   {--bg:#0E0E12;--bg2:#17171D;--panel:#131318;--panel2:#1C1C23;--accent:#CBD5E1;--accent2:#94A3B8;--accentSoft:rgba(203,213,225,.13)}
-html[data-accent="cyan"]{--accent:#38BDF8;--accent2:#0EA5E9;--accentSoft:rgba(56,189,248,.14)}
-html[data-accent="teal"]{--accent:#2DD4BF;--accent2:#14B8A6;--accentSoft:rgba(45,212,191,.14)}
-html[data-accent="blue"]{--accent:#60A5FA;--accent2:#3B82F6;--accentSoft:rgba(96,165,250,.14)}
-html[data-accent="violet"]{--accent:#A78BFA;--accent2:#8B5CF6;--accentSoft:rgba(167,139,250,.14)}
-html[data-accent="amber"]{--accent:#FBBF24;--accent2:#F59E0B;--accentSoft:rgba(251,191,36,.14)}
-html[data-accent="rose"]{--accent:#FB7185;--accent2:#F43F5E;--accentSoft:rgba(251,113,133,.14)}
+html[data-accent="cyan"]{--accent:#38BDF8;--accent2:#0EA5E9;--accentSoft:rgba(56,189,248,.14);--onAcc:#04121B}
+html[data-accent="teal"]{--accent:#2DD4BF;--accent2:#14B8A6;--accentSoft:rgba(45,212,191,.14);--onAcc:#04121B}
+html[data-accent="blue"]{--accent:#60A5FA;--accent2:#3B82F6;--accentSoft:rgba(96,165,250,.14);--onAcc:#04121B}
+html[data-accent="violet"]{--accent:#A78BFA;--accent2:#8B5CF6;--accentSoft:rgba(167,139,250,.14);--onAcc:#04121B}
+html[data-accent="amber"]{--accent:#FBBF24;--accent2:#F59E0B;--accentSoft:rgba(251,191,36,.14);--onAcc:#04121B}
+html[data-accent="rose"]{--accent:#FB7185;--accent2:#F43F5E;--accentSoft:rgba(251,113,133,.14);--onAcc:#04121B}
+/* light theme + accent variant → use the dark (readable) cousin of each accent
+   so accent-as-text and white button labels both keep WCAG AA contrast */
+html[data-theme="light"][data-accent="cyan"]{--accent:#0E7490;--accent2:#0891B2;--accentSoft:rgba(14,116,144,.10);--onAcc:#FFFFFF}
+html[data-theme="light"][data-accent="teal"]{--accent:#0F766E;--accent2:#0D9488;--accentSoft:rgba(15,118,110,.10);--onAcc:#FFFFFF}
+html[data-theme="light"][data-accent="blue"]{--accent:#1D4ED8;--accent2:#2563EB;--accentSoft:rgba(29,78,216,.10);--onAcc:#FFFFFF}
+html[data-theme="light"][data-accent="violet"]{--accent:#6D28D9;--accent2:#7C3AED;--accentSoft:rgba(109,40,217,.10);--onAcc:#FFFFFF}
+html[data-theme="light"][data-accent="amber"]{--accent:#B45309;--accent2:#D97706;--accentSoft:rgba(180,83,9,.10);--onAcc:#FFFFFF}
+html[data-theme="light"][data-accent="rose"]{--accent:#BE123C;--accent2:#E11D48;--accentSoft:rgba(190,18,60,.10);--onAcc:#FFFFFF}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%}
@@ -110,7 +120,7 @@ a{color:var(--accent);text-decoration:none}
 .btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);
   color:var(--text);font:inherit;font-size:12.5px;padding:7.5px 12px;border-radius:9px;cursor:pointer;transition:.14s}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.pri{background:var(--accent);border-color:var(--accent);color:#04121B;font-weight:650}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--onAcc,#04121B);font-weight:650}
 .btn.pri:hover{filter:brightness(1.08);color:#04121B}
 .btn svg{width:15px;height:15px}
 
@@ -168,6 +178,48 @@ html[data-theme="light"] .card.acc{border-color:rgba(14,116,144,.42)}
 .trace b{color:var(--accent);font-weight:700}
 html[data-sci="off"] .trace{display:none}
 .hint{font-size:11.5px;color:var(--dim)}
+/* --- chatbot outputs: rendered markdown (HTML is escaped first, then syntax) --- */
+.mdbody{font-size:13.2px;line-height:1.9}
+.mdbody ul,.mdbody ol{margin:8px 0;padding-inline-start:22px}
+.mdbody li{margin:3px 0}
+.mdbody pre{background:var(--panel2);border:1px dashed var(--line2);border-radius:8px;
+  padding:9px 12px;overflow-x:auto;unicode-bidi:plaintext}
+.mdbody code{font:500 12px ui-monospace,"Cascadia Mono",Consolas,monospace;color:var(--ok);
+  background:rgba(52,211,153,.1);padding:1px 5px;border-radius:4px}
+.mdbody pre code{background:none;padding:0;color:var(--text)}
+.mdbody b{color:var(--accent)}
+#chatOut{max-height:340px;overflow-y:auto;scrollbar-width:thin}
+#chatOut .hint{padding:14px 12px;border:1px dashed var(--line);border-radius:10px;background:var(--panel2)}
+.fld.collapsed .filters,.fld.collapsed #chatOut{display:none}
+#chatCol{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;
+  font-size:10.5px;padding:2px 8px;cursor:pointer;margin-inline-start:6px;vertical-align:middle}
+#chatCol:hover{color:var(--accent);border-color:var(--accent)}
+/* offline badge — engine is simulated, data served from the committed snapshot */
+#offlineBadge{animation:bl2.6s ease-in-out infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.55}}
+/* Run-Locally modal — GitHub Pages / localhost parity (same commands as README) */
+.rlBtn{background:transparent;border:1px solid var(--accent);color:var(--accent);
+  border-radius:9px;padding:5px 12px;font-size:11.5px;cursor:pointer}
+.rlBtn:hover{background:rgba(56,189,248,.14)}
+.rlOverlay{position:fixed;inset:0;background:rgba(4,6,12,.78);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;z-index:90;padding:20px}
+.rlOverlay.on{display:flex}
+.rlBox{position:relative;background:var(--panel);border:1px solid var(--line2);border-radius:14px;
+  max-width:640px;width:100%;padding:22px 22px 20px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.rlBox h3{margin:0 0 4px;font-size:16px;color:var(--accent)}
+.rlSub{font-size:11.5px;color:var(--dim);margin-bottom:14px}
+.rlRow{display:flex;gap:8px;align-items:center;background:var(--panel2);border:1px solid var(--line2);
+  border-radius:9px;padding:8px 10px;margin:8px 0}
+.rlRow code{flex:1;font:500 12px ui-monospace,"Cascadia Mono",Consolas,monospace;color:var(--text);
+  overflow-x:auto;white-space:nowrap;unicode-bidi:plaintext}
+.rlCopy{background:rgba(56,189,248,.12);border:1px solid var(--accent);color:var(--accent);
+  border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;flex:0 0 auto}
+.rlCopy:hover{background:rgba(56,189,248,.25)}
+.rlNote{font-size:11.5px;color:var(--dim);line-height:1.75;margin-top:12px;unicode-bidi:plaintext}
+.rlNote b{color:var(--warn)}
+.rlX{position:absolute;top:12px;right:14px;background:transparent;color:var(--dim);
+  border:1px solid var(--line);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:13px}
+.rlX:hover{color:var(--bad);border-color:var(--bad)}
 /* Arabic blocks (source registry + Ai.Mors identity) — RTL, right-aligned */
 .ar{direction:rtl;text-align:right;font-family:"Segoe UI","Tahoma","Arial",system-ui,sans-serif;
     line-height:1.85;unicode-bidi:isolate}
@@ -396,7 +448,8 @@ img.broken{display:none}
     <div class="side-foot">
       <b>MORS Scientific Command Center</b><br>
       build 1.0.0 · <span id="sfEngine">—</span><br>
-      <span id="sfSync">no sync yet</span>
+      <span id="sfSync">no sync yet</span><br>
+      <button type="button" class="rlBtn" data-runlocal style="margin-top:8px;width:100%">⌘ Run Locally</button>
     </div>
   </aside>
 
@@ -415,6 +468,7 @@ img.broken{display:none}
         <span class="pill" id="pillEngine"><span class="dot"></span>engine</span>
         <span class="pill" id="pillQuality">quality —</span>
         <span class="pill acc" id="pillOpen">0 open</span>
+        <span class="pill warn" id="offlineBadge" style="display:none;letter-spacing:.3px">[MORS OFFLINE SIMULATION MODE]</span>
       </div>
       <button class="btn" id="btnTheme" title="Cycle theme">◐ <span id="themeName">Dark</span></button>
       <button class="btn pri" id="btnCustom" title="Customize MORS">⚙ Customize MORS</button>
@@ -495,6 +549,37 @@ function esc(s) {
   return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+/* safe markdown renderer for chatbot outputs — HTML is escaped first,
+   then **bold**, `code`, ```blocks```, $equations$, - bullets and 1. lists */
+function mdHtml(s) {
+  s = String(s == null ? "" : s);
+  var blocks = [];
+  s = s.replace(/```([\s\S]*?)```/g, function (m, c) { blocks.push(c); return "\u0000B" + (blocks.length - 1) + "\u0000"; });
+  var e = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  e = e.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  e = e.replace(/\$\$([^$]+)\$\$/g, '<span class="eqb">$1</span>');
+  e = e.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  e = e.replace(/(^|[^*\w])\*([^*\n]+)\*/g, "$1<i>$2</i>");
+  e = e.replace(/(?:^|\n)((?:[-*\u2022] [^\n]*(?:\n|$))+)/g, function (m, list) {
+    var items = list.trim().split(/\n/).map(function (l) {
+      return "<li>" + l.replace(/^[-*\u2022]\s*/, "") + "</li>";
+    }).join("");
+    return "\n<ul>" + items + "</ul>";
+  });
+  e = e.replace(/(?:^|\n)((?:\d+[-.)] [^\n]*(?:\n|$))+)/g, function (m, list) {
+    var items = list.trim().split(/\n/).map(function (l) {
+      return "<li>" + l.replace(/^\d+[-.)]\s*/, "") + "</li>";
+    }).join("");
+    return "\n<ol>" + items + "</ol>";
+  });
+  e = e.replace(/\n{2,}/g, "\n").replace(/\n/g, "<br>");
+  e = e.replace(/<br>(?=<ul>|<ol>|\u0000B)/g, "").replace(/(<\/ul>|<\/ol>)<br>/g, "$1");
+  e = e.replace(/\u0000B(\d+)\u0000/g, function (m, i) {
+    return "<pre><code>" + String(blocks[+i]).replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</code></pre>";
+  });
+  return e;
+}
 function n2(v, d) {
   d = (d == null) ? 2 : d;
   return (typeof v === "number" && isFinite(v)) ? v.toLocaleString(undefined, { maximumFractionDigits: d }) : "—";
@@ -557,9 +642,14 @@ var S = { theme: "dark", planet: "earth", accent: null, grid: "off", particles: 
   bigtext: false, rmotion: true };
 var LS = "mors.settings.v1";
 
+function showOfflineBadge() {
+  var b = document.getElementById("offlineBadge");
+  if (b) b.style.display = "";
+}
 function markSnapshot() {
   if (window.__MORS_SNAPSHOT__) return;
   window.__MORS_SNAPSHOT__ = true;
+  showOfflineBadge();
   var d = document.createElement("div");
   d.id = "snapBanner";
   d.textContent = "وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).";
@@ -630,6 +720,7 @@ function applySettings() {
   $("#themeName").textContent = names[S.theme] || "Dark";
   try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {}
   seedFX();
+  relayoutMaps();   /* compact/contrast/theme changes resize the canvas stage */
 }
 function loadSettings() {
   try { Object.assign(S, JSON.parse(localStorage.getItem(LS) || "{}")); } catch (e) {}
@@ -658,11 +749,14 @@ function seedFX() {
     FX.pts.push({ x: Math.random() * FX.w, y: Math.random() * FX.h,
       r: Math.random() * 1.25 + 0.35, s: Math.random() * 0.16 + 0.03, a: Math.random() * 0.4 + 0.12 });
   }
-  cancelAnimationFrame(FX.raf);
-  if (!FX.pts.length) { cv.getContext("2d").clearRect(0, 0, cv.width, cv.height); return; }
+  cancelAnimationFrame(FX.raf); FX.raf = 0;
+  if (!FX.pts.length || document.hidden) {
+    cv.getContext("2d").clearRect(0, 0, cv.width, cv.height); return;
+  }
   var ctx = cv.getContext("2d");
   var accent = cssVar("--accent") || "#38BDF8";
   (function loop() {
+    if (document.hidden) { FX.raf = 0; return; }   /* tab hidden → loop ends */
     ctx.clearRect(0, 0, FX.w, FX.h);
     ctx.fillStyle = accent;
     FX.pts.forEach(function (p) {
@@ -675,10 +769,44 @@ function seedFX() {
     FX.raf = requestAnimationFrame(loop);
   })();
 }
+/* rAF lifecycle: stop the particle loop while the tab is hidden, resume on return */
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) { cancelAnimationFrame(FX.raf); FX.raf = 0; }
+  else if (FX.pts.length) seedFX();
+});
 
 /* ================================================================ charts */
 function cssVar(v) {
   return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+}
+/* data sanitization — null / undefined / NaN never reach Chart.js:
+   primitives become null (a clean gap, index alignment kept), numeric strings
+   are coerced, and non-numeric payload objects (tooltip data) are left alone. */
+function sanitizeData(cfg) {
+  try {
+    var sets = (cfg.data && cfg.data.datasets) || [];
+    sets.forEach(function (ds) {
+      if (!Array.isArray(ds.data)) return;
+      ds.data = ds.data.map(function (v) {
+        if (v == null) return null;
+        if (typeof v === "number") return isFinite(v) ? v : null;
+        if (typeof v === "object") {
+          var o = {};
+          for (var k in v) {
+            var vv = v[k];
+            if (typeof vv === "number") o[k] = isFinite(vv) ? vv : null;
+            else if (typeof vv === "string" && vv !== "" && isFinite(Number(vv)) &&
+                     /^[-+]?[\d.]+([eE][-+]?\d+)?$/.test(vv)) o[k] = Number(vv);
+            else o[k] = vv;
+          }
+          return o;
+        }
+        var nv = Number(v);
+        return isFinite(nv) ? nv : null;
+      });
+    });
+  } catch (err) { /* never let sanitization break the view */ }
+  return cfg;
 }
 function mkChart(id, cfg) {
   var el = document.getElementById(id);
@@ -706,11 +834,23 @@ function mkChart(id, cfg) {
     };
   }
   if (circular) delete cfg.options.scales;
+  sanitizeData(cfg);
   CH[id] = new Chart(el, cfg);
   return CH[id];
 }
 function destroyCharts() {
   Object.keys(CH).forEach(function (k) { try { CH[k].destroy(); } catch (e) {} delete CH[k]; });
+}
+/* redraw hand-drawn canvases (sky map, ground track, Bloch sphere) after a
+   viewport change — sidebar overlay toggles, window resize or theme refresh.
+   This is the canvas equivalent of Leaflet's map.invalidateSize(). */
+function relayoutMaps() {
+  try {
+    if (CURRENT === "astronomy" && D.objects) drawSky("skyMap", D.objects.rows || []);
+    if (SAT_SEL && document.getElementById("satMap")) drawGroundTrack($("#satMap"), SAT_SEL);
+    if (CURRENT === "quantum" && document.getElementById("blochCv")) drawBloch("blochCv", BLOCH.t, BLOCH.p);
+    Object.keys(CH).forEach(function (k) { try { CH[k].resize(); } catch (e) {} });
+  } catch (e) { /* redraw is best-effort */ }
 }
 function PALETTE() {
   return [cssVar("--accent"), "#818CF8", "#34D399", "#FBBF24", "#F87171", "#F472B6", "#22D3EE", "#A3E635"];
@@ -992,7 +1132,9 @@ VIEWS.ai = function () {
         }).join("") + "</ul>" +
       '<div class="disclaim">The greeting is a hard constraint in <span class="mono">agent4_aimors.py</span> — ' +
       "if the model omits it, the agent prepends it before the answer is returned.</div></div>" +
-      '<div><div class="fld"><div class="fl">Ask Ai.Mors directly</div>' +
+      '<div><div class="fld"><div class="fl">Ask Ai.Mors directly' +
+      '<button type="button" id="chatCol" aria-expanded="true" aria-controls="chatOut" ' +
+      'title="Collapse / expand the chat panel">▾ chat</button></div>' +
       '<div class="filters"><input type="search" id="chatQ" style="flex:1;min-width:200px" dir="auto" ' +
       'placeholder="اسأل سؤالاً فلكياً… e.g. what is the fastest CME speed?">' +
       '<button class="btn pri" data-act="chat">Ask</button></div>' +
@@ -1148,7 +1290,7 @@ function renderMorsChat(box, j) {
   var body = String(j.reply || "").split("\n");
   var head = body.shift() || "";
   var html = '<div class="tier t3"><div class="tl2">' + esc(head) + "</div>" +
-    '<p class="ar">' + esc(body.join("\n")).replace(/\n/g, "<br>") + "</p></div>";
+    '<div class="ar mdbody">' + mdHtml(body.join("\n")) + "</div></div>";
   html += '<div class="trace">[ <b>Ai.Mors</b> | engine: ' + esc(j.engine || "—") +
     " | greeting_ok: " + esc(String(!!j.greeting_ok)) +
     " | trace: " + esc((j.trace || []).join(", ") || "none") +
@@ -1809,6 +1951,7 @@ function showImageDetail(r) {
 }
 /* ================================================================ SATELLITE */
 var SAT_SEL = null;
+var BLOCH = { t: 0, p: 0 };   /* last drawn Bloch state — kept for redraws */
 function drawGroundTrack(el, sat) {
   if (!el) return;
   var dpr = window.devicePixelRatio || 1;
@@ -2138,7 +2281,9 @@ VIEWS.quantum = function () {
     function pick(i) {
       var s = states[i];
       if (!s) return;
-      drawBloch("blochCv", (s.bloch && s.bloch.theta) || 0, (s.bloch && s.bloch.phi) || 0);
+      BLOCH.t = (s.bloch && s.bloch.theta) || 0;
+      BLOCH.p = (s.bloch && s.bloch.phi) || 0;
+      drawBloch("blochCv", BLOCH.t, BLOCH.p);
       $("#blochLbl").textContent = s.id + " · " + s.label +
         " · amplitudes [" + (s.amplitudes || []).map(function (a) { return n2(a, 4); }).join(", ") + "]";
       $$("#qsFilters .chip").forEach(function (c, j) { c.classList.toggle("on", j === i); });
@@ -2798,6 +2943,62 @@ function runSearch() {
 }
 
 /* ================================================================ EVENTS */
+/* ---------------------------------------------------------------- run locally
+   Same commands as the README "Run locally" section — copyable from the UI */
+var RL_CMDS = [
+  "git clone https://github.com/laythraad/ASI-HACK-Space-Analytics-Engine.git",
+  "cd ASI-HACK-Space-Analytics-Engine && python3 -m http.server 8000"
+];
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    return navigator.clipboard.writeText(t).catch(function () { return copyTextFallback(t); });
+  return copyTextFallback(t);
+}
+function copyTextFallback(t) {
+  var ta = document.createElement("textarea");
+  ta.value = t; ta.style.cssText = "position:fixed;opacity:0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch (e) {}
+  ta.remove(); return Promise.resolve();
+}
+function openRunLocal() {
+  var ov = document.getElementById("rlOverlay");
+  if (!ov) {
+    ov = document.createElement("div");
+    ov.id = "rlOverlay"; ov.className = "rlOverlay";
+    ov.setAttribute("role", "dialog");
+    ov.setAttribute("aria-label", "Run MORS locally");
+    ov.innerHTML =
+      '<div class="rlBox">' +
+      "<h3>\u25B6 Run MORS locally</h3>" +
+      '<div class="rlSub">pure static site \u00B7 no build step \u00B7 stdlib Python only</div>' +
+      RL_CMDS.map(function (c, i) {
+        return '<div class="rlRow"><code>' + esc(c) + "</code>" +
+          '<button type="button" class="rlCopy" data-cmd="' + i + '">\u23FB Copy</button></div>';
+      }).join("") +
+      '<div class="rlNote">open <b>http://localhost:8000/</b> \u2192 launcher with both UIs, dashboards at ' +
+      "<b>/static/index.html</b> and <b>/static/mors.html</b> (identical to the live site \u2014 snapshot mode).<br>" +
+      "For the <b>full live backend</b> (Gemini chat + real 4-agent pipeline): " +
+      '<span class="mono">pip install -r requirements.txt && python main.py</span> \u2192 http://127.0.0.1:5000</div>' +
+      '<button type="button" class="rlX" data-close aria-label="Close">\u2715</button>' +
+      "</div>";
+    document.body.appendChild(ov);
+    ov.addEventListener("click", function (e) {
+      if (e.target === ov || (e.target.closest && e.target.closest("[data-close]"))) {
+        ov.classList.remove("on"); return;
+      }
+      var cp = e.target.closest && e.target.closest(".rlCopy[data-cmd]");
+      if (cp) {
+        copyText(RL_CMDS[Number(cp.dataset.cmd)]).then(function () {
+          cp.textContent = "\u2713 Copied";
+          setTimeout(function () { cp.textContent = "\u23FB Copy"; }, 1600);
+        });
+      }
+    });
+  }
+  ov.classList.add("on");
+}
+
 function bindEvents() {
   document.addEventListener("click", function (e) {
     var t = e.target;
@@ -2879,7 +3080,13 @@ function bindEvents() {
     if (t.id === "scrim") { closeAll(); return; }
     if (t.id === "btnCustom") { $("#drawer").classList.add("on"); openScrim(true); return; }
     if (t.closest && t.closest("#btnTheme")) { cycleTheme(); return; }
-    if (t.id === "burger") { $("#sidebar").classList.toggle("on"); return; }
+    if (t.id === "burger") {
+      $("#sidebar").classList.toggle("on");
+      /* sidebar accordion/overlay finished moving → canvases may need a redraw */
+      clearTimeout(bindEvents._sb);
+      bindEvents._sb = setTimeout(relayoutMaps, 300);
+      return;
+    }
     if (t.id === "btnReset") {
       localStorage.removeItem(LS);
       S.theme = "dark"; S.planet = "earth"; S.accent = null; S.grid = "off"; S.particles = "low";
@@ -2888,6 +3095,15 @@ function bindEvents() {
       applySettings(); toast("MORS defaults restored");
       return;
     }
+    if (t.id === "chatCol") {
+      var chatFld = t.closest(".fld");
+      var chatCol = chatFld.classList.toggle("collapsed");
+      t.setAttribute("aria-expanded", String(!chatCol));
+      t.textContent = chatCol ? "▴ chat" : "▾ chat";
+      return;
+    }
+    var rlBtn = t.closest && t.closest("[data-runlocal]");
+    if (rlBtn) { e.preventDefault(); openRunLocal(); return; }
 
     var opt = t.closest && t.closest("#drawer .opt button");
     if (opt) {
@@ -2906,7 +3122,12 @@ function bindEvents() {
   });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") { closeAll(); $("#sres").classList.remove("on"); }
+    if (e.key === "Escape") {
+      closeAll();
+      $("#sres").classList.remove("on");
+      var rlo = document.getElementById("rlOverlay");
+      if (rlo) rlo.classList.remove("on");
+    }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
       e.preventDefault(); $("#q").focus();
     }
@@ -2921,11 +3142,17 @@ function bindEvents() {
     clearTimeout(bindEvents._r);
     bindEvents._r = setTimeout(function () {
       seedFX();
-      if (CURRENT === "astronomy" && D.objects) drawSky("skyMap", D.objects.rows || []);
-      if (SAT_SEL && $("#satMap")) drawGroundTrack($("#satMap"), SAT_SEL);
+      relayoutMaps();
     }, 220);
   });
 }
+
+/* resilience: surface simulation mode instead of a silent blank state */
+window.addEventListener("offline", showOfflineBadge);
+window.addEventListener("unhandledrejection", function (ev) {
+  var m = String((ev.reason && ev.reason.message) || ev.reason || "");
+  if (/fetch|network|Failed to load|load failed/i.test(m)) showOfflineBadge();
+});
 
 /* ================================================================ BOOT */
 function routeFromHash() {
