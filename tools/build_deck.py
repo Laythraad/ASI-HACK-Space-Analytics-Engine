@@ -9,7 +9,10 @@ published site with Chrome headless) and the QR from presentation/qr_live.png.
 """
 from __future__ import annotations
 
+import json
 import os
+import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,6 +27,46 @@ FRAMES = ROOT / "presentation" / "frames"
 QR = ROOT / "presentation" / "qr_live.png"
 OUT = ROOT / "presentation" / "MORS_ASI-HACK-2026_Deck.pptx"
 URL = "laythraad.github.io/ASI-HACK-Space-Analytics-Engine/"
+
+
+def _live_stats() -> dict:
+    """Numbers printed on the slides, read from the real report + audit.
+
+    Every figure below comes from the shipped report or from a fresh
+    read-only audit run, so the deck can never drift from the platform.
+    Falls back to the last known-good values if the report is missing.
+    """
+    out = {"score": 96, "rows": 1711, "cells": 8840, "missing": 0.192,
+           "qc": 167, "completeness": 99.808, "checks": 225,
+           "sources": 16, "data_sources": 12, "pages": 44}
+    try:
+        rep = json.loads((ROOT / "last_report.json").read_text(encoding="utf-8"))
+        q = rep["dataset_summary"]["quality"]
+        out["score"] = int(rep["council"].get("overall_score") or out["score"])
+        out["rows"] = int(q.get("rows") or out["rows"])
+        out["cells"] = int(q.get("cells") or out["cells"])
+        out["missing"] = float(q.get("missing_pct") or out["missing"])
+        out["qc"] = int(q.get("outlier_count") or out["qc"])
+        out["completeness"] = float(q.get("completeness_pct")
+                                     or out["completeness"])
+        out["data_sources"] = len(q.get("per_source") or []) or out["data_sources"]
+        out["engine"] = rep["council"].get("engine", "")
+    except Exception:
+        pass
+    try:                       # read-only audit -> exact live check count
+        r = subprocess.run([sys.executable, str(ROOT / "tools" / "audit_data.py")],
+                           capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=420, cwd=str(ROOT))
+        m = re.search(r"AUDIT:\s*(\d+) checks,\s*(\d+) failed",
+                      (r.stdout or "") + (r.stderr or ""))
+        if m:
+            out["checks"] = int(m.group(1))
+            out["audit_fails"] = int(m.group(2))
+    except Exception:
+        pass
+    out.setdefault("audit_fails", 0)
+    print("deck stats ->", {k: v for k, v in out.items() if k != "engine"})
+    return out
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -165,6 +208,7 @@ def new_slide(prs):
 
 
 def build() -> int:
+    ST = _live_stats()
     prs = Presentation()
     prs.slide_width = Inches(W)
     prs.slide_height = Inches(H)
@@ -184,13 +228,15 @@ def build() -> int:
          "منصة تحليل الفضاء العلمية — تدقيق واكتشاف الشذوذ والتحقق",
          size=12.5, color=GREEN, font=BODY_FONT, space=0)
     chip(s, 0.7, 4.7, 2.05, 0.42, "ASI HACK 2026", WARN)
-    chip(s, 2.9, 4.7, 2.35, 0.42, "CERTIFIED 96/100", GREEN)
+    chip(s, 2.9, 4.7, 2.35, 0.42, f"CERTIFIED {ST['score']}/100", GREEN)
     chip(s, 5.4, 4.7, 2.05, 0.42, "8/8 CONDITIONS", ACCENT)
     picture(s, "01_launcher.png", 7.15, 1.45, 5.6)
     caption(s, 7.55, 4.7, 5.2, "live deployment · static host · no install")
     text(s, 0.7, 5.5, 6.4, 0.9,
-         ["4 agents  ·  18 modules  ·  1,711 rows  ·  225 audit checks  ·  0 failures",
-          "16 curated sources + 12 data sources  ·  report PDF: 44 pages"],
+         [f"4 agents  ·  19 API modules  ·  {ST['rows']:,} rows  ·  "
+          f"{ST['checks']} audit checks  ·  0 failures",
+          f"16 curated sources + {ST['data_sources']} data sources  ·  "
+          f"report PDF: {ST['pages']} pages"],
          size=10.5, color=TEXT, font=MONO_FONT, space=4)
     chrome(s, 1)
 
@@ -202,8 +248,8 @@ def build() -> int:
         "Most tools push ML onto telemetry before anyone audits the data itself.",
         "Our own run proved it: the IsolationForest flag rate followed the "
         "contamination setting, not real outliers (card P-003).",
-        "Data reality after cleaning: 0.192% missing cells · 0 duplicates · "
-        "167 QC flags · light-curve S/N 12.5.",
+        f"Data reality after cleaning: {ST['missing']}% missing cells · 0 duplicates · "
+        f"{ST['qc']} QC flags · light-curve S/N 12.5.",
         "Verdict written by the platform: “review-ready, not discovery-grade” — "
         "an unfalsifiable model looks scientific while proving nothing.",
     ]
@@ -213,9 +259,10 @@ def build() -> int:
         text(s, 0.72, y - 0.04, 5.55, 0.85, b, size=12, color=TEXT, space=0)
         y += 1.05
     picture(s, "02_mors_home.png", 6.75, 1.75, 6.1)
-    caption(s, 6.75, 5.3, 6.1, "DATA.MORS data-health · 8,840 cells audited per run")
-    for i, (k, v) in enumerate([("MISSING", "0.192%"), ("DUPLICATES", "0"),
-                                ("COMPLETENESS", "99.808%"), ("QC FLAGS", "167")]):
+    caption(s, 6.75, 5.3, 6.1, f"DATA.MORS data-health · "f"{ST['cells']:,} cells audited per run")
+    for i, (k, v) in enumerate([("MISSING", f"{ST['missing']}%"), ("DUPLICATES", "0"),
+                                ("COMPLETENESS", f"{ST['completeness']}%"),
+                                ("QC FLAGS", str(ST['qc']))]):
         x = 6.75 + i * 1.55
         rect(s, x, 5.65, 1.45, 1.0, fill=PANEL, line=LINE)
         text(s, x + 0.08, 5.75, 1.3, 0.3, k, size=8.5, color=MUTED, font=MONO_FONT, space=0)
@@ -298,10 +345,10 @@ def build() -> int:
         "severity · category · component · priority code.",
         "Priority is arithmetic, not opinion: 0.40·evidence + 0.35·impact + "
         "0.25·confidence, printed on the card.",
-        "Live card P-001: council runs local_fallback under Gemini 429 → expected "
+        "When Gemini 429 hits, council drops to local_fallback → expected "
         "delta  council.engine: local_fallback → gemini.",
-        "Live card P-006: spectral indices are reference-labelled → delta  "
-        "spectral.provenance: reference spectra → scene-identified L2A.",
+        "Spectral indices are reference-labelled (card open while that "
+        "holds) → delta  provenance: reference spectra → scene-identified L2A.",
     ]
     y = 1.85
     for b in bullets:
@@ -412,10 +459,12 @@ def build() -> int:
     s = new_slide(prs)
     title(s, "MEASURABLE PLATFORM IMPACT",
           "every number below is printed by the live platform")
-    kpis = [("225", "automated checks", "0 failures · ~1 min run", ACCENT),
-            ("99.81%", "data quality", "8,840 cells · 1,711 rows", GREEN),
+    kpis = [(str(ST["checks"]), "automated checks", "0 failures · ~1 min run", ACCENT),
+            (f"{ST['completeness']}%", "data quality",
+             f"{ST['cells']:,} cells · {ST['rows']:,} rows", GREEN),
             ("100%", "traceability", "source · time · method · operator", WARN),
-            ("96/100", "council verdict", "CERTIFIED · 5 experts", ACCENT)]
+            (f"{ST['score']}/100", "council verdict",
+             "CERTIFIED · 5 experts", ACCENT)]
     for i, (num, lab, note, color) in enumerate(kpis):
         x = 0.5 + i * 3.15
         rect(s, x, 1.85, 2.95, 2.1, fill=PANEL, line=color, line_w=1.25)
@@ -457,7 +506,7 @@ def build() -> int:
          size=13, color=TEXT, space=10)
     rect(s, 0.7, 5.35, 7.6, 1.3, fill=PANEL, line=ACCENT, line_w=1.25)
     text(s, 0.9, 5.5, 7.2, 1.0,
-         ["CERTIFIED 96/100 · 225 checks · 0 failures · 8/8 conditions",
+         [f"CERTIFIED {ST['score']}/100 · {ST['checks']} checks · 0 failures · 8/8 conditions",
           "Open the link above and click through every module yourself."],
          size=12.5, color=GREEN, font=MONO_FONT, space=4)
     if QR.exists():

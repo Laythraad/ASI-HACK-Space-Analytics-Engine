@@ -24,12 +24,13 @@ INCLUDE = [
     "START.bat",
     "index.html",
     "README.md",
+    "LICENSE",
     "المشكلات_التي_تم_حلها.md",
     "DEPLOYMENT.md",
     "requirements.txt",
     "render.yaml",
     ".python-version",
-    ".env",
+    ".env.example",
     ".gitignore",
     "last_report.json",
     "agents/__init__.py",
@@ -65,6 +66,15 @@ INCLUDE = [
     "data/light_pollution_reference.csv",
     "data/spectral_reference.csv",
 ]
+
+# dynamic payload: the full static snapshot the hosted demo serves
+for _dir, _sub in (("static/api", None), ("presentation", None)):
+    for _root, _dirs, _files in os.walk(os.path.join(ROOT, _dir)):
+        _dirs[:] = [d for d in _dirs if d not in ("_qa", "__pycache__")]
+        for _f in sorted(_files):
+            if _f.lower().endswith((".json", ".pdf", ".pptx", ".png", ".mp4")):
+                INCLUDE.append(os.path.relpath(os.path.join(_root, _f),
+                                               ROOT).replace("\\", "/"))
 
 # roles come from the curated registry that also drives docs/PROJECT_GUIDE.pdf
 sys.path.insert(0, os.path.join(ROOT, "tools"))

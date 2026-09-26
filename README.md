@@ -63,7 +63,7 @@ python main.py                 # leave the server running
 python tools\audit_data.py     # -> RESULT: AUDIT: PASS
 ```
 
-Read-only battery of **225 checks** (223–227 as problem cards activate):
+Read-only battery of **224 checks** (223–227 as problem cards activate):
 priority-formula math, Kepler period/velocity consistency, habitability-gate
 reproduction, CME-vs-FLR counting, per-body Horizons radii, quantum
 normalisation and unit conversions, spectral PCA, light-pollution direction,
@@ -87,7 +87,7 @@ Environment variables are read from **`.env`** in the project root
 
 ### Requirements
 
-Python **3.10+** (tested on 3.12) on Windows / macOS / Linux. Network access is
+Python **3.11+** (tested on 3.12) on Windows / macOS / Linux. Network access is
 *optional* — every source has a local deterministic fallback. Browser: any
 modern Chromium/Firefox, responsive down to mobile.
 
@@ -119,7 +119,7 @@ Agent 3  Citations     formula + reference enrichment → traceability records
 Agent 4  Ai.Mors       conversational face: Arabic greeting, numbered steps,
                        5-tier protocol, Traceability IDs
    ↓
-UI layer               /static/mors.html (SPA, 10 sections)
+UI layer               /static/mors.html (SPA, 11 sections)
                        /static/index.html (analytics charts)
                        / (launcher: dashboards + PDFs + video)
 ```
@@ -135,9 +135,10 @@ to be live.
 
 ## 3. What the UI gives you
 
-**Sidebar sections (10):** MORS Home · AI.MORS · DATA.MORS · ASTRONOMY.MORS ·
+**Sidebar sections (11):** MORS Home · AI.MORS · DATA.MORS · ASTRONOMY.MORS ·
 SATELLITE.MORS · QUANTUM.MORS · Problems → Solutions · Solutions Center ·
-PROJECTS.MORS · TEAM.MORS (plus SOURCES.MORS).
+PROJECTS.MORS · SOURCES.MORS · TEAM.MORS. Every section maps 1:1 to a
+`GET /api/mors/<name>` payload (19 modules registered in that index).
 
 * **SATELLITE.MORS** — satellite registry, pass-window estimates
   (`estimate=true`, period-derived, not TLE propagation), ground-track canvases.
@@ -181,13 +182,14 @@ PROJECTS.MORS · TEAM.MORS (plus SOURCES.MORS).
 | Chart.js, three.js (CDN) | charts, 3-D scene | cached by browser | cached by browser |
 
 Without keys every provider degrades to its deterministic local fallback —
-surfaced as problem **P-001** on the dashboard rather than hidden.
+surfaced as an open problem card (**P-001**, only present while the condition
+is live) on the dashboard rather than hidden.
 
 ---
 
 ## 5. Tech stack
 
-* **Backend:** Python 3.10+, Flask, pandas / NumPy, scikit-learn, astropy,
+* **Backend:** Python 3.11+, Flask, pandas / NumPy, scikit-learn, astropy,
   `google-generativeai`.
 * **Frontend:** vanilla ES2020 single-file SPAs (`static/mors.html`,
   `static/index.html`) — no build step, no framework, no bundler; Chart.js for
@@ -243,7 +245,7 @@ agents/
   agent3_citations.py    formula + reference enrichment, traceability records
   agent4_aimors.py       Ai.Mors conversational agent (Arabic greeting, numbered steps)
   datasets.py            science dataset builders reused by the MORS layer
-  mors_data.py           MORS data layer — 17 modules, API → AI → local acquisition
+  mors_data.py           MORS data layer — 19 API modules, API → AI → local acquisition
   sources_data.py        scientific source registry + the 8 hackathon conditions
 static/
   index.html             analytics dashboard (charts, chat, offline hardening)
@@ -251,7 +253,7 @@ static/
   api/*.json             certified snapshot served on GitHub Pages
   offline_assistant.js   offline chat / insight / pipeline engine (static:snapshot)
 tools/
-  audit_data.py          read-only data & analysis audit (225 checks -> AUDIT: PASS)
+  audit_data.py          read-only data & analysis audit (224 checks -> AUDIT: PASS)
   build_static_api.py    regenerates static/api/*.json from a live run
   build_report.py        generates docs/MORS_REPORT.pdf (figures + sources section)
   build_guide.py         generates docs/PROJECT_GUIDE.pdf (file-by-file guide)
@@ -263,7 +265,7 @@ docs/
   COMMITTEE_GUIDE.pdf    printable Arabic edition of the committee guide
 presentation/
   MORS_ASI-HACK-2026_Deck.pptx / .pdf  10-slide pitch deck (16:9)
-  MORS_Pitch_2min.mp4    2-minute pitch video (01:59, English voiceover)
+  MORS_Pitch_2min.mp4    pitch video (Arabic voiceover, edge-tts + ffmpeg)
   frames/                1920x1080 UI captures used by both builders
 prompts/                 prompt templates used by the agents
 data/                    reference CSVs (light pollution, spectra, Kp, metrics)
@@ -305,7 +307,7 @@ python tools\build_report.py    # writes docs\MORS_REPORT.pdf
 python tools\build_guide.py     # writes docs\PROJECT_GUIDE.pdf
 python tools\build_committee.py # writes 00_COMMITTEE_GUIDE.md + docs\COMMITTEE_GUIDE.pdf
 python tools\build_deck.py      # writes presentation\MORS_ASI-HACK-2026_Deck.pptx (+ .pdf/.png via PowerPoint)
-python tools\build_video.py     # writes presentation\MORS_Pitch_2min.mp4 (System.Speech TTS + ffmpeg)
+python tools\build_video.py     # writes presentation\MORS_Pitch_2min.mp4 (edge-tts ar-SA + ffmpeg)
 ```
 
 The report pulls live figures from `/api/report` and `/api/mors/*`, so it
@@ -319,7 +321,8 @@ the bottom of `requirements.txt`.
 
 * Gemini free-tier quota (HTTP 429) degrades Agents 2/3/4 to the
   deterministic **local fallback** engines; the report still certifies but is
-  *not* LLM cross-verified — surfaced as problem **P-001**.
+  *not* LLM cross-verified — surfaced as an open problem card (**P-001**
+  while that condition holds).
 * On GitHub Pages (no backend) everything runs from the snapshot: answers are
   canned-but-labelled, the pipeline is simulated stage-by-stage, and the badge
   `[MORS OFFLINE SIMULATION MODE]` is shown.
@@ -334,6 +337,9 @@ the bottom of `requirements.txt`.
 ---
 
 ## 11. License / credits
+
+Source code is released under the [MIT License](LICENSE) (third-party data
+terms apply — see the note inside the LICENSE file).
 
 Built for the **ASI Hack — AI for Space Challenges** track.
 Data: NASA (DONKI, NEOWS, Horizons, GIBS, APOD, Exoplanet Archive), NOAA SWPC,

@@ -2,10 +2,10 @@
 
 **MORS Scientific Command Center** — نسخة نصية من `docs/COMMITTEE_GUIDE.pdf`.
 
-- **تاريخ التوليد:** 2026-09-25 06:22 UTC
-- **رقم التشغيل (run_id):** `run-20260925-061746-46a7`
-- **حالة المجلس العلمي:** CERTIFIED — 96
-- **عدد الملفات في الحزمة:** 35
+- **تاريخ التوليد:** 2026-09-26 07:53 UTC
+- **رقم التشغيل (run_id):** `run-20260926-042301-0004`
+- **حالة المجلس العلمي:** CERTIFIED — 98
+- **عدد الملفات المُنتقاة في الجدول:** 36 (القائمة الكاملة في 00_MANIFEST.txt)
 
 > اقرأ هذا الدليل من الأعلى للأسفل؛ كل قسم ينتهي بنتيجة قابلة للتحقق بأمر واحد. إن أردت الأدلة التفصيلية فالمرجع `docs/MORS_REPORT.pdf`.
 
@@ -13,7 +13,7 @@
 
 - 1. نظرة عامة على الحزمة
 - 2. كيف تقيّم المشروع خلال خمس دقائق
-- 3. محتويات الحزمة — كل ملف وما يفعله
+- 3. الملفات الرئيسية — كل ملف وما يفعله
 - 4. المعمارية: خط أنابيب الوكيلاء الأربعة
 - 5. أرقام حيّة يمكن للجنة التحقق منها
 - 6. الشروط الثمانية — كيف تخدم المصادر الفريق
@@ -31,13 +31,13 @@
 
 الحزمة قائمة بذاتها (self-contained): تُفكّ وتُشغّل بأمر واحد، ولا تحتاج أي خطوة بناء أو تجميع (no build step). كل مستند في الحزمة مولّد من الكود نفسه، لذلك لا يمكن أن يتعارض مع ما هو مكتوب فيه.
 
-- **ملفات الحزمة** — 35
-- **أسطر بايثون وHTML** — 16,530
+- **ملفات مُنتقاة** — 36
+- **أسطر بايثون وHTML** — 17,798
 - **وحدات MORS** — 19
 - **مصادر علمية** — 16
-- **جودة البيانات** — 99.81/100
-- **صفوف معالَجة** — 1,711
-- **نتيجة المجلس العلمي** — CERTIFIED 96/100
+- **جودة البيانات** — 99.84/100
+- **صفوف معالَجة** — 1,714
+- **نتيجة المجلس العلمي** — CERTIFIED 98/100
 - **حالة الاختبار** — SELFTEST: PASS
 
 #### ما الذي يحققه المشروع في شروط الهاكاثون
@@ -52,8 +52,8 @@
 | # | الإجراء | النتيجة المتوقعة |
 |---|---|---|
 | 1 | فكّ ضغط الحزمة ثم شغّل START.bat (أو python main.py) | خادم Flask يعمل على http://127.0.0.1:5000 |
-| 2 | افتح http://127.0.0.1:5000/mors | واجهة MORS: شريط صحة البيانات + 18 وحدة في الشريط الجانبي |
-| 3 | اضغط زر تشغيل الخط أنابيب (POST /api/pipeline/run) | تقرير معتمد 96/100 من خمسة خبراء (CERTIFIED) |
+| 2 | افتح http://127.0.0.1:5000/mors | واجهة MORS: شريط صحة البيانات + 11 قسمًا و19 وحدة API |
+| 3 | اضغط زر تشغيل الخط أنابيب (POST /api/pipeline/run) | تقرير معتمد 98/100 من خمسة خبراء (CERTIFIED) |
 | 4 | افتح http://127.0.0.1:5000/mors#/sources | SOURCES.MORS: 16 مصدرًا علميًا + الشروط الثمانية |
 | 5 | شغّل python main.py --selftest | سطر أخير: SELFTEST : PASS بعد نحو 75 ثانية |
 | 6 | اقرأ 00_COMMITTEE_GUIDE.md ثم docs/COMMITTEE_GUIDE.pdf | هذا الدليل؛ ثم docs/MORS_REPORT.pdf للأدلة التفصيلية |
@@ -61,52 +61,53 @@
 
 #### ملاحظة عن مفاتيح API
 
-المشروع يعمل من دون مفاتيح بالوضع المحلي الاحتياطي (local_model)، لكن .env يحوي مفتاح NASA ومتغيرات نماذج Gemini. إن لم تتوفر حصيلة (quota) مجانية، تنتقل الوكيلاء تلقائيًا إلى المحرك الاحتياطي الحتمي ويسجَّل هذا التحويل في council.engine وفي مشكلة P-001 — أي أن المشروع لا يتوقف ولا يختلق نتيجة بديلة.
+المشروع يعمل من دون مفاتيح بالوضع المحلي الاحتياطي (local_model)، لكن .env يحوي مفتاح NASA ومتغيرات نماذج Gemini. إن لم تتوفر حصيلة (quota) مجانية، تنتقل الوكيلاء تلقائيًا إلى المحرك الاحتياطي الحتمي ويسجَّل هذا التحويل في council.engine وفي بطاقة المشكلة المخصَّصة لذلك (P-001) ما دامت الحالة مفتوحة — أي أن المشروع لا يتوقف ولا يختلق نتيجة بديلة.
 
 
-## 3. محتويات الحزمة — كل ملف وما يفعله
+## 3. الملفات الرئيسية — كل ملف وما يفعله
 
-القائمة بترتيب القراءة المقدَّم: المستندات المُصدَّرة أولًا، ثم نقطة الدخول، ثم الوكيلون، ثم الواجهات، ثم أدوات التوليد، ثم المستندات.
+قائمة القراءة المختصرة (٣٥ ملفًا مُنتقى) بترتيبها المقترح: المستندات المُصدَّرة أولًا، ثم نقطة الدخول، ثم الوكيلون، ثم الواجهات، ثم أدوات التوليد؛ القائمة الكاملة بكل ملف ومقاسه وبصمته موجودة في 00_MANIFEST.txt.
 
 | الملف | الحجم | الدور |
 |---|---|---|
-| 00_COMMITTEE_GUIDE.md | 26.6 KB | Submission guide for the judging committee (Markdown) |
-| 00_MANIFEST.txt | 6.0 KB | Package manifest (size + SHA-256 per file) |
-| main.py | 30.3 KB | Flask orchestrator, HTTP API and CLI entry point |
-| START.bat | 4.5 KB | Windows launcher with environment checks |
-| requirements.txt | 469 B | Python dependency list |
-| README.md | 9.5 KB | Front door: how to run, what it does, what it does not do |
-| المشكلات_التي_تم_حلها.md | 23.2 KB | Problems solved — data & analysis defect log (Arabic) |
-| DEPLOYMENT.md | 15.5 KB | Operations and deliverables manual |
-| .env | 1.5 KB | Secrets — never committed |
-| .gitignore | 164 B | Keeps secrets and runtime artifacts out of the repository |
-| last_report.json | 82.1 KB | Persisted copy of the most recent pipeline report |
+| 00_COMMITTEE_GUIDE.md | 27.1 KB | Submission guide for the judging committee (Markdown) |
+| 00_MANIFEST.txt | 13.1 KB | Package manifest (size + SHA-256 per file) |
+| main.py | 34.1 KB | Flask orchestrator, HTTP API and CLI entry point |
+| START.bat | 4.3 KB | Windows launcher with environment checks |
+| requirements.txt | 1.0 KB | Python dependency list |
+| README.md | 15.7 KB | Front door: how to run, what it does, what it does not do |
+| LICENSE | 2.0 KB | MIT license for the source code + data terms note |
+| المشكلات_التي_تم_حلها.md | 23.1 KB | Problems solved — data & analysis defect log (Arabic) |
+| DEPLOYMENT.md | 17.3 KB | Operations and deliverables manual |
+| .env.example | 305 B | Template for the secrets file — no real keys |
+| .gitignore | 282 B | Keeps secrets and runtime artifacts out of the repository |
+| last_report.json | 81.3 KB | Persisted copy of the most recent pipeline report |
 | agents/__init__.py | 341 B | Package façade for the four agents |
 | agents/agent1_ingestion.py | 37.8 KB | Agent 1 — Ingest & Clean |
 | agents/agent2_council.py | 15.3 KB | Agent 2 — Council of Five |
 | agents/agent3_citations.py | 15.8 KB | Agent 3 — Citations & traceability |
 | agents/agent4_aimors.py | 12.7 KB | Agent 4 — Ai.Mors conversational agent |
 | agents/datasets.py | 32.4 KB | Dataset builders for the science widgets |
-| agents/mors_data.py | 105.6 KB | MORS data layer — the 17 science modules |
+| agents/mors_data.py | 111.2 KB | MORS data layer — 19 API modules |
 | agents/sources_data.py | 28.8 KB | Scientific source registry and hackathon condition map |
-| static/index.html | 44.2 KB | Legacy ASI-HACK dashboard (single file, no build step) |
-| static/mors.html | 169.6 KB | MORS Scientific Command Center SPA |
-| tools/audit_data.py | 48.3 KB | Read-only data & analysis audit (225 checks, 223–227 range) |
-| tools/build_report.py | 83.9 KB | Generates docs/MORS_REPORT.pdf |
-| tools/build_guide.py | 47.3 KB | Generates this document (docs/PROJECT_GUIDE.pdf) |
-| tools/build_committee.py | 40.6 KB | Generates 00_COMMITTEE_GUIDE.md and docs/COMMITTEE_GUIDE.pdf |
-| tools/build_zip.py | 4.0 KB | Portable packager — writes the submitted archive |
+| static/index.html | 58.0 KB | Legacy ASI-HACK dashboard (single file, no build step) |
+| static/mors.html | 192.5 KB | MORS Scientific Command Center SPA |
+| tools/audit_data.py | 50.9 KB | Read-only data & analysis audit (224 checks) |
+| tools/build_report.py | 84.2 KB | Generates docs/MORS_REPORT.pdf |
+| tools/build_guide.py | 47.0 KB | Generates this document (docs/PROJECT_GUIDE.pdf) |
+| tools/build_committee.py | 41.3 KB | Generates 00_COMMITTEE_GUIDE.md and docs/COMMITTEE_GUIDE.pdf |
+| tools/build_zip.py | 4.7 KB | Portable packager — writes the submitted archive |
 | prompts/council_prompt.txt | 4.9 KB | System prompt for Agent 2 (Council of Five) |
 | prompts/aimors_prompt.txt | 4.8 KB | System prompt for Agent 4 (Ai.Mors) |
 | data/light_pollution_reference.csv | 657 B | Reference night-light / sky-brightness table |
 | data/reference_metrics.csv | 652 B | Reference metrics for the quality audit |
 | data/spectral_reference.csv | 406 B | Laboratory emission-line list |
-| docs/API_CONTRACT.md | 21.4 KB | Machine-readable-ish API contract |
-| docs/MORS_REPORT.pdf | 549.6 KB | Generated platform report (43 pages) |
-| docs/PROJECT_GUIDE.pdf | 182.2 KB | This document |
-| docs/COMMITTEE_GUIDE.pdf | 142.8 KB | Submission guide for the judging committee (PDF) |
+| docs/API_CONTRACT.md | 21.5 KB | Machine-readable-ish API contract |
+| docs/MORS_REPORT.pdf | 550.1 KB | Generated platform report (44 pages) |
+| docs/PROJECT_GUIDE.pdf | 182.7 KB | This document |
+| docs/COMMITTEE_GUIDE.pdf | 143.7 KB | Submission guide for the judging committee (PDF) |
 
-الإجمالي 35 ملفًا بحجم 1794 كيلوبايت (قبل الضغط).
+إجمالي الملفات المُنتقاة هنا: 36 ملفًا بحجم 1862 كيلوبايت (قبل الضغط)؛ أضف إليها لقطة static/api/ وملفات presentation/ التي تُدرَج تلقائيًا عند التغليف.
 
 
 ## 4. المعمارية: خط أنابيب الوكيلاء الأربعة
@@ -135,41 +136,41 @@
 
 كل رقم في هذا القسم يأتي من استجابة API مباشرة وقت توليد الدليل؛ يمكن إعادة قراءتها بأمر واحد كما في القسم 9.
 
-- **الجودة** — 99.81/100
-- **الصفوف** — 1,711
+- **الجودة** — 99.84/100
+- **الصفوف** — 1,714
 - **الأقمار** — 50
-- **المشكلات** — 5
+- **المشكلات** — 4
 - **الوحدات** — 19
 - **المصادر** — 16
-- **النتيجة** — 96/100
+- **النتيجة** — 98/100
 - **القرار** — CERTIFIED
 
 | المؤشر | القيمة | النقطة (endpoint) |
 |---|---|---|
-| جودة البيانات | 99.81/100 | /api/mors/datahealth |
-| الصفوف المعالَجة | 1,711 | /api/mors/datahealth |
+| جودة البيانات | 99.84/100 | /api/mors/datahealth |
+| الصفوف المعالَجة | 1,714 | /api/mors/datahealth |
 | المصادر الحية | 8 | /api/mors/datahealth |
-| الخلايا الناقصة | 0.192% | /api/mors/datahealth |
+| الخلايا الناقصة | 0.158% | /api/mors/datahealth |
 | الصفوف المكرّرة | 0% | /api/mors/datahealth |
-| الاكتمال | 99.808% | /api/mors/datahealth |
-| الدقة | 99.81% | /api/mors/datahealth |
-| الشواذ المكتشفة | 167 (9.76%) | /api/mors/datahealth |
-| قرار المجلس العلمي | CERTIFIED — 96/100 (محرك local_fallback) | /api/report |
+| الاكتمال | 99.842% | /api/mors/datahealth |
+| الدقة | 99.84% | /api/mors/datahealth |
+| الشواذ المكتشفة | 166 (9.685%) | /api/mors/datahealth |
+| قرار المجلس العلمي | CERTIFIED — 98/100 (محرك gemini:gemini-flash-latest) | /api/report |
 | الأقمار الصناعية | 50 (LEO 24 / MEO 12 / GEO 14) | /api/mors/satellite |
 | وحدات MORS | 19 | /api/mors |
 | الكواكب خارج المجموعة الشمسية | 59 | /api/mors/exoplanets |
 | أجرام قريبة من الأرض | 12 | /api/mors/objects |
-| انبعاثات كروونية مسجّلة | 125 | /api/data/space-weather |
-| انفجارات شمسية (30 يومًا) | 12 | /api/data/kp-index |
+| انبعاثات كروونية مسجّلة | 129 | /api/data/space-weather |
+| انفجارات شمسية (30 يومًا) | 11 | /api/data/kp-index |
 | أقصى مؤشر Kp | 4.33 من 9 | /api/data/kp-index |
-| ال NEO المراقَب | 32 | /api/data/neo |
+| ال NEO المراقَب | 35 | /api/data/neo |
 | أقرب اقتراب (يوم قمري) | 26.227 LD | /api/data/horizons |
 | علاقة إنتروبيا كمّية (بيل) | 1 ebit | /api/data/quantum |
-| مشكلات مفتوحة (مرتّبة) | 5 | /api/mors/problems |
+| مشكلات مفتوحة (مرتّبة) | 4 | /api/mors/problems |
 
 #### سياق التقرير
 
-رقم التشغيل الحالي run-20260925-061746-46a7 بتاريخ 2026-09-25T06:19:10.118819+00:00؛ خمسة خبراء (Dr. Orbit، Dr. Helios، Dr. Quantel، Dr. Terra، Dr. Vigil) يمنحون درجات مستقلة تُطابق وتُجمَّع، والنتيجة المجمّعة هي المعروضة أعلاه.
+رقم التشغيل الحالي run-20260926-042301-0004 بتاريخ 2026-09-26T04:24:14.930531+00:00؛ خمسة خبراء (Dr. Orbit، Dr. Helios، Dr. Quantel، Dr. Terra، Dr. Vigil) يمنحون درجات مستقلة تُطابق وتُجمَّع، والنتيجة المجمّعة هي المعروضة أعلاه.
 
 
 ## 6. الشروط الثمانية — كيف تخدم المصادر الفريق
@@ -257,7 +258,7 @@ High >= 75   Medium >= 50   otherwise Low
 python main.py --selftest
 # ======================================================
 #   verdict         : CERTIFIED
-#   score           : 96/100
+#   score           : 98/100
 #   Ai.Mors greeting: 'أهلاً وسهلاً بكم في الفضاء' (ok=True)
 #   SELFTEST        : PASS
 ```
@@ -281,15 +282,15 @@ curl http://127.0.0.1:5000/api/mors/datahealth
 
 | الرمز | المشكلة | الأولوية | الثقة |
 |---|---|---|---|
-| P-001 | Council verification running in local fallback | High | 96% |
 | P-006 | Multi-spectral profiles are reference spectra, not imagery | High | 98% |
 | P-003 | Anomaly count is methodologically forced, not discovered | High | 97% |
 | P-005 | Kp index window much shorter than the flare window | Medium | 93% |
 | P-008 | Light-curve SNR leaves limited photometric headroom | Medium | 86% |
 
-- P-001: تحقّق المجلس العلمي يعمل بالمحرك الاحتياطي المحلي عند نفاد حصيلة Gemini المجانية؛ الأرقام نفسها تبقى قابلة للتكرار لكنها غير مُتقاطعة من نموذج لغوي.
+- P-003: عدد الشواذ مشتقّ من معامل تلوث ثابت 0.1 لا من عتبة إحصائية مستنتجة — ولهذا هو معلَّم في التقرير.
+- P-005: نافذة مؤشر Kp أقصر بكثير من نافذة الانبعاثات، والارتباط محسوب على فترة التقاطع المشتركة فقط.
 - P-006: الملفات متعددة الطيف مبنية على طيفات مرجعية لا مشاهد مُصنَّفة فعليًا — والمصدر مذكور صراحةً.
-- P-003: عدد الشواذ (167) مشتقّ من معامل تلوث ثابت 0.1 لا من عتبة إحصائية مستنتجة — ولهذا هو معلَّم في التقرير.
+- P-008: منحنى الضوء محتوم بمقياس زمني واحد؛ إزالة الاتجاه قبل الطي هي المعالجة المقترحة لا الإنجاز الحالي.
 
 
 ## 11. أين تجد كل مستند
@@ -300,7 +301,7 @@ curl http://127.0.0.1:5000/api/mors/datahealth
 | README.md | التشغيل السريع وجدول نقاط النهاية | عند أول تشغيل |
 | المشكلات_التي_تم_حلها.md | كل خلل في البيانات وتحليله: السبب، الإصلاح، الرقم قبل/بعد | عند مراجعة دقّة البيانات |
 | DEPLOYMENT.md | النشر والتشغيل وجدول التسليمات | عند النشر أو التحقق من التغطية |
-| tools/audit_data.py | 225 فحصًا للقراءة فقط (223–227) ← AUDIT: PASS | قبل أي إعادة توليد للمستندات |
+| tools/audit_data.py | 225+ فحصًا للقراءة فقط ← AUDIT: PASS | قبل أي إعادة توليد للمستندات |
 | docs/API_CONTRACT.md | عقد الـ API كاملًا (§1-§20) | عند مراجعة الواجهات أو بناء عميل |
 | docs/MORS_REPORT.pdf | التقرير العلمي: الجودة، المشكلات، الرسوم، المصادر، الحدود | للحجج والأدلة التفصيلية |
 | docs/PROJECT_GUIDE.pdf | شرح ملف-ملف للمستودع | عند البحث عن مصدر سلوك معيّن |
@@ -327,7 +328,7 @@ python tools/build_zip.py          # -> الحزمة النهائية
 
 ---
 
-دليل لجنة التحكيمية — نسخة 2026-09-25 06:22 UTC ؛ رقم التشغيل run-20260925-061746-46a7 ؛ الحالة CERTIFIED 96/100.
+دليل لجنة التحكيمية — نسخة 2026-09-26 07:53 UTC ؛ رقم التشغيل run-20260926-042301-0004 ؛ الحالة CERTIFIED 98/100.
 
 
 ## 13. فريق العمل
@@ -336,9 +337,9 @@ python tools/build_zip.py          # -> الحزمة النهائية
 
 | العضو / الدور | المسؤوليات | الوحدات والمشكلات |
 |---|---|---|
-| ليث رعد | Team leadership · system architecture · pipeline integration · review | MORS architecture، HOME.MORS، PROJECTS.MORS، TEAM.MORS، P-007 |
-| Data Analyst | Data cleaning · EDA · statistics · data quality · anomalies | DATA.MORS، PROBLEMS.MORS، SOLUTIONS.MORS، P-002، P-003، P-004 |
+| ليث رعد | Team leadership · system architecture · pipeline integration · review | MORS architecture، HOME.MORS، PROJECTS.MORS، TEAM.MORS |
+| Data Analyst | Data cleaning · EDA · statistics · data quality · anomalies | DATA.MORS، PROBLEMS.MORS، SOLUTIONS.MORS، P-003 |
 | Astronomy Researcher | Photometry · spectroscopy · FITS · light curves · sources | ASTRONOMY.MORS، SOURCES.MORS، P-005، P-006، P-008 |
-| Space Systems & AI Engineer | Orbits · telemetry · AI model integration · quantum simulation | AI.MORS، SATELLITE.MORS، QUANTUM.MORS، P-001 |
+| Space Systems & AI Engineer | Orbits · telemetry · AI model integration · quantum simulation | AI.MORS، SATELLITE.MORS، QUANTUM.MORS |
 
 المسؤوليات تشمل الوحدات (مثل HOME.MORS أو SPECTRAL.MORS) وأرقام المشكلات التي يحلّها العضو؛ المالك مذكور في بطاقة كل مشكلة وحل معًا، وفي سجل التتبّع MORS-TEAM-v1.1.0.

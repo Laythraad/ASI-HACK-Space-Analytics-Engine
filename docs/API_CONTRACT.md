@@ -169,6 +169,11 @@ satellite acquisition; only the reduction pipeline (StandardScaler → PCA)
 runs on real input.
 
 ## 13) GET /api/data/quantum   (statevector simulation)
+
+> Consumed as a raw data contract (curl / audit / downstream tools). The
+> legacy \static/index.html\ dashboard draws seven charts and does not fetch
+> this one; the same physics is served at \/api/mors/quantum\ and rendered
+> interactively by **QUANTUM.MORS** in \static/mors.html\.
 {
   "states": {"bell": {"label":"|Phi+> = (|00>+|11>)/sqrt(2)",
                       "amplitudes":[[re,im] x 4],

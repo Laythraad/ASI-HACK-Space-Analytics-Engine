@@ -12,10 +12,19 @@ python-dotenv>=1.0
 # Optional - only needed to regenerate the PDF documents
 #   python tools/build_report.py   -> docs/MORS_REPORT.pdf
 #   python tools/build_guide.py    -> docs/PROJECT_GUIDE.pdf
+#   python tools/build_committee.py-> 00_COMMITTEE_GUIDE.md + docs/COMMITTEE_GUIDE.pdf
 # reportlab>=4.0
 # arabic-reshaper>=3.0
 # python-bidi>=0.4
 # matplotlib>=3.8
+
+# Optional - only needed to regenerate the pitch deck and the pitch video
+#   python tools/build_deck.py     -> presentation/MORS_ASI-HACK-2026_Deck.pptx/.pdf
+#   python tools/build_video.py    -> presentation/MORS_Pitch_2min.mp4
+# python-pptx>=0.6.21
+# Pillow>=10.0
+# imageio-ffmpeg>=0.4.9   (bundles the ffmpeg binary used to mux the video)
+# edge-tts>=6.1           (Arabic neural voiceover, ar-SA-HodaNeural)
 
 # Production WSGI server (Render / gunicorn)
 gunicorn>=21.2

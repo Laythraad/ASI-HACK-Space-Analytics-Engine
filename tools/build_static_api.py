@@ -97,11 +97,28 @@ def main() -> int:
             failed.append((f"/api/data/{name}", str(exc)[:120]))
             print(f"  FAIL /api/data/{name}: {exc}")
 
+    # 4) prune: a module removed from the registry must not linger in the
+    #    snapshot, otherwise the static demo keeps serving a dead payload.
+    #    ONLY safe when every endpoint answered — a transient fetch failure
+    #    must never delete a good snapshot.
+    pruned = []
+    if not failed:
+        keep = {r for r, _ in written} | {"api/_meta.json"}
+        for p in sorted((OUT / "api").rglob("*.json")):
+            rel = p.relative_to(OUT).as_posix()
+            if rel not in keep:
+                p.unlink()
+                pruned.append(rel)
+                print(f"  del  {rel}")
+    elif written:
+        print("  skip prune (snapshot incomplete — kept existing files)")
+
     meta = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "base": BASE,
         "files": sorted(r for r, _ in written),
         "failed": failed,
+        "pruned": pruned,
         "note": "Read-only JSON snapshot served by the frontends when no "
                 "backend is reachable (static hosting). POST endpoints "
                 "(/api/chat, /api/mors/insight, /api/pipeline/run) are not "
@@ -109,7 +126,8 @@ def main() -> int:
     }
     write("api/_meta.json", meta)
     total = sum(n for _, n in written)
-    print(f"\nWROTE {len(written)} files, {total:,} bytes -> {OUT}")
+    print(f"\nWROTE {len(written)} files, {total:,} bytes -> {OUT}"
+          + (f" (pruned {len(pruned)} stale)" if pruned else ""))
     if failed:
         print(f"incomplete snapshot: {len(failed)} endpoint(s) failed")
         return 1

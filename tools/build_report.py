@@ -922,7 +922,7 @@ def build(D):
           f"'{san(engine.get('council'))}'; where Gemini free-tier quota "
           f"(HTTP 429) blocked the LLM pass, the deterministic local council "
           f"was substituted and that substitution is itself surfaced as "
-          f"problem P-001 rather than hidden.", "body"),
+          f"open problem card rather than hidden.", "body"),
         Spacer(1, 3 * mm),
         P("Headline metrics", "h2"),
     ]
@@ -1553,7 +1553,7 @@ def build(D):
     story += [P("13. Run instructions", "h1"),
               HRFlowable(width="100%", thickness=1.2, color=ACCENT,
                          spaceAfter=8),
-              P("Requirements: Python 3.10+ (tested on 3.12) and network "
+              P("Requirements: Python 3.11+ (tested on 3.12) and network "
                 "access. Every source has a deterministic local fallback, so "
                 "the platform still runs offline.", "body"),
               Spacer(1, 3 * mm),
@@ -1836,7 +1836,7 @@ def build(D):
     story += bullets([
         "Gemini free-tier quota (HTTP 429) degrades Agents 2/3/4 to the "
         "deterministic local engines. The run still certifies, but it is not "
-        "LLM cross-verified. This is surfaced as problem P-001 on the "
+        "LLM cross-verified. This is surfaced as an open problem card on the "
         "dashboard rather than hidden.",
         "IsolationForest is configured with contamination=0.1, so roughly "
         "10% of cells are flagged as outliers by construction. The outlier "

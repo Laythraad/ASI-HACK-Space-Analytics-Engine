@@ -9,7 +9,7 @@ rem  ASI-HACK SPACE ANALYTICS ENGINE - ONE-CLICK LAUNCHER
 rem  اضغط مرتين على هذا الملف لتشغيل النظام كاملاً وفتح لوحة التحكم
 rem
 rem  What it does:
-rem    1) Locates a usable Python 3.10+
+rem    1) Locates a usable Python 3.11+
 rem    2) Installs any missing libraries (requirements.txt)
 rem    3) Starts the Flask backend (main.py)
 rem    4) Waits until the API is healthy
@@ -36,7 +36,7 @@ if defined PY goto :havepy
 
 echo  [X] Python was not found on this PC.
 echo.
-echo      Please install Python 3.10+ from https://www.python.org/downloads/
+echo      Please install Python 3.11+ from https://www.python.org/downloads/
 echo      IMPORTANT: tick "Add python.exe to PATH" during installation.
 echo.
 pause

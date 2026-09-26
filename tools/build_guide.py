@@ -99,6 +99,15 @@ FILES = {
         "deps": "required by every Python file in the project.",
         "where": "README.md step 0 and START.bat preflight.",
     },
+    "LICENSE": {
+        "role": "MIT license for the source code + data terms note",
+        "what": ["Grants permission to use, copy, modify and distribute the "
+                 "code, and lists the third-party data terms (NASA, NOAA, "
+                 "CelesTrak) that still apply."],
+        "io": "read only.",
+        "deps": "referenced by README.md section 11.",
+        "where": "root of the repository and of the delivered package.",
+    },
     "README.md": {
         "role": "Front door: how to run, what it does, what it does not do",
         "what": ["Requirements, three run options (START.bat, manual, "
@@ -119,13 +128,14 @@ FILES = {
         "deps": "references main.py routes and the docs folder.",
         "where": "the second document a reviewer opens.",
     },
-    ".env": {
-        "role": "Secrets — never committed",
-        "what": ["Holds GEMINI_API_KEY, NASA_API_KEY and the model names. "
-                 "Loaded by python-dotenv at import time in main.py."],
-        "io": "read only; excluded by .gitignore.",
-        "deps": "required by Agents 2, 3 and 4 and by every NASA fetch in "
-                "Agent 1.",
+    ".env.example": {
+        "role": "Template for the secrets file — no real keys",
+        "what": ["Names the variables the backend reads (GEMINI_API_KEY, "
+                 "NASA_API_KEY, model ids) with placeholder values. Copy it "
+                 "to .env and fill in your own keys."],
+        "io": "shipped in the package; the real .env is gitignored and "
+              "never packaged.",
+        "deps": "the template every deployment starts from.",
         "where": "never rendered anywhere — the UI only shows the engine "
                  "name, never the key.",
     },
@@ -259,7 +269,7 @@ FILES = {
         "where": "the legacy dashboard charts and PROJECT PRJ-002.",
     },
     "agents/mors_data.py": {
-        "role": "MORS data layer — the 17 science modules",
+        "role": "MORS data layer — 19 API modules",
         "what": [
             "One module per MORS view: data_health, problems, solutions, "
             "home, photometry, spectroscopy, lightcurves, images, "
@@ -451,7 +461,8 @@ FILES = {
                  "reference values used to calibrate the light-pollution "
                  "model."],
         "io": "read by agents/datasets.py and Agent 1.",
-        "deps": "feeds PRJ-002 and problem P-002.",
+        "deps": "feeds PRJ-002 and the light-pollution problem card when its "
+                 "coverage condition is open.",
         "where": "the light-pollution widget and the DATA.MORS table.",
     },
     "data/reference_metrics.csv": {
@@ -482,7 +493,7 @@ FILES = {
         "where": "the reference used when adding a new endpoint.",
     },
     "docs/MORS_REPORT.pdf": {
-        "role": "Generated platform report (43 pages)",
+        "role": "Generated platform report (44 pages)",
         "what": ["The evidence document: quality audit, problem and solution "
                  "cards, module registry, figures with plain-English "
                  "captions, the full scientific source list and the honest "
@@ -540,7 +551,7 @@ FILES = {
         "where": "regenerate with: python tools/build_committee.py",
     },
     "tools/audit_data.py": {
-        "role": "Read-only data & analysis audit (225+ checks)",
+        "role": "Read-only data & analysis audit (224 checks)",
         "what": [
             "Probes the running API and prints one line per check; exits 0 "
             "only when every check passes (RESULT: AUDIT: PASS).",
@@ -592,9 +603,9 @@ FILES = {
 }
 
 ORDER = ["00_COMMITTEE_GUIDE.md", "00_MANIFEST.txt", "main.py", "START.bat",
-         "requirements.txt", "README.md",
+         "requirements.txt", "README.md", "LICENSE",
          "المشكلات_التي_تم_حلها.md",
-         "DEPLOYMENT.md", ".env", ".gitignore", "last_report.json",
+         "DEPLOYMENT.md", ".env.example", ".gitignore", "last_report.json",
          "agents/__init__.py", "agents/agent1_ingestion.py",
          "agents/agent2_council.py", "agents/agent3_citations.py",
          "agents/agent4_aimors.py", "agents/datasets.py",
@@ -910,7 +921,7 @@ def build() -> list:
         "sources and limitations.",
         "docs/PROJECT_GUIDE.pdf (this file) - where each behaviour lives.",
         "DEPLOYMENT.md - how to run it somewhere else.",
-        "tools/audit_data.py - 225+ read-only checks -> RESULT: AUDIT: PASS.",
+        "tools/audit_data.py - 224 read-only checks -> RESULT: AUDIT: PASS.",
     ], "small")
 
     # -------------------------------------------------- per-folder sections

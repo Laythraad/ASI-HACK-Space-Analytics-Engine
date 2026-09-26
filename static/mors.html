@@ -108,7 +108,8 @@ a{color:var(--accent);text-decoration:none}
 #q{width:100%;padding:8px 12px 8px 33px;border-radius:9px;background:var(--panel2);
   border:1px solid var(--line);color:var(--text);font-size:13px;font-family:inherit}
 #q::placeholder{color:var(--dim)}
-#q:focus{border-color:var(--accent);outline:none}
+#q:focus{border-color:var(--accent)}
+#q:focus-visible,button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.ph:focus-visible,.mod:focus-visible,tr.clk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .pills{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4.5px 9px;border-radius:20px;
   background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -252,7 +253,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:ui-
 .chip.on{background:var(--accentSoft);border-color:var(--accent);color:var(--accent);font-weight:650}
 select,input[type=text],input[type=search]{background:var(--panel2);border:1px solid var(--line);color:var(--text);
   border-radius:8px;padding:7px 10px;font:inherit;font-size:12.5px}
-select:focus,input:focus{border-color:var(--accent);outline:none}
+select:focus,input:focus{border-color:var(--accent)}
 
 .flow{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
 .flow .st{flex:1;min-width:118px;position:relative;padding:13px 12px 13px 20px;background:var(--panel);
@@ -450,12 +451,13 @@ img.broken{display:none}
       build 1.0.0 · <span id="sfEngine">—</span><br>
       <span id="sfSync">no sync yet</span><br>
       <button type="button" class="rlBtn" data-runlocal style="margin-top:8px;width:100%">⌘ Run Locally</button>
+      <a href="../index.html" class="rlBtn" style="margin-top:6px;width:100%;display:block;text-align:center;text-decoration:none;box-sizing:border-box">← ASI-HACK launcher</a>
     </div>
   </aside>
 
   <div class="shell">
     <div class="topbar">
-      <button class="burger" id="burger" aria-label="Open navigation">☰</button>
+      <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">☰</button>
       <div class="crumb" id="crumb"><b>MORS Home</b></div>
       <div class="searchwrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -539,7 +541,7 @@ img.broken{display:none}
   <div class="mbody" id="mBody"></div>
 </div>
 
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script>
 "use strict";
 /* ================================================================ utils */
@@ -652,7 +654,7 @@ function markSnapshot() {
   showOfflineBadge();
   var d = document.createElement("div");
   d.id = "snapBanner";
-  d.textContent = "وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).";
+  d.setAttribute("lang", "ar"); d.textContent = "وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).";
   d.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;" +
     "background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);" +
     "padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center";
@@ -951,19 +953,29 @@ function lifecycleHTML(stages) {
 }
 function shortName(s) { s = String(s || ""); return s.length > 22 ? s.slice(0, 20) + "…" : s; }
 function openScrim(on) { $("#scrim").classList.toggle("on", !!on); }
+var _lastFocus = null;
 function openModal(title, sub, body) {
+  _lastFocus = document.activeElement;
   $("#mTitle").textContent = title;
   $("#mSub").innerHTML = sub || "";
   $("#mBody").innerHTML = body || "";
   $("#modal").classList.add("on");
   $("#drawer").classList.remove("on");
   openScrim(true);
+  var first = $("#modal .x") || $("#modal [data-close]");
+  if (first && first.focus) first.focus();
 }
 function closeAll() {
+  var wasOpen = $("#modal").classList.contains("on");
   $("#modal").classList.remove("on");
   $("#drawer").classList.remove("on");
   $("#sidebar").classList.remove("on");
   openScrim(false);
+  $("#burger").setAttribute("aria-expanded", "false");
+  if (wasOpen && _lastFocus && _lastFocus.focus &&
+      document.contains(_lastFocus)) {
+    try { _lastFocus.focus(); } catch (e) {}
+  }
 }
 
 /* ================================================================ HOME */
@@ -1074,7 +1086,7 @@ VIEWS.home = function () {
       var labels = [], data = [];
       var daily = (kp && kp.daily) || [];
       daily.forEach(function (d) {
-        if (!d.no_data && typeof d.kp === "number") { labels.push(String(d.date).slice(5)); data.push(d.kp); }
+        if (!d.no_data && typeof d.kp_max === "number") { labels.push(String(d.t).slice(5)); data.push(d.kp_max); }
       });
       if (!labels.length) { labels = ["—"]; data = [0]; }
       mkChart("sparkChart", { type: "line",
@@ -1104,8 +1116,12 @@ var TIER_DESC = [
 ];
 VIEWS.ai = function () {
   return Promise.all([api("ai"),
-                      api("prompts").catch(function () { return {}; })]).then(function (rr) {
+                      api("prompts").catch(function () { return {}; }),
+                      api("problems").catch(function () { return {}; }),
+                      api("solutions").catch(function () { return {}; }),
+                      getJSON("/api/report")]).then(function (rr) {
     var a = rr[0] || {}, lib = rr[1] || {};
+    var aiPr = rr[2] || {}, aiSo = rr[3] || {}, aiRep = rr[4] || {};
     var e = a.engine || {};
     var html = pageHead("AI.MORS — Data Intelligence",
       "AI here is an <b>analysis assistant</b>, not a chatbot: it reads the certified dataset, flags problems, " +
@@ -1119,8 +1135,8 @@ VIEWS.ai = function () {
       '<div class="rt"><span class="tag acc">POST /api/chat</span>' +
       '<span class="tag low">POST /api/mors/insight</span></div></div>' +
       '<div class="grid g2"><div>' +
-      '<div class="ar ttl">أهلاً وسهلاً بكم في الفضاء</div>' +
-      '<ul class="ar-list">' +
+      '<div class="ar ttl" lang="ar">أهلاً وسهلاً بكم في الفضاء</div>' +
+      '<ul class="ar-list" lang="ar">' +
       [["1-", "أنا <b>Ai.Mors</b>، وكيل الفضاء المعتمد داخل منصة ASI-HACK."],
        ["2-", "اضغط <b>Run Pipeline</b> أولاً لبناء قاعدة المعرفة من بيانات NASA الحية " +
               '(<span class="mono">DONKI · NEOWS · JPL Horizons</span>).'],
@@ -1128,7 +1144,7 @@ VIEWS.ai = function () {
               'ومعرّفات التتبع <span class="mono">Traceability IDs</span> والمراجع العلمية.'],
        ["\u2713", "الخلاصة: كل إجابة أقدّمها مُوثّقة من مجلس الخبراء الخمسة."]]
         .map(function (x) {
-          return '<li><span class="n">' + x[0] + '</span><span class="t ar">' + x[1] + "</span></li>";
+          return '<li><span class="n">' + x[0] + '</span><span class="t ar" lang="ar">' + x[1] + "</span></li>";
         }).join("") + "</ul>" +
       '<div class="disclaim">The greeting is a hard constraint in <span class="mono">agent4_aimors.py</span> — ' +
       "if the model omits it, the agent prepends it before the answer is returned.</div></div>" +
@@ -1136,7 +1152,7 @@ VIEWS.ai = function () {
       '<button type="button" id="chatCol" aria-expanded="true" aria-controls="chatOut" ' +
       'title="Collapse / expand the chat panel">▾ chat</button></div>' +
       '<div class="filters"><input type="search" id="chatQ" style="flex:1;min-width:200px" dir="auto" ' +
-      'placeholder="اسأل سؤالاً فلكياً… e.g. what is the fastest CME speed?">' +
+      'lang="ar" placeholder="اسأل سؤالاً فلكياً… e.g. what is the fastest CME speed?">' +
       '<button class="btn pri" data-act="chat">Ask</button></div>' +
       '<div id="chatOut"><div class="hint">Answers are grounded in the certified report; ' +
       "replies come back prefixed with the Arabic greeting.</div></div></div>" +
@@ -1155,6 +1171,60 @@ VIEWS.ai = function () {
       metric("Last council score", n2(e.last_score, 0) + "/100", "deterministic audit", "") +
       metric("Formula coverage", n2(e.formula_coverage, 0), "equations with references", "") +
       metric("Data quality", n2(e.data_quality, 1), "as reported by ingestion", "") + "</div>";
+
+    /* ---- reasoning chain: problem -> equation -> solution ---- */
+    (function () {
+      var probs = aiPr.problems || [];
+      var sols = aiSo.solutions || [];
+      var solBy = {};
+      sols.forEach(function (s) { solBy[s.problem_id] = s; });
+      var sci = aiRep.science || {};
+      var lp = sci.light_pollution || {}, lpm = lp.model || {};
+      var q = sci.quantum || {};
+      var eqs = [];
+      eqs.push(["Priority score", (probs[0] && probs[0].priority_formula) ||
+                "0.40·evidence + 0.35·impact + 0.25·confidence"]);
+      if (sci.kp_index && sci.kp_index.scale && sci.kp_index.scale.class_formula)
+        eqs.push(["Solar flare class", sci.kp_index.scale.class_formula]);
+      if (lpm.index_formula) eqs.push(["Light-pollution index", lpm.index_formula]);
+      if (lpm.nelm_formula) eqs.push(["NELM from SQM", lpm.nelm_formula]);
+      if (lpm.calibration) eqs.push(["Bortle calibration", lpm.calibration]);
+      if (q.qho_levels && q.qho_levels.formula)
+        eqs.push(["QHO energy ladder", q.qho_levels.formula]);
+      if (q.rabi_drive && q.rabi_drive.formula)
+        eqs.push(["Rabi excitation", q.rabi_drive.formula]);
+      if (!probs.length) return;
+      html += '<div class="card acc"><div class="chd"><div><h3>Reasoning chain — problem → equation → solution</h3>' +
+        '<div class="sub">What Ai.Mors is reasoning over right now: every certified finding, the maths that ranks it, ' +
+        "and the resolution path with its expected impact.</div></div>" +
+        '<div class="rt"><span class="tag acc">' + probs.length + " findings</span>" +
+        '<span class="tag low">' + eqs.length + " equations</span></div></div>" +
+        '<div class="grid g2"><div>' +
+        probs.map(function (p) {
+          var s = solBy[p.id] || {};
+          var imp = (s.expected_impact || [])[0] || {};
+          return '<div class="fld" style="margin-bottom:9px">' +
+            '<div class="fl">' + esc(p.id) + " · " + esc(p.category || "") + " · " + esc(p.severity || "") + "</div>" +
+            "<p><b>" + esc(p.title) + "</b></p>" +
+            '<div class="hint mono" style="margin:6px 0">' + esc(p.priority_formula ||
+              "0.40·evidence + 0.35·impact + 0.25·confidence") + "</div>" +
+            '<div class="pill-row"><span class="kpi">score ' + n2(p.priority_score, 1) + "/100</span>" +
+            '<span class="kpi">confidence ' + n2(p.confidence_level, 0) + "%</span>" +
+            '<span class="kpi">effort ' + esc(s.effort || "—") + "</span></div>" +
+            (s.title ? '<p class="hint" style="margin-top:6px">→ <b>' + esc(s.title) + "</b></p>" : "") +
+            (imp.delta ? '<p class="hint" style="margin-top:4px">expected impact: ' + esc(imp.delta) + "</p>" : "") +
+            "</div>";
+        }).join("") + "</div><div>" +
+        '<div class="fld"><div class="fl">Equations in force</div>' +
+        eqs.map(function (x) {
+          return '<div class="hint mono" style="padding:5px 0;border-bottom:1px dashed var(--line)">' +
+            '<b style="color:var(--accent)">' + esc(x[0]) + "</b> · " + esc(x[1]) + "</div>";
+        }).join("") + "</div>" +
+        '<div class="cbox h260" style="margin-top:10px"><canvas id="aiChain"></canvas></div>' +
+        '<div class="cap"><b>Formula</b>0.40·evidence + 0.35·impact + 0.25·confidence ' +
+        "<b>Source</b>GET /api/mors/problems + /api/report</div></div></div></div>";
+      window.__aiChain = probs;
+    })();
 
     html += '<div class="card"><div class="chd"><div><h3>AI output protocol — 5 tiers</h3>' +
       '<div class="sub">Every AI statement on this platform is tagged. A tier is a claim about <i>how we know</i>, ' +
@@ -1200,9 +1270,11 @@ VIEWS.ai = function () {
       '<div class="sub">Instruments the assistant is allowed to touch</div></div></div>' +
       '<div class="tblwrap"><table><thead><tr><th>Tool</th><th>Type</th><th class="num">Records</th><th>Status</th></tr></thead><tbody>' +
       (a.tools || []).map(function (t) {
-        var ok = String(t.status).toLowerCase().indexOf("ok") >= 0;
+        var st = String(t.status || "").toLowerCase();
+        var tone = /^(live|installed|loaded|ok|configured|always available)$/.test(st) ? "low"
+                 : /(fallback|not in this run|error|failed)/.test(st) ? "high" : "med";
         return "<tr><td>" + esc(t.name) + "</td><td>" + esc(t.type) + '</td><td class="num">' + num(t.records) + "</td>" +
-          '<td><span class="tag ' + (ok ? "low" : "med") + '">' + esc(t.status) + "</span></td></tr>";
+          '<td><span class="tag ' + tone + '">' + esc(t.status) + "</span></td></tr>";
       }).join("") + "</tbody></table></div></div>";
     html += "</div>";
 
@@ -1240,6 +1312,22 @@ VIEWS.ai = function () {
         last_updated: new Date().toISOString(), operator_id: "agent:ai.mors" }) + "</div>";
 
     $("#view").innerHTML = html;
+
+    var chain = window.__aiChain || [];
+    if (chain.length) {
+      mkChart("aiChain", { type: "bar",
+        data: { labels: chain.map(function (p) { return p.id; }),
+          datasets: [
+            { label: "evidence", data: chain.map(function (p) { return p.evidence_metric; }),
+              backgroundColor: PALETTE()[0], borderRadius: 5 },
+            { label: "impact", data: chain.map(function (p) { return p.impact_score; }),
+              backgroundColor: PALETTE()[1], borderRadius: 5 },
+            { label: "confidence", data: chain.map(function (p) { return p.confidence_level; }),
+              backgroundColor: PALETTE()[2], borderRadius: 5 }
+          ] },
+        options: { plugins: { legend: { position: "bottom" } },
+          scales: { y: { beginAtZero: true, max: 100 } } } });
+    }
   });
 };
 function renderInsight(box, j) {
@@ -1587,9 +1675,9 @@ var ASTRO_TILES = [
   { k: "photometry",  ic: "lc",    t: "Photometry",           d: "Brightness, magnitude, cadence, variability, observation window.", f: ["V band", "S/N"] },
   { k: "spectroscopy",ic: "spec",  t: "Spectroscopy",         d: "Wavelength, flux, spectral lines, redshift, temperature indicators.", f: ["NIST lines", "log ε"] },
   { k: "fits",        ic: "img",   t: "FITS Data",            d: "Header cards: WCS, exposure, instrument, pipeline status.", f: ["FITS standard", "WCS"] },
-  { k: "images",      ic: "img",   t: "Astronomical Images",  d: "Telescope, object, exposure, wavelength, observation date.", f: ["NASA APOD", "Level 1"] },
-  { k: "coordinates", ic: "astro", t: "Sky Coordinates",      d: "ICRS / GCRS transforms, RA/Dec catalogue, frame provenance.", f: ["ICRS", "GCRS"] }
+  { k: "images",      ic: "img",   t: "Astronomical Images",  d: "Telescope, object, exposure, wavelength, observation date.", f: ["NASA APOD", "Level 1"] }
 ];
+
 function renderObjects(rows) {
   var b = $("#objBody");
   if (!b) return;
@@ -2337,27 +2425,27 @@ function problemCard(p) {
     '<span class="tag">open ▾</span></div></div>' +
     '<div class="pbody">' +
 
-    '<div class="fld wide"><div class="fl">Problem — ما المشكلة؟</div><p>' +
+    '<div class="fld wide"><div class="fl">Problem — <span lang="ar">ما المشكلة؟</span></div><p>' +
     esc(p.symptom) + "</p></div>" +
 
-    '<div class="fld wide"><div class="fl">Evidence — البيانات التي أثبتت المشكلة</div><ul>' + ev + "</ul>" +
+    '<div class="fld wide"><div class="fl">Evidence — <span lang="ar">البيانات التي أثبتت المشكلة</span></div><ul>' + ev + "</ul>" +
     (p.evidence_metric != null ? '<div class="meter"><i style="width:' +
       Math.max(2, Math.min(100, p.evidence_metric)) + '%"></i></div>' +
       '<div class="hint">evidence strength = ' + n2(p.evidence_metric, 1) + "/100</div>" : "") + "</div>" +
 
-    '<div class="fld"><div class="fl">Impact — التأثير</div><p>' + esc(p.impact) + "</p>" +
+    '<div class="fld"><div class="fl">Impact — <span lang="ar">التأثير</span></div><p>' + esc(p.impact) + "</p>" +
     (p.impact_score != null ? '<div class="meter w"><i style="width:' +
       Math.max(2, Math.min(100, p.impact_score)) + '%"></i></div>' +
       '<div class="hint">impact = ' + n2(p.impact_score, 1) + "/100</div>" : "") + "</div>" +
 
-    '<div class="fld"><div class="fl">Root cause — السبب المحتمل</div><p>' + esc(p.root_cause) + "</p></div>" +
+    '<div class="fld"><div class="fl">Root cause — <span lang="ar">السبب المحتمل</span></div><p>' + esc(p.root_cause) + "</p></div>" +
 
-    '<div class="fld wide"><div class="fl">Analysis — ماذا أظهر التحليل؟</div><p>' + esc(p.analysis) + "</p></div>" +
+    '<div class="fld wide"><div class="fl">Analysis — <span lang="ar">ماذا أظهر التحليل؟</span></div><p>' + esc(p.analysis) + "</p></div>" +
 
-    '<div class="fld"><div class="fl">Solution — الحل المقترح</div><ol class="steps" style="counter-reset:none">' +
+    '<div class="fld"><div class="fl">Solution — <span lang="ar">الحل المقترح</span></div><ol class="steps" style="counter-reset:none">' +
     sol + "</ol></div>" +
 
-    '<div class="fld"><div class="fl">Suggestions — مقترحات إضافية</div><div class="pill-row">' + sug + "</div></div>" +
+    '<div class="fld"><div class="fl">Suggestions — <span lang="ar">مقترحات إضافية</span></div><div class="pill-row">' + sug + "</div></div>" +
 
     '<div class="fld"><div class="fl">Confidence level</div>' +
     '<p><b>' + n2(p.confidence_level, 1) + "%</b> algorithmic confidence</p>" +
@@ -2636,7 +2724,7 @@ function srcCard(s) {
     esc(s.id) + " · " + esc(s.title) + '</h3><div class="sub">' + esc(s.kind) + " · " + esc(s.level) +
     "</div></div><div class=\"rt\">" + phaseTag(s.phase) +
     '<span class="tag">' + esc(CAT_LABEL[s.category] || s.category) + "</span></div></div>" +
-    '<div class="ar ttl">' + esc(s.title_ar) + "</div>" +
+    '<div class="ar ttl" lang="ar">' + esc(s.title_ar) + "</div>" +
     '<div class="fld"><div class="fl">goal</div><div class="ar sm">' + esc(s.goal_ar) + "</div></div>" +
     '<div class="grid g2">' +
     '<div class="fld"><div class="fl">you will learn</div><div class="ar sm">' + esc(s.learn_ar) + "</div></div>" +
@@ -2660,7 +2748,7 @@ function condCard(c) {
     '<div class="sub">' + esc(c.evidence) + '</div></div><div class="rt">' +
     '<span class="tag ' + (c.status === "core" ? "low" : "med") + '">' +
     esc(c.status === "core" ? "core in build" : "documented extension") + "</span></div></div>" +
-    '<div class="ar ttl">' + esc(c.name_ar) + "</div>" +
+    '<div class="ar ttl" lang="ar">' + esc(c.name_ar) + "</div>" +
     '<div class="ar sm">' + esc(c.helps_ar) + "</div>" +
     '<div class="fld"><div class="fl">sources that support it</div><div class="pill-row">' +
     (c.sources || []).map(function (id) { return '<span class="kpi mono">' + esc(id) + "</span>"; }).join("") +
@@ -2697,7 +2785,7 @@ VIEWS.sources = function () {
 
     html += '<div class="card"><div class="chd"><div><h3>Brief rule</h3>' +
       '<div class="sub">Quoted from the hackathon instructions</div></div></div>' +
-      '<div class="ar ttl">' + esc(d.disclaimer_ar || "") + "</div></div>";
+      '<div class="ar ttl" lang="ar">' + esc(d.disclaimer_ar || "") + "</div></div>";
 
     html += '<div class="card"><div class="chd"><div><h3>The 8 conditions — how the sources help the team</h3>' +
       '<div class="sub">Each condition lists its supporting sources <b>and</b> the file in this repo where it is applied.</div>' +
@@ -2846,12 +2934,14 @@ function renderHealth() {
 var SEARCH_DONE = false;
 function buildIndex() {
   if (SEARCH_DONE) return Promise.resolve();
-  SEARCH_DONE = true;
   var jobs = ["objects", "exoplanets", "satellite", "problems", "solutions", "projects",
     "team", "modules", "ai", "datahealth", "lightcurves", "photometry", "spectroscopy", "images", "fits",
     "sources"]
     .map(function (k) { return tryApi(k); });
+  /* mark done only once the payloads landed — a failed build must be retryable,
+     otherwise a single network error leaves search permanently empty */
   return Promise.all(jobs).then(function () {
+    SEARCH_DONE = true;
     IDX.length = 0;
     function add(ty, name, sub, view, id) { IDX.push({ ty: ty, n: name, s: sub, v: view, id: id || "" }); }
     (D.objects && D.objects.rows || []).forEach(function (r) {
@@ -2999,7 +3089,67 @@ function openRunLocal() {
   ov.classList.add("on");
 }
 
+/* reveal a card after a view switch: poll for the node instead of a fixed
+   420 ms sleep — a slow render (or a failed fetch) must not drop the jump */
+function revealIn(sel, tries) {
+  tries = tries == null ? 24 : tries;
+  var el = document.querySelector(sel);
+  if (el) {
+    if (el.classList.contains("ph") || el.classList.contains("mod")) el.classList.add("open");
+    el.scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
+  if (tries > 0) setTimeout(function () { revealIn(sel, tries - 1); }, 60);
+}
+
+/* delegated keyboard activation for div/tr "buttons" (.ph, .mod, tr.clk) */
+function a11yKeys(e) {
+  if (e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+  var t = e.target;
+  if (!t || !t.closest) return;
+  var el = t.closest('.ph[data-toggle],.mod[data-open],.mod[data-prj],tr.clk');
+  if (!el) return;
+  e.preventDefault();
+  el.click();
+}
+function markInteractive(root) {
+  var sel = ".ph[data-toggle],.mod[data-open],.mod[data-prj],tr.clk";
+  var list = (root || document).querySelectorAll(sel);
+  for (var i = 0; i < list.length; i++) {
+    var el = list[i];
+    if (el.hasAttribute("tabindex") || el.hasAttribute("aria-hidden")) continue;
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", el.tagName === "TR" ? "button" : "button");
+  }
+}
+document.addEventListener("keydown", a11yKeys);
+/* views are rendered asynchronously — watch for injected nodes instead of
+   remembering a dozen call sites */
+if (window.MutationObserver) {
+  var _a11yQueue = null;
+  var _a11yObs = new MutationObserver(function () {
+    if (_a11yQueue) return;
+    _a11yQueue = setTimeout(function () {
+      _a11yQueue = null;
+      markInteractive(document);
+    }, 30);
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    _a11yObs.observe(document.body, { childList: true, subtree: true });
+    markInteractive(document);
+  });
+}
+
 function bindEvents() {
+  /* Enter submits the two assistant boxes (search inputs fire no click) */
+  [["chatQ", runMorsChat], ["insQ", runInsight]].forEach(function (pair) {
+    var el = document.getElementById(pair[0]);
+    if (!el) return;
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); try { pair[1](); } catch (err) {} }
+    });
+  });
+
   document.addEventListener("click", function (e) {
     var t = e.target;
 
@@ -3028,11 +3178,8 @@ function bindEvents() {
     if (gp) {
       e.preventDefault();
       var pid = gp.dataset.goproblem;
-      location.hash = "#/problems";
-      setTimeout(function () {
-        var el = document.getElementById("card-" + pid);
-        if (el) { el.classList.add("open"); el.scrollIntoView({ block: "center" }); }
-      }, 420);
+      if (CURRENT !== "problems") location.hash = "#/problems";
+      revealIn("#card-" + pid);
       return;
     }
 
@@ -3041,10 +3188,7 @@ function bindEvents() {
       e.preventDefault();
       var sid = gs.dataset.gosol;
       if (CURRENT !== "solutions") location.hash = "#/solutions";
-      setTimeout(function () {
-        var el2 = document.getElementById("sol-" + sid);
-        if (el2) el2.scrollIntoView({ block: "center" });
-      }, 420);
+      revealIn("#sol-" + sid);
       return;
     }
 
@@ -3078,10 +3222,21 @@ function bindEvents() {
 
     if (t.closest && t.closest("[data-close]")) { closeAll(); return; }
     if (t.id === "scrim") { closeAll(); return; }
+    /* tap outside the open mobile sidebar closes it */
+    if ($("#sidebar").classList.contains("on") &&
+        !(t.closest && t.closest("#sidebar")) &&
+        !(t.closest && t.closest("#burger"))) {
+      $("#sidebar").classList.remove("on");
+      $("#burger").setAttribute("aria-expanded", "false");
+      clearTimeout(bindEvents._sb);
+      bindEvents._sb = setTimeout(relayoutMaps, 300);
+    }
     if (t.id === "btnCustom") { $("#drawer").classList.add("on"); openScrim(true); return; }
     if (t.closest && t.closest("#btnTheme")) { cycleTheme(); return; }
     if (t.id === "burger") {
-      $("#sidebar").classList.toggle("on");
+      var sb = $("#sidebar");
+      sb.classList.toggle("on");
+      t.setAttribute("aria-expanded", String(sb.classList.contains("on")));
       /* sidebar accordion/overlay finished moving → canvases may need a redraw */
       clearTimeout(bindEvents._sb);
       bindEvents._sb = setTimeout(relayoutMaps, 300);

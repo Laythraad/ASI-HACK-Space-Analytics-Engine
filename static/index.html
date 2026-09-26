@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +25,9 @@ body{
 }
 h1,h2,h3,.mono-t{font-family:'Orbitron',sans-serif;letter-spacing:.5px}
 button{font-family:'Cairo',sans-serif;cursor:pointer;border:none;outline:none}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,
+textarea:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--cyan);outline-offset:2px;border-radius:4px}
 ::-webkit-scrollbar{width:9px;height:9px}
 ::-webkit-scrollbar-thumb{background:linear-gradient(var(--cyan),var(--violet));border-radius:9px}
 ::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
@@ -174,7 +177,7 @@ main{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;padding:16px 22px}
 @keyframes b{50%{transform:translateY(-5px);opacity:.4}}
 
 /* ---------- toasts ---------- */
-#toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:9px;z-index:99}
+#toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:9px;z-index:1500}
 .toast{
   padding:11px 15px;border-radius:11px;font-size:12.5px;max-width:340px;
   background:rgba(8,10,30,.96);border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.5);
@@ -242,7 +245,7 @@ footer .rlBtn{margin-left:12px;vertical-align:middle}
 <body>
 
 <div class="mors-cta" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:9px 16px;background:#083344;border-bottom:1px solid #0e7490;color:#CFF6FF;font:600 12.5px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif">
-  <span style="margin:0">هذا هو اللوحة القديمة (ASI-HACK). الواجهة الجديدة الكاملة هي <b style="color:#7DD3FC">MORS Scientific Command Center</b> — 18 وحدة علمية.</span>
+  <span style="margin:0" lang="ar">هذا هو اللوحة القديمة (ASI-HACK). الواجهة الجديدة الكاملة هي <b style="color:#7DD3FC">MORS Scientific Command Center</b> — 11 قسمًا و19 وحدة API.</span>
   <a href="mors.html" style="display:inline-block;padding:6px 14px;border-radius:999px;background:#38BDF8;color:#052432;text-decoration:none;font-weight:700;white-space:nowrap">افتح مركز MORS ←</a>
 </div>
 <header>
@@ -510,8 +513,10 @@ function initViz(){
     document.addEventListener('visibilitychange', ()=> document.hidden ? stopViz() : startViz());
     startViz();
   }catch(err){
-    document.getElementById('viz').innerHTML =
-      '<div style="padding:30px;color:#ff8fa3;font-family:IBM Plex Mono">WebGL unavailable — 3D visualizer disabled.<br>'+err.message+'</div>';
+    const note = document.createElement('div');
+    note.style.cssText = 'position:absolute;inset:0;padding:30px;color:#ff8fa3;font-family:IBM Plex Mono;background:rgba(4,8,17,.82);z-index:1';
+    note.innerHTML = 'WebGL unavailable — 3D visualizer disabled.<br>'+err.message;
+    document.getElementById('viz').appendChild(note);
   }
 }
 
@@ -541,7 +546,7 @@ window.__viz = {
     });
   },
   setAuto(v){ autoRotate = v; if(controls) controls.autoRotate = v; },
-  setHud(lines){ document.getElementById('hud').innerHTML = lines; }
+  setHud(lines){ const h = document.getElementById('hud'); if(h) h.innerHTML = lines; }
 };
 initViz();
 </script>
@@ -569,11 +574,10 @@ function markSnapshot(){
   const d=document.createElement('div');
   d.id='snapBanner';
   d.textContent='وضع العرض الثابت — لا خادم هنا، كل الأقسام تُقرأ من لقطة JSON محفوظة عند النشر (المخطط والمحادثة يعملان على اللقطة).';
-  d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9999;background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center';
+  d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:1400;background:rgba(11,15,25,.96);color:#FBBF24;border:1px solid rgba(251,191,36,.45);padding:6px 14px;border-radius:999px;font-size:11.5px;max-width:92vw;text-align:center';
   const add=()=>{ if(!document.getElementById('snapBanner') && document.body) document.body.appendChild(d); };
   document.addEventListener('DOMContentLoaded',add);
   add();
-  const a=document.querySelector('a[href="/mors"]'); if(a) a.href='mors.html';
 }
 async function snapshot(path){
   const rel=String(path).replace(/^\/+/,'');
@@ -625,6 +629,11 @@ if(window.Chart){
   Chart.defaults.borderColor = 'rgba(56,124,220,.14)';
   Chart.defaults.font.family = "'IBM Plex Mono', monospace";
   Chart.defaults.font.size = 10;
+} else {
+  /* the CDN script failed (offline / blocked) — never fail silently */
+  document.addEventListener('DOMContentLoaded', function(){
+    toast('Chart.js CDN unavailable — charts disabled, tables and numbers still live', 'err');
+  });
 }
 
 function mkChart(id, cfg){
@@ -772,8 +781,8 @@ function drawHaz(d){
       backgroundColor:fill, borderColor:color, borderWidth:1.4, hoverBorderWidth:2.5});
   const haz = all.filter(p=>p.hazardous), ok = all.filter(p=>!p.hazardous);
   mkChart('chartHaz',{type:'bubble',data:{datasets:[
-    mk(ok,'potentially hazardous','#ff5d73','rgba(255,93,115,.55)'),
-    mk(haz,'not hazardous','#38bdf8','rgba(56,189,248,.45)')
+    mk(haz,'potentially hazardous','#ff5d73','rgba(255,93,115,.55)'),
+    mk(ok,'not hazardous','#38bdf8','rgba(56,189,248,.45)')
   ]}, options:{
     responsive:true, maintainAspectRatio:false,
     plugins:{
@@ -1174,13 +1183,18 @@ $('#btnRefresh').addEventListener('click', async ()=>{
   await Promise.all([loadHealth(), loadCharts(), loadReport()]);
   toast('تم التحديث ✅','ok');
 });
-$('#btnAuto').addEventListener('click', ()=>{
-  const next = $('#btnAuto').textContent.includes('Auto') ?
-    !$('#btnAuto').dataset.off : false;
-  window.__viz && window.__viz.setAuto(next);
-  $('#btnAuto').dataset.off = next ? '1':'';
-  $('#btnAuto').textContent = next ? '▶ Auto-Rotate' : '⏸ Auto-Rotate';
-});
+(function(){
+  const btn = $('#btnAuto');
+  const initOn = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  btn.dataset.on = initOn ? '1' : '0';
+  btn.textContent = initOn ? '⏸ Auto-Rotate' : '▶ Auto-Rotate';
+  btn.addEventListener('click', ()=>{
+    const next = btn.dataset.on !== '1';
+    window.__viz && window.__viz.setAuto(next);
+    btn.dataset.on = next ? '1' : '0';
+    btn.textContent = next ? '⏸ Auto-Rotate' : '▶ Auto-Rotate';
+  });
+})();
 
 (async function boot(){
   await loadHealth();

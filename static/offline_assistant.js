@@ -133,7 +133,7 @@
         (byP.High || 0) + " عالية، " + (byP.Medium || 0) + " متوسطة).");
       lines.push("3- الشروط: " + (agg.conditions_covered || 8) + "/" + (agg.conditions_total || 8) +
         " — المصادر: " + (agg.total || 16) + " تدريجية + " + (agg.live_data_sources || 8) + " حيّة.");
-      lines.push("4- الوحدات: 18 وحدة في مركز القيادة + تقرير PDF من 44 صفحة.");
+      lines.push("4- الوحدات: 19 وحدة API في مركز القيادة + تقرير PDF من 44 صفحة.");
       lines.push("الخلاصة: اسألني عن (المشكلات) أو (المصادر) أو (الفريق) أو (النتيجة) أو (التشغيل).");
     }
 
@@ -182,7 +182,8 @@
         },
         {
           tier: "Confidence", text: Math.round(
-            0.5 * Math.min(100, numOf(dig.completeness_pct, 99)) + 0.3 * 96 + 0.2 * 100) +
+            0.5 * Math.min(100, numOf(dig.completeness_pct, 99)) +
+            0.3 * Math.min(100, numOf(home.score, 96)) + 0.2 * 100) +
             "% — مشتق من اكتمال البيانات ونتيجة المجلس؛ تقدير لا إثبات مطلق."
         },
         { tier: "Action", text: "الأولوية التالية: " + (top.problem_id || top.id || "P-001") + " — " + (firstFix(top) || "راجع PROBLEMS.MORS") },
@@ -209,9 +210,17 @@
 
   function runPipeline(step, S) {
     var list = stages(S), i = 0;
+    var run = ((S.home.runs || [])[0]) || {};
+    var ok = run.status === "completed" && run.verdict;
     return new Promise(function (resolve) {
       (function next() {
-        if (i >= list.length) { resolve({ status: "completed", final: list[list.length - 1] }); return; }
+        if (i >= list.length) {
+          /* honest status: mirror the snapshot's last run, never claim success blindly */
+          resolve({ status: ok ? "completed" : "failed",
+                    final: list[list.length - 1],
+                    note: ok ? "" : "snapshot has no completed run" });
+          return;
+        }
         var s = list[i++];
         step(s.to, s.label, s.note);
         setTimeout(next, 650);

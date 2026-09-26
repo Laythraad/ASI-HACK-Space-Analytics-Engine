@@ -1838,10 +1838,63 @@ def quantum_lab() -> Dict[str, Any]:
 
 
 # ================================================================== 7) AI.MORS
+def _connector_status(report: Dict[str, Any], *needles: str,
+                      count_records: bool = True) -> Dict[str, Any]:
+    """Status of a pipeline connector from *this run's* source list.
+
+    ``type: nasa_api`` + records > 0 means the run actually pulled live data;
+    anything else (``partial``/``fallback``/``local``/``simulation``) is
+    reported as such instead of a hardcoded "live".
+    """
+    srcs = ((report.get("dataset_summary") or {}).get("sources") or [])
+    hits = [s for s in srcs
+            if any(n in (str(s.get("name", "")) + " " +
+                         str(s.get("endpoint", ""))).lower() for n in needles)]
+    if not hits:
+        return {"status": "not in this run"}
+    kinds = {str(s.get("type") or "") for s in hits}
+    live = [s for s in hits if s.get("type") == "nasa_api"
+            and (s.get("records") or 0) > 0]
+    if len(live) == len(hits):
+        status = "live"
+    elif live:
+        status = "partial"
+    elif kinds <= {"local", "simulation"}:
+        status = "local"
+    else:
+        status = "fallback"
+    out: Dict[str, Any] = {"status": status}
+    if count_records:
+        rec = sum(int(s.get("records") or 0) for s in hits)
+        if rec:
+            out["records"] = rec
+    return out
+
+
+def _module_status(key: str) -> Dict[str, Any]:
+    """Acquisition status of an on-demand module (satellites, exoplanets).
+
+    Reports what the ladder actually did this session: ``live`` only when the
+    payload came from the API, otherwise the fallback tier it used, or
+    ``on-demand`` when the module has not been opened yet.
+    """
+    hit = _cached(key)
+    if not isinstance(hit, dict):
+        return {"status": "on-demand"}
+    src = hit.get("source") or {}
+    rows = len(hit.get("rows") or [])
+    out: Dict[str, Any] = {
+        "status": "live" if src.get("live") else str(src.get("via") or "cache")}
+    if rows:
+        out["records"] = rows
+    return out
+
+
 def ai_workspace(report: Dict[str, Any]) -> Dict[str, Any]:
     cou = report.get("council") or {}
     cit = report.get("citations") or {}
     health = data_health(report)
+    live_pids = {p["id"] for p in (problems(report).get("problems") or [])}
     return {
         "models": [
             {"id": "gemini-3.1-pro-preview", "role": "Council + Ai.Mors reasoning",
@@ -1859,13 +1912,16 @@ def ai_workspace(report: Dict[str, Any]) -> Dict[str, Any]:
              "context": "tabular", "temperature": 0.0, "status": "installed"},
         ],
         "tools": [
-            {"name": "NASA DONKI / NEOWS / Horizons", "type": "data connector",
-             "status": "live", "records": (report.get("metrics") or {}).get("cme_count")},
-            {"name": "NOAA SWPC Kp", "type": "data connector", "status": "live"},
-            {"name": "NASA GIBS WMS", "type": "geospatial raster", "status": "live"},
-            {"name": "CelesTrak GP", "type": "orbital elements", "status": "live"},
-            {"name": "NASA Exoplanet Archive TAP", "type": "SQL/TAP query",
-             "status": "live"},
+            dict({"name": "NASA DONKI / NEOWS / Horizons", "type": "data connector"},
+                 **_connector_status(report, "donki", "neows", "horizons")),
+            dict({"name": "NOAA SWPC Kp", "type": "data connector"},
+                 **_connector_status(report, "swpc", "planetary-k")),
+            dict({"name": "NASA GIBS WMS", "type": "geospatial raster"},
+                 **_connector_status(report, "gibs", "viirs")),
+            dict({"name": "CelesTrak GP / TLE mirror", "type": "orbital elements"},
+                 **_module_status("satellites")),
+            dict({"name": "NASA Exoplanet Archive TAP", "type": "SQL/TAP query"},
+                 **_module_status("exoplanets")),
             {"name": "StandardScaler + IsolationForest", "type": "preprocessing",
              "status": "installed"},
             {"name": "Astropy units/Time/SkyCoord", "type": "scientific runtime",
@@ -1873,17 +1929,23 @@ def ai_workspace(report: Dict[str, Any]) -> Dict[str, Any]:
             {"name": "Chart.js / Three.js", "type": "visualisation", "status": "loaded"},
         ],
         "insights": _auto_insights(report),
+        # recommendations are bound to live problem cards: a card that no longer
+        # exists (condition resolved) drops its recommendation instead of dangling.
         "recommendations": [
-            {"priority": "High", "text": "Serialize Agents 2/3/4 to escape the "
-             "Gemini free-tier 429 window (see P-001)."},
-            {"priority": "High", "text": "Re-run Agent 3 when quota resets to lift "
-             "the citation graph above the 18/11 baseline (P-007)."},
-            {"priority": "Medium", "text": "Add GIBS tile retry + disk cache so "
-             "light-pollution coverage returns to 11/11 live (P-004)."},
-            {"priority": "Medium", "text": "Expose an overlap mask for the "
-             "flare/Kp dual axis (P-005)."},
-            {"priority": "Low", "text": "Add a rasterio-gated path so the "
-             "spectral module can ingest a real L2A scene (P-006)."},
+            rec for rec in [
+                {"priority": "High", "pid": "P-001", "text": "Serialize Agents 2/3/4 "
+                 "to escape the Gemini free-tier 429 window (see P-001)."},
+                {"priority": "High", "pid": "P-007", "text": "Re-run Agent 3 when "
+                 "quota resets to lift the citation graph above the 18/11 baseline "
+                 "(P-007)."},
+                {"priority": "Medium", "pid": "P-004", "text": "Add GIBS tile retry + "
+                 "disk cache so light-pollution coverage returns to 11/11 live "
+                 "(P-004)."},
+                {"priority": "Medium", "pid": "P-005", "text": "Expose an overlap mask "
+                 "for the flare/Kp dual axis (P-005)."},
+                {"priority": "Low", "pid": "P-006", "text": "Add a rasterio-gated path "
+                 "so the spectral module can ingest a real L2A scene (P-006)."},
+            ] if rec["pid"] in live_pids
         ],
         "research": [
             {"topic": "Quorum-sensing anomaly detection for sparse time series",
@@ -2043,7 +2105,8 @@ def projects(report: Dict[str, Any]) -> Dict[str, Any]:
          "results": "11 sites calibrated, anchors pinned to Bortle 1/9",
          "issues": [p["id"] + " — " + p["title"] for p in pr["problems"]
                     if p["id"] == "P-004"],
-         "solutions": ["P-004 — Raise tile timeout to 45 s with 2 retries + jitter"],
+         "solutions": [s["problem_id"] + " — " + (s["steps"][0]["action"] if s["steps"] else "")
+                       for s in fl["solutions"] if s["problem_id"] == "P-004"],
          "technologies": ["NASA GIBS WMS", "Pillow", "NumPy", "Chart.js"],
          "source_docs": ["agents/datasets.py", "data/light_pollution_reference.csv"]},
         {"id": "PRJ-003", "name": "MORS Multi-Spectral Reduction",
@@ -2056,7 +2119,8 @@ def projects(report: Dict[str, Any]) -> Dict[str, Any]:
          "results": "PCA1 ≈ 0.73, PCA2 ≈ 0.22 on 6×5 endmember matrix",
          "issues": [p["id"] + " — " + p["title"] for p in pr["problems"]
                     if p["id"] == "P-006"],
-         "solutions": ["P-006 — Label widget 'REFERENCE SPECTRA' permanently"],
+         "solutions": [s["problem_id"] + " — " + (s["steps"][0]["action"] if s["steps"] else "")
+                       for s in fl["solutions"] if s["problem_id"] == "P-006"],
          "technologies": ["scikit-learn", "NumPy", "Chart.js"],
          "source_docs": ["agents/datasets.py", "data/spectral_reference.csv"]},
         {"id": "PRJ-004", "name": "MORS Quantum Simulation Lab",
@@ -2080,7 +2144,7 @@ def projects(report: Dict[str, Any]) -> Dict[str, Any]:
             "trace": t, "badge": badge(t)}
 
 
-def team() -> Dict[str, Any]:
+def team(report: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """The four-member ASI-HACK submission team.
 
     Only the team leader is published by name; the other three seats are
@@ -2129,6 +2193,13 @@ def team() -> Dict[str, Any]:
                    "leader); the other seats are published by role — "
                    "Data Analyst, Astronomy Researcher, Space Systems & "
                    "AI Engineer.")
+    # P-IDs stay ownership claims only while the corresponding problem card
+    # is live in this run's payload (resolved conditions drop their owner).
+    if report is not None:
+        live = {p["id"] for p in (problems(report).get("problems") or [])}
+        for m in rows:
+            m["owns"] = [o for o in m["owns"]
+                         if not o.startswith("P-") or o in live]
     return {"members": rows, "count": len(rows), "trace": t, "badge": badge(t)}
 
 

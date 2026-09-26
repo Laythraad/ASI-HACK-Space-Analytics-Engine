@@ -10,7 +10,7 @@ a scientifically validated space-analytics engine plus an interactive 3D agent, 
 Double-click **`START.bat`**.
 
 It will, automatically:
-1. Locate Python 3.10+ (`py -3` → `python` → `python3`)
+1. Locate Python 3.11+ (`py -3` → `python` → `python3`)
 2. Install anything missing from `requirements.txt`
 3. Free port 5000 if an old instance is holding it
 4. Start the backend (`main.py`) minimized
@@ -163,8 +163,8 @@ python main.py --selftest
 Expected tail:
 
 ```
-  [ completed] Agent 1 — Ingest & Clean: ~1735 rows, 8 sources
-  [ completed] Agent 2 — Council of 5: CERTIFIED 96/100 [local_fallback | gemini]
+  [ completed] Agent 1 — Ingest & Clean: ~1714 rows, 8 sources
+  [ completed] Agent 2 — Council of 5: CERTIFIED 98/100 [gemini:gemini-flash-latest]
   [ completed] Agent 3 — Citations: 18 formulas, 11 refs  (grows when Gemini responds)
 verdict         : CERTIFIED
 report keys     : [... 'science']
@@ -185,7 +185,7 @@ python tools\audit_data.py
 Expected tail:
 
 ```
-AUDIT: 225 checks, 0 failed
+AUDIT: 224 checks, 0 failed
 RESULT: AUDIT: PASS
 ```
 
@@ -339,11 +339,11 @@ working tree so it always matches the files on disk.
 | Requirement | Where |
 |---|---|
 | MORS command-center UI | `static/mors.html` |
-| MORS data layer (17 modules, API → AI → local) | `agents/mors_data.py` |
+| MORS data layer (19 API modules, API → AI → local) | `agents/mors_data.py` |
 | `/mors`, `/api/mors/*`, `/api/mors/insight` | `main.py` |
 | Scientific source registry + 8 hackathon conditions | `agents/sources_data.py` → `GET /api/mors/sources` → `SOURCES.MORS` |
 | Ai.Mors clarified (greeting, numbered steps, live chat, engine ladder) | `static/mors.html` → `AI.MORS` + `POST /api/chat` |
-| Data & analysis audit (225 read-only checks, 223–227 as cards activate) | `tools/audit_data.py` → `RESULT: AUDIT: PASS` |
+| Data & analysis audit (224 read-only checks, 223–227 as cards activate) | `tools/audit_data.py` → `RESULT: AUDIT: PASS` |
 | Problems solved — data/analysis defect log (Arabic) | `المشكلات_التي_تم_حلها.md` |
 | Platform report (PDF) with figures and the sources section | `docs/MORS_REPORT.pdf` via `tools/build_report.py` |
 | File-by-file project guide (PDF) | `docs/PROJECT_GUIDE.pdf` via `tools/build_guide.py` |
@@ -352,5 +352,5 @@ working tree so it always matches the files on disk.
 | Run instructions | `README.md` + this file + `START.bat` |
 | API contract incl. MORS | `docs/API_CONTRACT.md` §15–20 |
 | Pitch deck, 10 slides (PPTX + PDF) | `presentation/MORS_ASI-HACK-2026_Deck.pptx` / `.pdf` via `tools/build_deck.py` |
-| Pitch video, 01:59 English voiceover | `presentation/MORS_Pitch_2min.mp4` via `tools/build_video.py` (System.Speech + ffmpeg) |
+| Pitch video, Arabic voiceover | `presentation/MORS_Pitch_2min.mp4` via `tools/build_video.py` (edge-tts `ar-SA-HamedNeural` + ffmpeg) |
 | Launcher cards for deck + video | root `index.html` (site front door) |

@@ -486,11 +486,28 @@ def create_app():
     # -- health ------------------------------------------------------------
     @app.get("/api/health")
     def health():
+        # agents reflect the last real run: a stage is "registered" once it has
+        # produced output (never a hardcoded True).
+        snap = STATE.snapshot()
+        done = {s.get("name") for s in (snap.get("stages") or [])
+                if s.get("status") == "completed"}
+        last = STATE.get_report() or {}
+        agents = {
+            "agent1": "ingestion" in done or bool(
+                ((last.get("dataset_summary") or {}).get("quality") or {}).get("rows")),
+            "agent2": "council" in done or bool(
+                (last.get("council") or {}).get("engine")),
+            "agent3": "citations" in done or bool(last.get("citations")),
+            # agent 4 (AI assistant): available when Gemini is configured or the
+            # last council run actually used an LLM engine.
+            "agent4": bool(GEMINI_API_KEY) or str(
+                (last.get("council") or {}).get("engine") or "").startswith("gemini"),
+        }
         return jsonify({
             "status": "ok",
             "gemini_configured": bool(GEMINI_API_KEY),
             "nasa_key_mode": "live" if NASA_API_KEY != "DEMO_KEY" else "demo",
-            "agents": {"agent1": True, "agent2": True, "agent3": True, "agent4": True},
+            "agents": agents,
             "data_endpoints": [
                 "/api/data/space-weather", "/api/data/neo", "/api/data/horizons",
                 "/api/data/neo-matrix", "/api/data/light-pollution",
@@ -609,7 +626,7 @@ def create_app():
         return rep or {}
 
     _MORS_WITH_REPORT = {"home", "datahealth", "problems", "solutions",
-                         "projects", "ai"}
+                         "projects", "ai", "team"}
     _MORS = {
         "home": mors_data.home,
         "datahealth": mors_data.data_health,

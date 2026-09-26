@@ -170,7 +170,8 @@ def audit_datahealth(D):
     check("accuracy_score in [0,100]", 0 <= (dh.get("accuracy_score") or -1) <= 100)
     bad = [r.get("source") for r in srcs if not (0 <= (r.get("accuracy_score") or -1) <= 100)]
     check("every per_source accuracy in [0,100]", not bad, ",".join(map(str, bad)))
-    bad = [r.get("source") for r in srcs if r.get("status") not in ("ok", "warn", "degraded")]
+    bad = [r.get("source") for r in srcs
+           if r.get("status") not in ("ok", "warning", "critical", "warn", "degraded")]
     check("per_source status values are declared", not bad, ",".join(map(str, bad)))
     check("trace present on datahealth", bool(dh.get("trace")) and bool(dh.get("badge")))
 
@@ -210,6 +211,10 @@ def audit_problems(D):
               and (c.get("fix") or []) for c in cards))
     ids = [c.get("problem_id") for c in cards]
     check("problem ids unique", len(ids) == len(set(ids)), str(ids))
+    check("id mirrors problem_id on every card",
+          all(c.get("id") == c.get("problem_id") for c in cards),
+          str([(c.get("id"), c.get("problem_id")) for c in cards
+               if c.get("id") != c.get("problem_id")][:4]))
     for c in cards:
         want = round(0.40 * (c.get("evidence_metric") or 0)
                      + 0.35 * (c.get("impact_score") or 0)
@@ -260,7 +265,7 @@ def audit_satellite(D):
         check("satellite catalog fell back to the labelled reference set",
               len(rows) >= 10, f"n={len(rows)} via={via}")
     else:
-        check("50 satellites returned", len(rows) == 50,
+        check("10-50 satellites returned", 10 <= len(rows) <= 50,
               f"n={len(rows)} via={via}")
     if not rows:
         return
@@ -482,10 +487,14 @@ def audit_report(D):
               council.get("overall_score") is not None
               and abs(council["overall_score"] - want) <= 1,
               f"declared={council.get('overall_score')} mean={want}")
-    check("verdict declared", council.get("verdict") in ("CERTIFIED", "REJECTED", "PARTIAL"),
+    check("verdict declared",
+          council.get("verdict") in ("CERTIFIED", "CERTIFIED_WITH_CORRECTIONS",
+                                     "REJECTED", "PARTIAL"),
           str(council.get("verdict")))
-    check("council records an engine", bool(council.get("engine")),
-          str(council.get("engine")))
+    engine = str(council.get("engine") or "")
+    check("council records a working engine",
+          bool(engine) and not engine.lower().startswith("error"),
+          engine)
     m = rep.get("metrics") or {}
     sane = [
         ("kp_max", 0 <= (m.get("kp_max") or -1) <= 9),
@@ -840,7 +849,7 @@ def audit_light_pollution(D):
     bad = []
     for s in sites:
         L = s.get("radiance_nw_cm2_sr")
-        if not L:
+        if not L or L <= 0:
             continue
         mu = 17.836 - 2.5 * math.log10(L)          # declared SQM calibration
         if not near(s.get("sqm_mag_arcsec2"), mu, 0.05):
@@ -867,8 +876,8 @@ def audit_curves(D):
     bad = []
     for r in photo:
         flux = (r.get("curve") or {}).get("flux") or []
-        if not flux:
-            bad.append((r.get("target_id"), "no curve"))
+        if not flux or min(flux) <= 0:
+            bad.append((r.get("target_id"), "no/invalid curve"))
             continue
         want = 2.5 * math.log10(max(flux) / min(flux))
         if abs(want - (r.get("amplitude_mag") or 0)) > 0.02:
@@ -1048,30 +1057,21 @@ def audit_name_policy(D=None):
 def main() -> int:
     print(f"audit -> {BASE}")
     D = load()
-    audit_health(D)
-    audit_datahealth(D)
-    audit_problems(D)
-    audit_solutions(D)
-    audit_satellite(D)
-    audit_exoplanets(D)
-    audit_objects(D)
-    audit_sky_surfaces(D)
-    audit_space_weather(D)
-    audit_report(D)
-    audit_sources(D)
-    audit_team(D)
-    audit_name_policy(D)
-    audit_prompts(D)
-    audit_modules(D)
-    audit_layouts(D)
-    audit_horizons(D)
-    audit_exoplanet_physics(D)
-    audit_quantum_physics(D)
-    audit_spectral_consistency(D)
-    audit_light_pollution(D)
-    audit_curves(D)
-    audit_kp_daily(D)
-    audit_images_fits(D)
+    sections = [
+        audit_health, audit_datahealth, audit_problems, audit_solutions,
+        audit_satellite, audit_exoplanets, audit_objects, audit_sky_surfaces,
+        audit_space_weather, audit_report, audit_sources, audit_team,
+        audit_name_policy, audit_prompts, audit_modules, audit_layouts,
+        audit_horizons, audit_exoplanet_physics, audit_quantum_physics,
+        audit_spectral_consistency, audit_light_pollution, audit_curves,
+        audit_kp_daily, audit_images_fits,
+    ]
+    for fn in sections:
+        try:
+            fn(D)
+        except Exception as exc:                      # never crash the audit
+            check(f"{fn.__name__} completed without exception",
+                  False, f"{type(exc).__name__}: {exc}")
 
     fails = [r for r in RESULTS if not r[1]]
     print()

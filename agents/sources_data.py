@@ -176,7 +176,7 @@ CONDITIONS: List[Dict[str, Any]] = [
         "used_in": [
             "agents/datasets.py — night-light -> sky-brightness model",
             "PROJECTS.MORS — PRJ-002 Light-Pollution & Sky-Brightness Model",
-            "problems P-002 / P-004 — calibration and tile-coverage findings",
+            "problems module — calibration and tile-coverage findings",
         ],
         "evidence": ("The light-pollution module follows the LightViz pattern "
                      "(real imagery -> calibrated index -> human-readable "
